@@ -30,4 +30,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Admin::class);
     }
+    public function getAuthIdentifierName()
+{
+    return 'username';
+}
+
 }
