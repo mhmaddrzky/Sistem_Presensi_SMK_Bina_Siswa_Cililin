@@ -21,10 +21,10 @@
         <div class="flex-1 flex flex-col gap-3">
             {{-- Brand kiri atas --}}
             <div class="flex items-center gap-3">
-                {{-- Kalau punya logo, un-comment img ini --}}
-                {{-- <img src="{{ asset('images/logo-sekolah.png') }}"
-                     alt="Logo Sekolah"
-                     class="w-10 h-10 rounded-full bg-white/10 object-contain"> --}}
+                {{-- logo Sekolah --}}
+                <img src="{{ asset('images/logosekolah.png') }}"
+                     alt="logosekolah"
+                     class="w-10 h-10 rounded-full bg-white/10 object-contain"> 
 
                 <div class="leading-tight text-xs lg:text-sm">
                     <p class="uppercase tracking-[0.25em] text-[9px] lg:text-[10px]">
