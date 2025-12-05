@@ -1,9 +1,12 @@
 @extends('layouts.admin')
 
 @section('content')
-    <h1 style="color: #1f3a93;">Koreksi Kehadiran Manual (Validasi Akhir)</h1>
-    <p>Gunakan fitur ini untuk mengoreksi status **Alfa** siswa menjadi Sakit atau Izin.</p>
-    
+
+
+{{-- Judul --}}
+    <h1 class="text-2xl font-bold text-gray-800">Koreksi Kehadiran</h1>
+    <p class="text-gray-500 mb-6">Ubah status Alfa menjadi Sakit atau Izin.</p>
+   
     @if(session('success'))
         <p style="color: green;">✅ {{ session('success') }}</p>
     @endif
@@ -18,8 +21,8 @@
          <select name="jadwal_id" id="jadwal_id" required onchange="this.form.submit()" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd; width: 100%; max-width: 500px;">
     <option value="">-- Pilih Jadwal --</option>
     @foreach($jadwals as $jadwal)
-        <option 
-            value="{{ $jadwal->id }}" 
+        <option
+            value="{{ $jadwal->id }}"
             {{ request('jadwal_id') == $jadwal->id ? 'selected' : '' }}
         >
             {{-- 🛑 FIX FINAL: Hanya tampilkan Jurusan, Hari, Waktu, dan Ruang Lab --}}
@@ -29,10 +32,10 @@
 </select>
         </div>
     </form>
-    
+   
     @if (isset($jadwalTerpilih))
     <h2 style="margin-top: 30px;">Daftar Peserta Sesi: {{ $jadwalTerpilih->hari }}</h2>
-    
+   
     <form action="{{ route('admin.koreksi.store') }}" method="POST">
         @csrf
         <input type="hidden" name="jadwal_id" value="{{ $jadwalTerpilih->id }}">
@@ -48,15 +51,15 @@
                 </tr>
             </thead>
         <tbody>
-                
+               
                 @forelse ($rekapKoreksi as $i => $koreksi)
                     <tr>
                         {{-- 1. Kolom NIS --}}
-                        <td style="padding: 8px;">{{ $koreksi['siswa_id'] }}</td> 
-                        
+                        <td style="padding: 8px;">{{ $koreksi['siswa_id'] }}</td>
+                       
                         {{-- 2. Kolom Nama Siswa --}}
                         <td style="padding: 8px;">{{ $koreksi['nama'] }}</td>
-                        
+                       
                         {{-- 3. Kolom Kelas --}}
                         <td style="padding: 8px;">{{ $koreksi['kelas'] }}</td>
 
@@ -64,11 +67,11 @@
                         <td style="padding: 8px; font-weight: bold; color: {{ ($koreksi['status_otomatis'] == 'Hadir') ? 'green' : 'red' }};">
                             {{ $koreksi['status_otomatis'] }}
                         </td>
-                        
+                       
                         {{-- 5. Kolom Dropdown Koreksi --}}
                         <td style="padding: 8px;">
                             <input type="hidden" name="koreksi[{{ $i }}][siswa_id]" value="{{ $koreksi['siswa_id'] }}">
-                            
+                           
                             <select name="koreksi[{{ $i }}][status]" style="padding: 5px;" required>
                                 {{-- Pilih yang sesuai dengan status awal, atau default ke Alfa --}}
                                 <option value="Hadir" {{ $koreksi['status_otomatis'] == 'Hadir' ? 'selected' : '' }}>Hadir (Otomatis/Koreksi)</option>
@@ -87,7 +90,7 @@
                 @endforelse
             </tbody>
         </table>
-        
+       
         <button type="submit" style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white;">Simpan Koreksi Final</button>
     </form>
 
