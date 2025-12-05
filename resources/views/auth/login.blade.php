@@ -19,11 +19,11 @@
              class="w-[70px] mx-auto mb-2">
 
         {{-- JUDUL --}}
-        <h2 class="text-[19px] font-bold mb-1">Login Sistem Presensi</h2>
+        <h2 class="text-[19px] font-bold mb-1">SMK BINA SISWA 2 CILILIN</h2>
 
         {{-- SUB JUDUL --}}
         <p class="text-[12px] text-gray-500 mb-4">
-            SMK Bina Siswa 2 Cililin
+            Login Sistem Presensi
         </p>
 
         {{-- NOTIFIKASI --}}
