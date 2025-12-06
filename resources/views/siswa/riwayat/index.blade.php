@@ -1,41 +1,83 @@
 @extends('layouts.siswa')
 
 @section('content')
-    <h1 style="color: #1f3a93;">Catatan Riwayat Presensi Saya</h1>
-    <p>Daftar lengkap kehadiran Anda di laboratorium.</p>
+    {{-- ================= HEADER HALAMAN ================= --}}
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Presensi Siswa Praktikum</h1>
+        <p class="text-gray-600 text-sm">Lakukan Absen ketika sesi dimulai</p>
+    </div>
 
-    <table border="1" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
-        <thead>
-            <tr style="background-color: #f2f2f2;">
-                <th style="padding: 10px;">Tanggal Presensi</th>
-                <th style="padding: 10px;">Waktu Presensi</th>
-                <th style="padding: 10px;">Mata Pelajaran</th>
-                <th style="padding: 10px;">Sesi</th>
-                <th style="padding: 10px;">Status Akhir</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($riwayats as $riwayat)
-                @php
-                    $statusColor = 'black';
-                    if ($riwayat->status == 'Hadir') $statusColor = 'green';
-                    if ($riwayat->status == 'Sakit' || $riwayat->status == 'Izin') $statusColor = '#ffc107'; // Kuning
-                    if ($riwayat->status == 'Alfa') $statusColor = 'red';
-                @endphp
-                <tr>
-                    <td style="padding: 8px;">{{ $riwayat->tanggal }}</td>
-                    <td style="padding: 8px;">{{ $riwayat->waktu }}</td>
-                    <td style="padding: 8px;">{{ $riwayat->jadwal->mata_pelajaran ?? 'Jadwal Dihapus' }}</td>
-                    <td style="padding: 8px;">{{ $riwayat->jadwal->waktu_mulai ?? 'N/A' }} - {{ $riwayat->jadwal->waktu_selesai ?? 'N/A' }}</td>
-                    <td style="padding: 8px; font-weight: bold; color: {{ $statusColor }};">
-                        {{ $riwayat->status }}
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 15px;">Anda belum memiliki riwayat presensi.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    {{-- ================= CARD CONTAINER ================= --}}
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        
+        {{-- Responsive Table Wrapper --}}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                {{-- Table Head --}}
+                <thead class="bg-gray-100 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Tanggal Presensi</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Waktu Presensi</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Mata Pelajaran</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Sesi</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status Akhir</th>
+                    </tr>
+                </thead>
+                
+                {{-- Table Body --}}
+                <tbody class="divide-y divide-gray-200">
+                    @forelse($riwayats as $riwayat)
+                        @php
+                            // Tentukan warna status berdasarkan kondisi
+                            $statusColor = 'text-gray-800';
+                            $statusBg = 'bg-gray-100';
+                            
+                            if ($riwayat->status == 'Hadir') {
+                                $statusColor = 'text-green-700';
+                                $statusBg = 'bg-green-100';
+                            } elseif ($riwayat->status == 'Sakit' || $riwayat->status == 'Izin') {
+                                $statusColor = 'text-yellow-700';
+                                $statusBg = 'bg-yellow-100';
+                            } elseif ($riwayat->status == 'Alfa') {
+                                $statusColor = 'text-red-700';
+                                $statusBg = 'bg-red-100';
+                            }
+                        @endphp
+                        
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 text-sm text-gray-800">
+                                {{ \Carbon\Carbon::parse($riwayat->tanggal)->format('d/m/Y') }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-800">
+                                {{ $riwayat->waktu }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-800 font-medium">
+                                {{ $riwayat->jadwal->mata_pelajaran ?? 'Jadwal Dihapus' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ isset($riwayat->jadwal->waktu_mulai) ? substr($riwayat->jadwal->waktu_mulai, 0, 5) : 'N/A' }} - 
+                                {{ isset($riwayat->jadwal->waktu_selesai) ? substr($riwayat->jadwal->waktu_selesai, 0, 5) : 'N/A' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                <span class="{{ $statusBg }} {{ $statusColor }} px-3 py-1 rounded-full font-semibold text-xs">
+                                    {{ $riwayat->status }}
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-16 h-16 text-gray-300 mb-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <p class="text-gray-500 font-medium">Anda belum memiliki riwayat presensi.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection
