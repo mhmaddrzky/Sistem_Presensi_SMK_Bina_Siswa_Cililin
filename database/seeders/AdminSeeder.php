@@ -9,22 +9,23 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
 {
-    public function run(): void
+   public function run()
     {
-        // 1. Buat User sebagai Admin
-        $userAdmin = User::create([
-            'username' => 'adminlab', // Username untuk login
-            'password' => Hash::make('password123'), // Password default: password123
-            'role' => 'Admin', // Peran utama
+        // 1. BUAT AKUN LOGIN (USERS)
+        $adminUser = User::create([
+            'username' => 'Superadmin', // Username Paten
+            // Password di-hash untuk keamanan
+            'password' => Hash::make('20279922'), // Password Paten
+            'role' => 'Admin', 
         ]);
 
-        // 2. Buat data Admin yang terhubung ke User di atas
+        // 2. BUAT DETAIL ADMIN (ADMINS)
         Admin::create([
-            'user_id' => $userAdmin->id,
-            'id_admin' => 'A001', // ID Admin unik
-            'nama' => 'Kepala Laboratorium',
+            'user_id' => $adminUser->id,
+            'nama' => 'SMKS Bina Siswa 2', // Nama Paten
+            'id_admin' => '22997202', // ID Admin Paten
         ]);
         
-        $this->command->info('Akun Admin telah berhasil dibuat (Username: adminlab, Password: password123).');
+        $this->command->info('Akun Super Admin Paten berhasil diinisialisasi.');
     }
 }
