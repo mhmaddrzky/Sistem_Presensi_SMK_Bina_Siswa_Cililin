@@ -1,152 +1,345 @@
 @extends('layouts.admin')
 
 @section('content')
-    <h1 style="color: #1f3a93;">Manajemen Pembagian Sesi Siswa (Kuota)</h1>
-    <p>Pilih Jadwal dan tentukan siswa mana yang masuk ke sesi tersebut (Maks. 20 siswa per sesi).</p>
-    
-    {{-- Notifikasi Sukses/Gagal --}}
+
+<div class="max-w-6xl mx-auto space-y-6">
+
+    {{-- Header --}}
+    <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-3">
+            📚 Manajemen Pembagian Sesi Siswa (Kuota)
+        </h1>
+        <p class="text-gray-500 text-sm md:text-base mt-1">
+            Pilih jadwal dan tentukan siswa mana yang masuk ke sesi tersebut (maks. 20 siswa).
+        </p>
+    </div>
+
+    {{-- Notifikasi --}}
     @if(session('success'))
-        <div style="background: #d4edda; color: green; padding: 10px; border-radius: 5px; margin-bottom: 20px;">✅ {{ session('success') }}</div>
+        <div class="p-3 rounded-lg bg-green-100 text-green-800 border border-green-300">
+            ✅ {{ session('success') }}
+        </div>
     @endif
+
     @if(session('error'))
-        <div style="background: #f8d7da; color: red; padding: 10px; border-radius: 5px; margin-bottom: 20px;">❌ {{ session('error') }}</div>
+        <div class="p-3 rounded-lg bg-red-100 text-red-800 border border-red-300">
+            ❌ {{ session('error') }}
+        </div>
     @endif
 
-    {{-- 🛑 FIX 1: FORM FILTER JURUSAN SISWA 🛑 --}}
-    {{-- Form ini hanya untuk memfilter daftar siswa, diarahkan ke route index --}}
-    <form action="{{ route('admin.sesi.index') }}" method="GET" style="margin-bottom: 20px;">
-        <div style="border: 1px solid #ccc; padding: 15px; background: #f2f2f2;">
-            <label for="jurusan_filter" style="font-weight: bold;">Filter Daftar Siswa berdasarkan Jurusan:</label>
-            <select name="jurusan_filter" id="jurusan_filter" onchange="this.form.submit()" style="padding: 8px;">
-                <option value="all" {{ $jurusanFilter == 'all' ? 'selected' : '' }}>Semua Siswa</option>
-                <option value="TKJ" {{ $jurusanFilter == 'TKJ' ? 'selected' : '' }}>TKJ</option>
-                <option value="TBSM" {{ $jurusanFilter == 'TBSM' ? 'selected' : '' }}>TBSM</option>
-            </select>
-            @if ($jurusanFilter !== 'all')
-                <small style="margin-left: 20px; color: #1f3a93;">Hanya menampilkan siswa Jurusan: **{{ $jurusanFilter }}**</small>
-            @endif
-        </div>
-    </form>
-    
-    {{-- Form Utama untuk Menyimpan Pembagian Sesi --}}
-    <form action="{{ route('admin.sesi.store') }}" method="POST">
-        @csrf
+    {{-- Filter Jurusan --}}
+    @php
+        $labelJurusan = 'Semua Siswa';
+        if ($jurusanFilter === 'TKJ')  $labelJurusan = 'TKJ';
+        if ($jurusanFilter === 'TBSM') $labelJurusan = 'TBSM';
+    @endphp
 
-        {{-- 🛑 FIX 2: DROPDOWN JADWAL DENGAN DETAIL LENGKAP 🛑 --}}
-        <div style="margin-bottom: 20px;">
-            <label for="jadwal_id" style="font-weight: bold;">1. Pilih Jadwal/Sesi:</label>
-            <select name="jadwal_id" id="jadwal_id" required style="padding: 8px;">
-                <option value="">-- Pilih Jadwal --</option>
-                @foreach ($jadwals as $jadwal)
-                    <option value="{{ $jadwal->id }}">
-                        [{{ $jadwal->jurusan }}] {{ $jadwal->hari }}, {{ substr($jadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->waktu_selesai, 0, 5) }} | {{ $jadwal->mata_pelajaran }} ({{ $jadwal->ruang_lab }}, Kuota: {{ $jadwal->kapasitas }})
-                    </option>
-                @endforeach
-            </select>
-            <button type="button" onclick="loadSessionData()" style="padding: 8px 15px;">Muat Siswa Sesi</button>
-        </div>
+    <div class="bg-white shadow-md border rounded-xl px-5 py-4">
+        <form action="{{ route('admin.sesi.index') }}" method="GET"
+              class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 
-        <h3 style="margin-top: 30px;">2. Tentukan Peserta Sesi:</h3>
-        
-        {{-- Tabel Siswa --}}
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background-color: #f2f2f2;">
-                    <th style="padding: 10px;">Pilih</th>
-                    <th style="padding: 10px;">NIS</th>
-                    <th style="padding: 10px;">Nama</th>
-                    <th style="padding: 10px;">Kelas</th>
-                    <th style="padding: 10px;">Jurusan</th> {{-- 🛑 FIX 3: Kolom Jurusan Siswa --}}
-                    <th style="padding: 10px;">Status Sesi Saat Ini</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($siswas as $siswa)
-                    <tr>
-                        <td style="text-align: center; padding: 8px;">
-                            <input type="checkbox" name="siswa_ids[]" value="{{ $siswa->id }}" data-siswa-id="{{ $siswa->id }}">
-                        </td>
-                        <td style="padding: 8px;">{{ $siswa->nis }}</td>
-                        <td style="padding: 8px;">{{ $siswa->nama }}</td>
-                        <td style="padding: 8px;">{{ $siswa->kelas }}</td>
-                        
-                        {{-- 🛑 FIX 4: Tampilkan Jurusan Siswa --}}
-                        <td style="padding: 8px; font-weight: bold;">{{ $siswa->jurusan }}</td>
-                        
-                        <td style="padding: 8px;" id="status-{{ $siswa->id }}">
-                            Belum Dimuat
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" style="text-align: center;">Tidak ada siswa yang ditemukan. (Mungkin karena filter jurusan yang dipilih)</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-            
-        <button type="submit" style="padding: 10px 20px; margin-top: 20px; background: #28a745; color: white;">Simpan Pembagian Sesi</button>
-    </form>
-    
-    {{-- SCRIPT JAVASCRIPT UNTUK MEMUAT DATA MAPPING --}}
-    <script>
-        // Data mapping dari Controller (Grouping by jadwal_id)
-        const mappingData = @json($mappingSesi); 
-        const allJadwals = @json($jadwals->keyBy('id')); // Ambil semua jadwal, di-key oleh ID
+            <div>
+                <p class="font-semibold text-gray-700">Filter Jurusan</p>
+                <p class="text-xs text-gray-500 mt-1">
+                    Pilih jurusan untuk mempermudah pemilihan siswa.
+                </p>
+            </div>
 
-        function loadSessionData() {
-            const selectedJadwalId = document.getElementById('jadwal_id').value;
-            
-            // 1. Reset semua status dan checkbox
-            document.querySelectorAll('[id^="status-"]').forEach(el => {
-                el.textContent = 'Tidak Terdaftar';
-                el.style.color = '#6c757d';
-            });
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = false;
-            });
-            
-            if (!selectedJadwalId) return;
+            <div class="flex items-center gap-3">
+                {{-- DROPDOWN CUSTOM FILTER JURUSAN --}}
+                <div class="relative w-full md:w-56" id="jurusanFilterWrapper">
+                    <input type="hidden" name="jurusan_filter" id="jurusan_filter_input" value="{{ $jurusanFilter }}">
 
-            // 2. Loop melalui SEMUA Siswa untuk cek status mapping
-            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                const siswaId = checkbox.dataset.siswaId;
-                
-                // Cari apakah siswa ini terdaftar di sesi LAIN
-                for (const jadwalId in mappingData) {
-                    // Cari record mapping di jadwal manapun
-                    const found = mappingData[jadwalId].find(map => map.siswa_id == siswaId);
-                    
-                    if (found) {
-                        // Jika sudah ditemukan mapping, tandai statusnya
-                        const statusElement = document.getElementById('status-' + siswaId);
-                        
-                        // Jika terdaftar di jadwal yang SEDANG DIPILIH
-                        if (jadwalId == selectedJadwalId) {
-                            checkbox.checked = true;
-                            statusElement.textContent = 'Terpilih untuk Sesi Ini';
-                            statusElement.style.color = 'blue';
-                            return; // Lanjut ke siswa berikutnya
-                        } 
-                        
-                        // Jika terdaftar di jadwal LAIN
-                        if (statusElement) {
-                             const mappedJadwal = allJadwals[jadwalId];
-                             
-                             // 🛑 FIX TAMPILAN STATUS JADWAL LAIN: Lebih Detail
-                             statusElement.textContent = 'Terdaftar: [' + mappedJadwal.jurusan + '] ' + mappedJadwal.mata_pelajaran + ' (' + mappedJadwal.hari + ' ' + mappedJadwal.waktu_mulai.substring(0, 5) + ')';
-                             statusElement.style.color = 'orange';
-                             return; // Lanjut ke siswa berikutnya
+                    <button type="button"
+                        onclick="toggleJurusanFilter()"
+                        class="w-full flex items-center justify-between gap-2 px-3 py-2.5 border rounded-lg bg-gray-50 hover:bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <span id="jurusan_filter_label" class="truncate text-gray-700">
+                            {{ $labelJurusan }}
+                        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </button>
+
+                    <div id="jurusan_filter_list"
+                        class="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden hidden z-30 text-sm">
+                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50"
+                            data-value="all" data-label="Semua Siswa"
+                            onclick="pickJurusanFilter(this)">
+                            Semua Siswa
+                        </button>
+                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50"
+                            data-value="TKJ" data-label="TKJ"
+                            onclick="pickJurusanFilter(this)">
+                            TKJ
+                        </button>
+                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50"
+                            data-value="TBSM" data-label="TBSM"
+                            onclick="pickJurusanFilter(this)">
+                            TBSM
+                        </button>
+                    </div>
+                </div>
+
+                @if ($jurusanFilter !== 'all')
+                    <span class="hidden md:inline text-blue-700 text-sm font-medium">
+                        Menampilkan: {{ $jurusanFilter }}
+                    </span>
+                @endif
+            </div>
+        </form>
+    </div>
+
+    <form action="{{ route('admin.sesi.store') }}" method="POST" class="space-y-6">
+    @csrf
+
+        {{-- Card Jadwal --}}
+        <div class="bg-white shadow-md border rounded-xl px-5 py-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                    <p class="font-semibold text-gray-700">1. Pilih Jadwal/Sesi</p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Pilih jadwal praktikum yang akan diisi oleh siswa.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-3 mt-4">
+
+                {{-- DROPDOWN CUSTOM JADWAL --}}
+                <div class="relative w-full md:flex-1" id="jadwalDropdownSesi">
+                    {{-- input asli untuk dikirim ke backend --}}
+                    <input type="hidden" name="jadwal_id" id="jadwal_id" value="{{ old('jadwal_id') }}">
+
+                    @php
+                        $selectedJadwalLabel = '-- Pilih Jadwal --';
+                        $selectedJadwalId = old('jadwal_id');
+                        if ($selectedJadwalId) {
+                            foreach ($jadwals as $j) {
+                                if ($j->id == $selectedJadwalId) {
+                                    $selectedJadwalLabel =
+                                        '['.$j->jurusan.'] '.$j->hari.', '.
+                                        substr($j->waktu_mulai,0,5).' - '.substr($j->waktu_selesai,0,5).
+                                        ' | '.$j->mata_pelajaran.' ('.$j->ruang_lab.')';
+                                    break;
+                                }
+                            }
                         }
+                    @endphp
+
+                    {{-- tombol utama (seperti select) --}}
+                    <button type="button"
+                        onclick="toggleJadwalListSesi()"
+                        class="p-3 border rounded-lg w-full bg-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
+                        <span id="jadwal_selected_label_sesi" class="text-gray-700 truncate">
+                            {{ $selectedJadwalLabel }}
+                        </span>
+
+                        {{-- icon panah --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0"
+                             viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                  clip-rule="evenodd" />
+                        </svg>
+                    </button>
+
+                    {{-- list jadwal --}}
+                    <div id="jadwal_list_sesi"
+                        class="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto hidden z-30 text-sm">
+                        @foreach ($jadwals as $jadwal)
+                            @php
+                                $label = '['.$jadwal->jurusan.'] '.$jadwal->hari.', '.
+                                         substr($jadwal->waktu_mulai,0,5).' - '.substr($jadwal->waktu_selesai,0,5).
+                                         ' | '.$jadwal->mata_pelajaran.' ('.$jadwal->ruang_lab.')';
+                            @endphp
+
+                            <button type="button"
+                                class="w-full text-left px-3 py-2 hover:bg-blue-50 {{ old('jadwal_id') == $jadwal->id ? 'bg-blue-50 font-semibold' : '' }}"
+                                data-id="{{ $jadwal->id }}"
+                                data-label="{{ $label }}"
+                                onclick="pickJadwalSesi(this)">
+                                {{ $label }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                <button type="button"
+                    onclick="loadSessionData()"
+                    class="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow text-sm md:text-base md:w-auto w-full">
+                    Muat Siswa
+                </button>
+            </div>
+        </div>
+
+        {{-- Tabel Siswa --}}
+        <div class="bg-white shadow-md border rounded-xl">
+            <div class="px-5 py-3 font-semibold text-gray-700 border-b">
+                2. Tentukan Peserta Sesi
+            </div>
+
+            {{-- SCROLL RESPONSIF --}}
+            <div class="overflow-x-auto w-full">
+                <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm">
+                    <thead class="bg-blue-600 text-white">
+                        <tr>
+                            <th class="p-3 text-center font-semibold w-16">Pilih</th>
+                            <th class="p-3 text-left font-semibold">NIS</th>
+                            <th class="p-3 text-left font-semibold">Nama</th>
+                            <th class="p-3 text-left font-semibold">Kelas</th>
+                            <th class="p-3 text-left font-semibold">Jurusan</th>
+                            <th class="p-3 text-left font-semibold">Status Sesi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y">
+                        @foreach ($siswas as $siswa)
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-3 text-center">
+                                <input type="checkbox"
+                                    name="siswa_ids[]"
+                                    value="{{ $siswa->id }}"
+                                    data-siswa-id="{{ $siswa->id }}"
+                                    class="w-4 h-4 md:w-5 md:h-5">
+                            </td>
+
+                            <td class="p-3 whitespace-nowrap">{{ $siswa->nis }}</td>
+                            <td class="p-3">{{ $siswa->nama }}</td>
+                            <td class="p-3 whitespace-nowrap">{{ $siswa->kelas }}</td>
+                            <td class="p-3 whitespace-nowrap">{{ $siswa->jurusan }}</td>
+
+                            <td class="p-3" id="status-{{ $siswa->id }}">
+                                <span class="text-gray-400">Belum dimuat</span>
+                            </td>
+                        </tr>
+                        @endforeach
+
+                        @if ($siswas->count() == 0)
+                        <tr>
+                            <td colspan="6" class="p-4 text-center text-gray-500">
+                                Tidak ada data.
+                            </td>
+                        </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Tombol Submit --}}
+        <div>
+            <button type="submit"
+                class="px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition text-sm md:text-base">
+                Simpan Pembagian Sesi
+            </button>
+        </div>
+
+    </form>
+</div>
+
+{{-- STYLE KECIL UNTUK DROPDOWN --}}
+<style>
+    #jadwal_list_sesi button,
+    #jurusan_filter_list button {
+        transition: background 0.15s;
+    }
+</style>
+
+{{-- SCRIPT --}}
+<script>
+    const mappingData = @json($mappingSesi);
+    const allJadwals = @json($jadwals->keyBy('id'));
+
+    // ===== DROPDOWN FILTER JURUSAN =====
+    function toggleJurusanFilter() {
+        const list = document.getElementById('jurusan_filter_list');
+        if (list) list.classList.toggle('hidden');
+    }
+
+    function pickJurusanFilter(btn) {
+        const value = btn.dataset.value;
+        const label = btn.dataset.label;
+
+        document.getElementById('jurusan_filter_input').value = value;
+        document.getElementById('jurusan_filter_label').textContent = label;
+
+        const list = document.getElementById('jurusan_filter_list');
+        if (list) list.classList.add('hidden');
+
+        // submit form filter
+        btn.closest('form').submit();
+    }
+
+    // ===== DROPDOWN CUSTOM JADWAL SESI =====
+    function toggleJadwalListSesi() {
+        const list = document.getElementById('jadwal_list_sesi');
+        if (list) list.classList.toggle('hidden');
+    }
+
+    function pickJadwalSesi(btn) {
+        const id = btn.dataset.id;
+        const label = btn.dataset.label;
+
+        document.getElementById('jadwal_id').value = id;
+        document.getElementById('jadwal_selected_label_sesi').textContent = label;
+
+        const list = document.getElementById('jadwal_list_sesi');
+        if (list) list.classList.add('hidden');
+    }
+
+    // klik di luar dropdown -> tutup dua-duanya
+    document.addEventListener('click', function(e) {
+        const jurusanWrapper = document.getElementById('jurusanFilterWrapper');
+        const jurusanList = document.getElementById('jurusan_filter_list');
+        if (jurusanWrapper && jurusanList && !jurusanWrapper.contains(e.target)) {
+            jurusanList.classList.add('hidden');
+        }
+
+        const jadwalWrapper = document.getElementById('jadwalDropdownSesi');
+        const jadwalList = document.getElementById('jadwal_list_sesi');
+        if (jadwalWrapper && jadwalList && !jadwalWrapper.contains(e.target)) {
+            jadwalList.classList.add('hidden');
+        }
+    });
+
+    // ===== LOGIKA MUAT SESI (sama seperti sebelumnya) =====
+    function loadSessionData() {
+        // reset status
+        document.querySelectorAll('[id^="status-"]').forEach(el => {
+            el.innerHTML = '<span class="text-gray-400">Tidak terdaftar</span>';
+        });
+
+        // uncheck semua
+        document.querySelectorAll('input[type="checkbox"]').forEach(ch => ch.checked = false);
+
+        const selectedJadwalId = document.getElementById('jadwal_id').value;
+        if (!selectedJadwalId) return;
+
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            const siswaId = checkbox.dataset.siswaId;
+
+            for (const jadwalId in mappingData) {
+                const found = mappingData[jadwalId].find(m => m.siswa_id == siswaId);
+
+                if (found) {
+                    const status = document.getElementById('status-' + siswaId);
+
+                    if (jadwalId == selectedJadwalId) {
+                        checkbox.checked = true;
+                        status.innerHTML =
+                            '<span class="text-blue-600 font-semibold">Sesi ini</span>';
+                    } else {
+                        const j = allJadwals[jadwalId];
+                        status.innerHTML =
+                            `<span class="text-orange-600 font-medium">Terdaftar di ${j.mata_pelajaran}</span>`;
                     }
                 }
-            });
-        }
-        
-        // Panggil fungsi saat dropdown jadwal berubah
-        document.getElementById('jadwal_id').addEventListener('change', loadSessionData);
-        
-        // Muat data saat halaman pertama dimuat
-        window.onload = loadSessionData;
-    </script>
+            }
+        });
+    }
+</script>
+
 @endsection

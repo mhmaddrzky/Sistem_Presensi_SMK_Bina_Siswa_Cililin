@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
             'username' => 'Superadmin', // Username Paten
             // Password di-hash untuk keamanan
             'password' => Hash::make('20279922'), // Password Paten
-            'role' => 'Admin', 
+            'role' => 'Admin',
         ]);
 
         // 2. BUAT DETAIL ADMIN (ADMINS)
@@ -25,7 +25,10 @@ class AdminSeeder extends Seeder
             'nama' => 'SMKS Bina Siswa 2', // Nama Paten
             'id_admin' => '22997202', // ID Admin Paten
         ]);
-        
+
         $this->command->info('Akun Super Admin Paten berhasil diinisialisasi.');
     }
 }
+
+
+
