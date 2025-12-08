@@ -32,11 +32,10 @@ class PresensiController extends Controller
         // Ambil ID Jadwal di mana Siswa ini terdaftar (Filter Sesi)
         $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
 
-        // Ambil SEMUA Jadwal yang terdaftar (tanpa filter Hari)
-        $jadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa) 
-                                ->orderByRaw("FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")
-                                ->orderBy('waktu_mulai')
-                                ->get();
+        // Ambil SEMUA Jadwal yang terdaftar, urutkan dari yang TERBARU dibuat (DESC)
+        $jadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)->get()
+                                ->sortByDesc('created_at')
+                                ->values();
         
         // Ambil presensi siswa hari ini
         $presensiSiswaHariIni = Presensi::where('siswa_id', $siswa->id)
@@ -132,6 +131,7 @@ class PresensiController extends Controller
 
     /**
      * ✅ METHOD YANG DIPERBAIKI: Menampilkan Halaman Presensi + Riwayat
+     * Sekarang passing KEDUA variabel: $jadwals dan $riwayats
      */
     public function showRiwayat()
     {
@@ -143,13 +143,12 @@ class PresensiController extends Controller
 
         $hariIni = Carbon::now()->locale('id')->dayName;
         
-        // ========== AMBIL DATA JADWAL (SAMA SEPERTI showPresensiForm) ==========
+        // ========== AMBIL DATA JADWAL, URUTKAN TERBARU DULUAN ==========
         $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
 
-        $jadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa) 
-                                ->orderByRaw("FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")
-                                ->orderBy('waktu_mulai')
-                                ->get();
+        $jadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)->get()
+                                ->sortByDesc('created_at')
+                                ->values();
         
         $presensiSiswaHariIni = Presensi::where('siswa_id', $siswa->id)
                                         ->whereDate('created_at', Carbon::today())
