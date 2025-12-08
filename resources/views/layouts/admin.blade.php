@@ -131,8 +131,8 @@
             @if (Auth::user()->role === 'Admin')
                 <a href="{{ route('admin.users.index') }}"
                    class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.users')
-                        ? 'border-white text-cyan-200'
-                        : 'border-transparent hover:border-white/70 text-cyan-200' }}">
+                        ? 'border-white'
+                    : 'border-transparent hover:border-white/70' }}">
                     Management Akun
                 </a>
             @endif

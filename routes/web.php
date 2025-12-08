@@ -9,6 +9,7 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\SesiSiswaController;
 use App\Http\Controllers\KoreksiPresensiController;
 use App\Http\Controllers\AdminUserController; // Wajib di-import
+use App\Http\Controllers\AdminDashboardController; // ⬅️ controller dashboard baru
 
 /*
 |--------------------------------------------------------------------------
@@ -44,10 +45,9 @@ Route::middleware(['auth'])->group(function () {
     // --- A. RUTE MANAJEMEN OPERASIONAL (ADMIN, GURU, ASLAB) ---
     Route::middleware('role:Admin,Guru,AsistenLab')->group(function () {
         
-        // 1. Dashboard Admin
-        Route::get('/admin/dashboard', function () {
-            return view('admin.dashboard'); 
-        })->name('admin.dashboard');
+        // 1. Dashboard Admin (sekarang pakai controller baru)
+        Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+            ->name('admin.dashboard');
         
         // 2. Persetujuan Registrasi Siswa (FULL ACCESS)
         Route::get('/admin/registrations', [RegistrationController::class, 'index'])->name('admin.registrations.index');
@@ -55,7 +55,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/registrations/{id}/reject', [RegistrationController::class, 'reject'])->name('admin.registrations.reject');
         
         // 3. Kelola Jadwal (FULL CRUD UNTUK SEMUA)
-        // 🛑 FIX UTAMA: Menggunakan names[] yang lengkap dan benar
         Route::resource('admin/jadwal', KelolaJadwalController::class)
             ->names([
                 'index' => 'admin.jadwal.index',
@@ -78,7 +77,6 @@ Route::middleware(['auth'])->group(function () {
     // 🛑 BLOK C: KHUSUS PEMBUATAN AKUN (ADMIN UTAMA SAJA) 🛑
     Route::middleware('role:Admin')->group(function () {
         // Manajemen Akun Staf (CRUD) - HANYA ADMIN UTAMA
-        // Route ini harus berada di grup 'role:Admin' yang lebih ketat
         Route::prefix('admin/users')->name('admin.users.')->group(function () {
             Route::get('/', [AdminUserController::class, 'index'])->name('index'); 
             Route::get('/create', [AdminUserController::class, 'create'])->name('create'); 
