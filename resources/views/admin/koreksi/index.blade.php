@@ -26,12 +26,11 @@
 {{-- Card Filter Jadwal --}}
 <div class="bg-white shadow-md rounded-xl border card-responsive mb-6">
     <form action="{{ route('admin.koreksi.index') }}" method="GET"
-      class="space-y-3 px-4 pt-4 pb-2" id="form_koreksi_jadwal">
+          class="space-y-3 px-4 pt-4 pb-2" id="form_koreksi_jadwal">
 
-    <label class="font-semibold text-gray-700 block mb-1">
-        Pilih Jadwal yang Akan Dikoreksi:
-    </label>
-
+        <label class="font-semibold text-gray-700 block mb-1">
+            Pilih Jadwal yang Akan Dikoreksi:
+        </label>
 
         {{-- DROPDOWN CUSTOM --}}
         <div class="relative" id="jadwalDropdown">
@@ -40,8 +39,8 @@
 
             {{-- tombol utama (seperti select) --}}
             <button type="button"
-                class="w-full p-3 rounded-lg border border-gray-300 bg-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                onclick="toggleJadwalList()">
+                    class="w-full p-3 rounded-lg border border-gray-300 bg-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onclick="toggleJadwalList()">
 
                 @php
                     $selectedLabel = '-- Pilih Jadwal --';
@@ -77,10 +76,10 @@
                     @endphp
 
                     <button type="button"
-                        class="w-full text-left px-3 py-2 hover:bg-blue-50 {{ request('jadwal_id') == $jadwal->id ? 'bg-blue-50 font-semibold' : '' }}"
-                        data-id="{{ $jadwal->id }}"
-                        data-label="{{ $label }}"
-                        onclick="pickJadwal(this)">
+                            class="w-full text-left px-3 py-2 hover:bg-blue-50 {{ request('jadwal_id') == $jadwal->id ? 'bg-blue-50 font-semibold' : '' }}"
+                            data-id="{{ $jadwal->id }}"
+                            data-label="{{ $label }}"
+                            onclick="pickJadwal(this)">
                         {{ $label }}
                     </button>
                 @endforeach
@@ -116,29 +115,74 @@
 
                 <tbody class="divide-y">
                     @forelse ($rekapKoreksi as $i => $koreksi)
+                        @php
+                            $currentStatus = $koreksi['status_otomatis'] ?? 'Alfa';
+                        @endphp
+
                         <tr class="hover:bg-gray-50">
                             <td class="p-3 whitespace-nowrap">{{ $koreksi['siswa_id'] }}</td>
                             <td class="p-3 whitespace-nowrap">{{ $koreksi['nama'] }}</td>
                             <td class="p-3 whitespace-nowrap">{{ $koreksi['kelas'] }}</td>
 
                             <td class="p-3 font-bold whitespace-nowrap">
-                                <span class="px-3 py-1 rounded-lg text-white
-                                    {{ $koreksi['status_otomatis'] == 'Hadir' ? 'bg-green-500' : 'bg-red-500' }}">
-                                    {{ $koreksi['status_otomatis'] }}
-                                </span>
-                            </td>
+    <span id="label_otomatis_{{ $i }}"
+          class="px-3 py-1 rounded-lg text-white
+          {{ $currentStatus == 'Hadir' ? 'bg-green-500' : '' }}
+          {{ $currentStatus == 'Izin' ? 'bg-yellow-500' : '' }}
+          {{ $currentStatus == 'Sakit' ? 'bg-blue-500' : '' }}
+          {{ $currentStatus == 'Alfa' ? 'bg-red-500' : '' }}">
+        {{ $currentStatus }}
+    </span>
+</td>
 
+
+                            {{-- Koreksi Menjadi: H I S A --}}
                             <td class="p-3 whitespace-nowrap">
+                                {{-- id siswa --}}
                                 <input type="hidden" name="koreksi[{{ $i }}][siswa_id]" value="{{ $koreksi['siswa_id'] }}">
 
-                                <div class="select-wrapper">
-                                    <select name="koreksi[{{ $i }}][status]"
-                                        class="p-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full">
-                                        <option value="Hadir" {{ $koreksi['status_otomatis'] == 'Hadir' ? 'selected' : '' }}>Hadir</option>
-                                        <option value="Alfa" {{ $koreksi['status_otomatis'] == 'Alfa' ? 'selected' : '' }}>Alfa</option>
-                                        <option value="Sakit">Sakit</option>
-                                        <option value="Izin">Izin</option>
-                                    </select>
+                                {{-- nilai status yang akan dikirim --}}
+                                <input type="hidden"
+                                       name="koreksi[{{ $i }}][status]"
+                                       id="status_input_{{ $i }}"
+                                       value="{{ $currentStatus }}">
+
+                                <div class="flex items-center gap-2">
+                                    {{-- H --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Hadir' ? 'status-h' : '' }}"
+                                        data-row="{{ $i }}"
+                                        data-status="Hadir"
+                                        onclick="pickKoreksi({{ $i }}, 'Hadir')">
+                                        H
+                                    </button>
+
+                                    {{-- I --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Izin' ? 'status-i' : '' }}"
+                                        data-row="{{ $i }}"
+                                        data-status="Izin"
+                                        onclick="pickKoreksi({{ $i }}, 'Izin')">
+                                        I
+                                    </button>
+
+                                    {{-- S --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Sakit' ? 'status-s' : '' }}"
+                                        data-row="{{ $i }}"
+                                        data-status="Sakit"
+                                        onclick="pickKoreksi({{ $i }}, 'Sakit')">
+                                        S
+                                    </button>
+
+                                    {{-- A --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Alfa' ? 'status-a' : '' }}"
+                                        data-row="{{ $i }}"
+                                        data-status="Alfa"
+                                        onclick="pickKoreksi({{ $i }}, 'Alfa')">
+                                        A
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -155,7 +199,7 @@
 
         {{-- Submit --}}
         <button type="submit"
-            class="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition w-full sm:w-auto">
+                class="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition w-full sm:w-auto">
             Simpan Koreksi Final
         </button>
     </form>
@@ -164,7 +208,34 @@
     <p class="text-gray-500">Silakan pilih jadwal yang akan dikoreksi dari dropdown di atas.</p>
 @endif
 
-{{-- SCRIPT DROPDOWN --}}
+{{-- STYLE KECIL UNTUK BULATAN STATUS --}}
+<style>
+    .status-dot {
+        width: 2rem;          /* w-8 */
+        height: 2rem;         /* h-8 */
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e5e7eb;  /* abu-abu netral */
+        font-size: 0.75rem;   /* text-xs */
+        font-weight: 600;
+        color: #374151;       /* text-slate-700 */
+        cursor: pointer;
+        transition: 0.15s;
+    }
+    .status-dot:hover {
+        transform: scale(1.05);
+    }
+
+    /* warna hanya untuk status terpilih */
+    .status-h { background-color: #22c55e; color: #fff; } /* Hadir hijau */
+    .status-i { background-color: #fbbf24; color: #fff; } /* Izin kuning */
+    .status-s { background-color: #3b82f6; color: #fff; } /* Sakit biru */
+    .status-a { background-color: #ef4444; color: #fff; } /* Alfa merah */
+</style>
+
+{{-- SCRIPT DROPDOWN + STATUS --}}
 <script>
     function toggleJadwalList() {
         const list = document.getElementById('jadwal_list');
@@ -189,10 +260,34 @@
         const dropdown = document.getElementById('jadwalDropdown');
         const list = document.getElementById('jadwal_list');
 
-        if (!dropdown.contains(e.target)) {
+        if (dropdown && list && !dropdown.contains(e.target)) {
             list.classList.add('hidden');
         }
     });
+
+    // ===== LOGIKA PILIH STATUS H / I / S / A =====
+    function pickKoreksi(row, status) {
+        // set value hidden input
+        const input = document.getElementById('status_input_' + row);
+        if (input) {
+            input.value = status;
+        }
+
+        // reset semua bulatan di baris ini
+        const btns = document.querySelectorAll('.status-dot[data-row="' + row + '"]');
+        btns.forEach(btn => {
+            btn.classList.remove('status-h', 'status-i', 'status-s', 'status-a');
+        });
+
+        // aktifkan bulatan yang dipilih
+        const active = document.querySelector('.status-dot[data-row="' + row + '"][data-status="' + status + '"]');
+        if (!active) return;
+
+        if (status === 'Hadir') active.classList.add('status-h');
+        else if (status === 'Izin') active.classList.add('status-i');
+        else if (status === 'Sakit') active.classList.add('status-s');
+        else if (status === 'Alfa') active.classList.add('status-a');
+    }
 </script>
 
 @endsection
