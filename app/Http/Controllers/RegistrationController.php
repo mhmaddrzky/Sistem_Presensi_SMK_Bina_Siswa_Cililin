@@ -15,11 +15,11 @@ class RegistrationController extends Controller
     // -------------------------------------------------    --------------------
     // FUNGSI SISWA: PROSES PENDAFTARAN
     // ---------------------------------------------------------------------
-    
+
     public function showRegistrationForm()
     {
         // View (Tahap 3)
-        return view('auth.register'); 
+        return view('auth.register');
     }
 
    // app/Http/Controllers/RegistrationController.php
@@ -37,7 +37,7 @@ public function register(Request $request)
             'string',
             'max:20',
             'unique:siswas',
-            'same:nis_confirmation' 
+            'same:nis_confirmation'
         ],
         'nis_confirmation' => 'required',
         'nama' => 'required|string|max:100',
@@ -48,7 +48,7 @@ public function register(Request $request)
     try {
         DB::beginTransaction();
 
-        $defaultPassword = $request->nis; 
+        $defaultPassword = $request->nis;
 
         // 2. Buat entitas Siswa (Logika Bersih)
         $siswa = Siswa::create([
@@ -82,19 +82,21 @@ public function register(Request $request)
     // ---------------------------------------------------------------------
 
     public function index()
-    {
-        // Ambil semua permintaan yang statusnya 'Pending'
-        $registrations = Registrasi::with('siswa')->where('status', 'Pending')->get();
-        
-        // View (Tahap 3)
-        return view('admin.registrations.index', compact('registrations'));
-    }
+{
+    $registrations = Registrasi::with('siswa')
+        ->where('status', 'Pending')
+        ->orderByDesc('id_reg')   // data paling baru muncul di atas
+        ->get();
+
+    return view('admin.registrations.index', compact('registrations'));
+}
+
 // app/Http/Controllers/RegistrationController.php
 
 public function approve(Request $request, $id)
 {
     // Ambil permintaan registrasi beserta data siswanya (eager load)
-    $registration = Registrasi::with('siswa')->find($id); 
+    $registration = Registrasi::with('siswa')->find($id);
 
     // Pengecekan dasar
     if (!$registration) {
@@ -103,7 +105,7 @@ public function approve(Request $request, $id)
     if ($registration->status !== 'Pending') {
         return back()->with('error', 'Registrasi sudah diproses sebelumnya.');
     }
-    
+
     // Pengecekan Wajib: Pastikan Admin yang menyetujui sudah login dan punya entitas Admin.
     if (!auth()->check() || !auth()->user()->admin) {
         // Logika ini penting jika sesi Admin tiba-tiba putus atau akunnya tidak lengkap
@@ -112,14 +114,14 @@ public function approve(Request $request, $id)
 
     try {
         DB::beginTransaction();
-        
+
         // 1. Buat User (akun login) menggunakan data yang disimpan di registrasi
         $user = User::create([
             'username' => $registration->username_request, // ERROR ADA DI SINI!
-            'password' => $registration->password_request, 
+            'password' => $registration->password_request,
             'role' => 'Siswa',
         ]);
-        
+
         // 2. Update Siswa dengan user_id yang baru
         $siswa = $registration->siswa;
         $siswa->user_id = $user->id;
@@ -133,15 +135,15 @@ public function approve(Request $request, $id)
         ]);
 
         DB::commit();
-        
+
         // Redirect sukses (kembali ke halaman yang sama)
         return back()->with('success', 'Registrasi Siswa berhasil disetujui. Akun login telah dibuat.');
 
-    } catch (\Exception $e) { 
+    } catch (\Exception $e) {
         DB::rollBack();
         // TAMPILKAN ERROR DETAIL UNTUK DEBUGGING!
         // Error ini mungkin terjadi jika username sudah ada (unique constraint)
-        return back()->with('error', 'Persetujuan gagal karena error database: ' . $e->getMessage()); 
+        return back()->with('error', 'Persetujuan gagal karena error database: ' . $e->getMessage());
     }
 }
 
@@ -155,10 +157,10 @@ public function approve(Request $request, $id)
 
         DB::transaction(function () use ($registration) {
             // 1. Hapus catatan Siswa (karena tidak disetujui)
-            $registration->siswa->delete(); 
-            
+            $registration->siswa->delete();
+
             // 2. Hapus permintaan Registrasi
-            $registration->delete(); 
+            $registration->delete();
         });
 
         return back()->with('success', 'Registrasi Siswa berhasil ditolak dan data dihapus.');

@@ -103,7 +103,7 @@
         {{-- Table Responsif --}}
         <div class="overflow-x-auto bg-white shadow-md rounded-xl border">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-600 text-white">
+                <thead class="bg-[#0D47C9] text-white">
                     <tr>
                         <th class="p-3 text-left font-semibold">NIS</th>
                         <th class="p-3 text-left font-semibold">Nama</th>
@@ -199,7 +199,7 @@
 
         {{-- Submit --}}
         <button type="submit"
-                class="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition w-full sm:w-auto">
+                class="px-6 py-3 bg-[#0D47C9] text-white rounded-lg shadow hover:bg-[#0D47C9] text-white transition w-full sm:w-auto">
             Simpan Koreksi Final
         </button>
     </form>

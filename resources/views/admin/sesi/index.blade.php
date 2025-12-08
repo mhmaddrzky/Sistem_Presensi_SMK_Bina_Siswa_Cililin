@@ -169,7 +169,7 @@
 
                 <button type="button"
                     onclick="loadSessionData()"
-                    class="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow text-sm md:text-base md:w-auto w-full">
+                    class="px-5 py-3 bg-[#0D47C9] text-white rounded-lg hover:bg-blue-700 shadow text-sm md:text-base md:w-auto w-full">
                     Muat Siswa
                 </button>
             </div>
@@ -184,7 +184,7 @@
             {{-- SCROLL RESPONSIF --}}
             <div class="overflow-x-auto w-full">
                 <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm">
-                    <thead class="bg-blue-600 text-white">
+                    <thead class="bg-[#0D47C9] text-white">
                         <tr>
                             <th class="p-3 text-center font-semibold w-16">Pilih</th>
                             <th class="p-3 text-left font-semibold">NIS</th>

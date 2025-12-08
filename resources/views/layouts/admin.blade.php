@@ -16,29 +16,29 @@
 {{-- HEADER / NAVBAR --}}
 <header class="bg-[#0B57D0] text-white shadow-md">
 
-    {{-- BARIS 1: LOGO + TITLE + PROFILE + HAMBURGER --}}
+    {{-- BARIS 1: LOGO + TITLE + PROFIL (DESKTOP) + HAMBURGER (MOBILE) --}}
     <div class="max-w-6xl mx-auto px-6 lg:px-10 py-3 flex items-center justify-between">
 
         {{-- KIRI: LOGO + JUDUL --}}
         <div class="flex items-center gap-3">
             <img src="{{ asset('images/logosekolah.png') }}"
-                 class="w-14 h-14 rounded-full object-contain shadow-sm">
+                 class="w-12 h-12 md:w-14 md:h-14 rounded-full object-contain shadow-sm">
 
             <div class="leading-tight">
-                <p class="uppercase tracking-[0.25em] text-[9px]">
+                <p class="uppercase tracking-[0.25em] text-[8px] md:text-[9px]">
                     Sistem Presensi Laboratorium
                 </p>
-                <p class="font-semibold text-xl">
+                <p class="font-semibold text-lg md:text-xl">
                     SMK BINA SISWA 2 CILILIN
                 </p>
             </div>
         </div>
 
-        {{-- KANAN: PROFIL + HAMBURGER --}}
+        {{-- KANAN: PROFIL (DESKTOP) + HAMBURGER (MOBILE) --}}
         <div class="flex items-center gap-4">
 
-            {{-- PROFIL (DESKTOP & MOBILE) --}}
-            <div class="relative">
+            {{-- PROFIL: HANYA DI DESKTOP / TABLET BESAR --}}
+            <div class="relative hidden md:block">
                 <button id="profile-toggle"
                         class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center
                                hover:bg-white/30 transition">
@@ -50,7 +50,7 @@
                     </svg>
                 </button>
 
-                {{-- DROPDOWN PROFIL (LOGOUT DI SINI) --}}
+                {{-- DROPDOWN PROFIL (LOGOUT DI SINI UNTUK DESKTOP) --}}
                 <div id="profile-menu"
                      class="hidden absolute right-0 mt-3 w-44 rounded-lg bg-white text-slate-800 shadow-lg py-2 text-sm z-20">
 
@@ -65,17 +65,16 @@
                             Logout
                         </button>
                     </form>
-                    
                 </div>
             </div>
 
-            {{-- HAMBURGER (KHUSUS MOBILE) --}}
+            {{-- HAMBURGER: HANYA DI MOBILE --}}
             <button id="nav-toggle"
                     class="md:hidden p-2 rounded border border-white/60">
                 <div class="space-y-1">
-                    <span class="block w-4 h-0.5 bg-white"></span>
-                    <span class="block w-4 h-0.5 bg-white"></span>
-                    <span class="block w-4 h-0.5 bg-white"></span>
+                    <span class="block w-5 h-0.5 bg-white"></span>
+                    <span class="block w-5 h-0.5 bg-white"></span>
+                    <span class="block w-5 h-0.5 bg-white"></span>
                 </div>
             </button>
         </div>
@@ -132,27 +131,87 @@
                 <a href="{{ route('admin.users.index') }}"
                    class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.users')
                         ? 'border-white'
-                    : 'border-transparent hover:border-white/70' }}">
+                        : 'border-transparent hover:border-white/70' }}">
                     Management Akun
                 </a>
             @endif
         </nav>
     </div>
 
-    {{-- NAV MOBILE (TANPA LOGOUT) --}}
-    <div id="mobile-menu" class="md:hidden hidden border-t border-white/20 bg-[#0B57D0]">
-        <nav class="px-6 py-3 flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.25em]">
-            <a href="{{ route('admin.dashboard') }}" class="py-1">Home</a>
-            <a href="{{ route('admin.jadwal.index') }}" class="py-1">Jadwal</a>
-            <a href="{{ route('admin.registrations.index') }}" class="py-1">Approval</a>
-            <a href="{{ route('admin.sesi.index') }}" class="py-1">Sesi</a>
-            <a href="{{ route('admin.koreksi.index') }}" class="py-1">Absensi</a>
-            <a href="{{ route('admin.laporan.index') }}" class="py-1">Rekap Absen</a>
-            @if (Auth::user()->role === 'Admin')
-                <a href="{{ route('admin.users.index') }}" class="py-1">Management Akun</a>
-            @endif
-        </nav>
-    </div>
+    {{-- NAV MOBILE (LINK + LOGOUT) --}}
+<div id="mobile-menu" class="md:hidden hidden bg-[#0B57D0] border-t border-white/20">
+    <nav class="max-w-6xl mx-auto px-4 py-4 space-y-1 text-[11px] font-semibold uppercase tracking-[0.20em]">
+
+        <a href="{{ route('admin.dashboard') }}"
+           class="flex items-center justify-between rounded-lg px-3 py-2
+                  {{ $routeName === 'admin.dashboard'
+                        ? 'bg-white/15'
+                        : 'hover:bg-white/10' }}">
+            <span>Home</span>
+        </a>
+
+        <a href="{{ route('admin.jadwal.index') }}"
+           class="flex items-center justify-between rounded-lg px-3 py-2
+                  {{ str_starts_with($routeName, 'admin.jadwal')
+                        ? 'bg-white/15'
+                        : 'hover:bg-white/10' }}">
+            <span>Jadwal</span>
+        </a>
+
+        <a href="{{ route('admin.registrations.index') }}"
+           class="flex items-center justify-between rounded-lg px-3 py-2
+                  {{ str_starts_with($routeName, 'admin.registrations')
+                        ? 'bg-white/15'
+                        : 'hover:bg-white/10' }}">
+            <span>Approval</span>
+        </a>
+
+        <a href="{{ route('admin.sesi.index') }}"
+           class="flex items-center justify-between rounded-lg px-3 py-2
+                  {{ str_starts_with($routeName, 'admin.sesi')
+                        ? 'bg-white/15'
+                        : 'hover:bg-white/10' }}">
+            <span>Sesi</span>
+        </a>
+
+        <a href="{{ route('admin.koreksi.index') }}"
+           class="flex items-center justify-between rounded-lg px-3 py-2
+                  {{ str_starts_with($routeName, 'admin.koreksi')
+                        ? 'bg-white/15'
+                        : 'hover:bg-white/10' }}">
+            <span>Absensi</span>
+        </a>
+
+        <a href="{{ route('admin.laporan.index') }}"
+           class="flex items-center justify-between rounded-lg px-3 py-2
+                  {{ str_starts_with($routeName, 'admin.laporan')
+                        ? 'bg-white/15'
+                        : 'hover:bg-white/10' }}">
+            <span>Rekap Absen</span>
+        </a>
+
+        @if (Auth::user()->role === 'Admin')
+            <a href="{{ route('admin.users.index') }}"
+               class="flex items-center justify-between rounded-lg px-3 py-2
+                      {{ str_starts_with($routeName, 'admin.users')
+                            ? 'bg-white/15'
+                            : 'hover:bg-white/10' }}">
+                <span>Management Akun</span>
+            </a>
+        @endif
+
+        {{-- LOGOUT DI MOBILE --}}
+        <form action="{{ route('logout') }}" method="POST" class="pt-3 mt-2 border-t border-white/25">
+            @csrf
+            <button type="submit"
+                    class="w-full text-left rounded-lg px-3 py-2 text-[11px]
+                           text-red-100 hover:bg-red-500/70 hover:text-white">
+                Logout
+            </button>
+        </form>
+    </nav>
+</div>
+
 </header>
 
 {{-- MAIN CONTENT --}}
@@ -172,6 +231,7 @@
         const navBtn  = document.getElementById('nav-toggle');
         const navMenu = document.getElementById('mobile-menu');
 
+        // Dropdown profil (desktop)
         if (profBtn && profMenu) {
             profBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -183,6 +243,7 @@
             });
         }
 
+        // Toggle menu mobile
         if (navBtn && navMenu) {
             navBtn.addEventListener('click', () => {
                 navMenu.classList.toggle('hidden');
