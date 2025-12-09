@@ -86,7 +86,7 @@
                 <li class="flex items-start gap-2">
                     <span class="text-blue-600 font-bold">•</span>
                     <a href="{{ route('siswa.presensi.form') }}" class="text-blue-600 hover:underline text-sm">
-                        Jadwal 
+                        Daftar Jadwal 
                     </a>
                 </li>
                 <li class="flex items-start gap-2">

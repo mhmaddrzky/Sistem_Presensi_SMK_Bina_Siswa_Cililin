@@ -26,11 +26,36 @@
     $isHadir = $jadwal->is_hadir;
     $statusWaktu = $jadwal->waktu_status;
     $isPenuh = $jadwal->is_penuh;
+    $statusPresensi = $jadwal->status_presensi ?? null;
 
-    // Badge color
-    $badgeColor = 'bg-green-600';
-    if ($statusWaktu == 'Belum Dimulai') $badgeColor = 'bg-yellow-500';
-    if ($isPenuh) $badgeColor = 'bg-red-600';
+    // Badge color berdasarkan status presensi dari guru atau status waktu
+    if ($statusPresensi) {
+        // Jika ada status dari guru, tampilkan itu
+        if ($statusPresensi == 'Hadir') {
+            $badgeColor = 'bg-green-600';
+            $badgeText = 'Hadir';
+        } elseif ($statusPresensi == 'Sakit') {
+            $badgeColor = 'bg-yellow-500';
+            $badgeText = 'Sakit';
+        } elseif ($statusPresensi == 'Izin') {
+            $badgeColor = 'bg-yellow-500';
+            $badgeText = 'Izin';
+        } elseif ($statusPresensi == 'Alfa') {
+            $badgeColor = 'bg-red-600';
+            $badgeText = 'Alfa';
+        }
+    } else {
+        // Jika belum ada status dari guru, tampilkan status waktu
+        $badgeColor = 'bg-green-600';
+        $badgeText = $statusWaktu;
+        
+        if ($statusWaktu == 'Belum Dimulai') {
+            $badgeColor = 'bg-yellow-500';
+        } elseif ($isPenuh) {
+            $badgeColor = 'bg-red-600';
+            $badgeText = 'Kuota Penuh';
+        }
+    }
 @endphp
 
 {{-- ================= CARD ================= --}}
@@ -45,31 +70,42 @@
 
         {{-- BADGE STATUS --}}
         <span class="{{ $badgeColor }} text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm flex-shrink-0">
-            {{ $isHadir ? 'Sudah Hadir' : ($isPenuh ? 'Kuota Penuh' : $statusWaktu) }}
+            {{ $badgeText }}
         </span>
     </div>
 
-    {{-- BODY --}}
-    <div class="p-5 space-y-2 text-sm text-gray-700">
-        <div class="flex items-center gap-3 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-            </svg>
-            <span>{{ $jadwal->ruang_lab }}</span>
-        </div>
-        <div class="flex items-center gap-3 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
-            </svg>
-        <span>{{ $jadwal->hari }}, {{ \Carbon\Carbon::parse($jadwal->tanggal_mulai)->format('d/m/Y') }}</span>
-        </div>
-        <div class="flex items-center gap-3 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-            </svg>
-        <span>{{ substr($jadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->waktu_selesai, 0, 5) }}</span>
-        </div>
+ {{-- BODY --}}
+<div class="p-5 space-y-2 text-sm text-gray-700">
+
+    {{-- ICON GEDUNG / LAB --}}
+    <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-black-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
+        </svg>
+        <span>{{ $jadwal->ruang_lab }}</span>
     </div>
+
+    {{-- ICON KALENDER --}}
+    <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-black-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span>{{ $jadwal->hari }}, {{ \Carbon\Carbon::parse($jadwal->tanggal_mulai)->format('d/m/Y') }}</span>
+    </div>
+
+    {{-- ICON JAM --}}
+    <div class="flex items-center gap-3">
+        <svg class="w-5 h-5 text-black-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>{{ substr($jadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->waktu_selesai, 0, 5) }}</span>
+    </div>
+</div>
+
 
 </div>
 @endforeach
