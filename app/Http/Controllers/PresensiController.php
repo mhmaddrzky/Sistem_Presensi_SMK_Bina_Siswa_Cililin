@@ -122,7 +122,8 @@ class PresensiController extends Controller
                 'status' => 'Hadir', 
             ]);
 
-            return redirect()->route('siswa.dashboard')->with('success', 'Presensi berhasil dicatat!');
+            // Redirect kembali ke halaman presensi agar card bisa hilang otomatis
+            return back()->with('success', '✅ Presensi berhasil dicatat untuk ' . $jadwal->mata_pelajaran . '!');
 
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mencatat presensi: ' . $e->getMessage());
@@ -185,10 +186,9 @@ class PresensiController extends Controller
             return $jadwal;
         });
         
-        // ========== AMBIL DATA RIWAYAT ==========
+        // ========== AMBIL DATA RIWAYAT, URUTKAN DARI TERBARU (ATAS) ==========
         $riwayats = Presensi::where('siswa_id', $siswa->id)
-                            ->orderBy('tanggal', 'desc')
-                            ->orderBy('waktu', 'desc')
+                            ->orderBy('created_at', 'desc')
                             ->with('jadwal')
                             ->get();
 
