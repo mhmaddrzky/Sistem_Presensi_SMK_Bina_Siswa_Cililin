@@ -39,9 +39,36 @@
                     <h2 class="text-sm font-semibold text-slate-700">
                         List Pending Registrasi
                     </h2>
-                    <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                        Total: {{ $registrations->count() }} siswa
-                    </span>
+
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                            Total: {{ $registrations->count() }} siswa
+                        </span>
+
+                        {{-- FORM SETUJUI SEMUA --}}
+                        @php
+                            $canApproveAny = $registrations->count() > 0;
+                        @endphp
+
+                        <form id="approve-all-form"
+                              method="POST"
+                              action="{{ route('admin.registrations.approveAll') }}">
+                            @csrf
+
+                            <button
+                                type="button"
+                                class="btn-confirm inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold
+                                       bg-emerald-600 text-white shadow-sm
+                                       hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1
+                                       transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-form-id="approve-all-form"
+                                data-type="approve"
+                                data-nama="semua registrasi"
+                                @if(! $canApproveAny) disabled aria-disabled="true" @endif>
+                                Setujui Semua
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 {{-- WRAPPER UNTUK SCROLL DI HP --}}

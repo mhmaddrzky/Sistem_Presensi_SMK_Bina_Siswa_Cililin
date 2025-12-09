@@ -50,10 +50,22 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.dashboard');
         
         // 2. Persetujuan Registrasi Siswa (FULL ACCESS)
-        Route::get('/admin/registrations', [RegistrationController::class, 'index'])->name('admin.registrations.index');
-        Route::post('/admin/registrations/{id}/approve', [RegistrationController::class, 'approve'])->name('admin.registrations.approve');
-        Route::post('/admin/registrations/{id}/reject', [RegistrationController::class, 'reject'])->name('admin.registrations.reject');
-        
+        // - Setujui Semua (approveAll)
+        // Daftar registrasi (halaman index yang menampilkan pending)
+        Route::get('/admin/registrations', [RegistrationController::class, 'index'])
+        ->name('admin.registrations.index');
+
+        Route::post('/admin/registrations/approve-all', [RegistrationController::class, 'approveAll'])
+            ->name('admin.registrations.approveAll');
+
+        // - Approve single
+        Route::post('/admin/registrations/{id}/approve', [RegistrationController::class, 'approve'])
+            ->name('admin.registrations.approve');
+
+        // - Reject single
+        Route::post('/admin/registrations/{id}/reject', [RegistrationController::class, 'reject'])
+            ->name('admin.registrations.reject');
+
         // 3. Kelola Jadwal (FULL CRUD UNTUK SEMUA)
         Route::resource('admin/jadwal', KelolaJadwalController::class)
             ->names([
