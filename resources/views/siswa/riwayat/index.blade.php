@@ -2,16 +2,16 @@
 
 @section('content')
 
-{{-- ================= ALERT SUCCESS (STIMIK STYLE) ================= --}}
+{{-- ================= ALERT SUCCESS ================= --}}
 @if(session('success'))
-<div id="successAlert" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-white border-l-4 border-green-500 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 max-w-md w-11/12 md:w-auto">
+<div id="successAlert" class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] bg-white border-l-4 border-green-500 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 max-w-md w-11/12 md:w-auto opacity-100 transition-all duration-300">
     <div class="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
         <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
         </svg>
     </div>
     <span class="text-gray-800 text-sm font-medium">{{ session('success') }}</span>
-    <button onclick="document.getElementById('successAlert').remove()" class="ml-auto text-gray-400 hover:text-gray-600">
+    <button onclick="document.getElementById('successAlert').remove()" class="ml-auto text-gray-400 hover:text-gray-600 transition-colors">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
         </svg>
@@ -19,16 +19,16 @@
 </div>
 @endif
 
-{{-- ================= ALERT ERROR (STIMIK STYLE) ================= --}}
+{{-- ================= ALERT ERROR ================= --}}
 @if(session('error'))
-<div id="errorAlert" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] bg-white border-l-4 border-red-500 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 max-w-md w-11/12 md:w-auto">
+<div id="errorAlert" class="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] bg-white border-l-4 border-red-500 px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 max-w-md w-11/12 md:w-auto opacity-100 transition-all duration-300">
     <div class="flex-shrink-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
         <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
         </svg>
     </div>
     <span class="text-gray-800 text-sm font-medium">{{ session('error') }}</span>
-    <button onclick="document.getElementById('errorAlert').remove()" class="ml-auto text-gray-400 hover:text-gray-600">
+    <button onclick="document.getElementById('errorAlert').remove()" class="ml-auto text-gray-400 hover:text-gray-600 transition-colors">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
         </svg>
@@ -42,26 +42,49 @@
     <p class="text-gray-600 text-sm">Lakukan Absen ketika sesi dimulai</p>
 </div>
 
-{{-- ================= JIKA TIDAK ADA JADWAL ================= --}}
+{{-- ================= JIKA TIDAK ADA JADWAL (ADMIN BELUM BUAT) ================= --}}
 @if ($jadwalsAktif->isEmpty())
-<div class="bg-yellow-50 border border-yellow-300 text-yellow-800 p-6 rounded-xl shadow-sm mb-8">
-    <p class="font-semibold">
-        Tidak ada jadwal aktif hari ini ({{ now()->translatedFormat('l, d F Y') }}).
-    </p>
-</div>
-@elseif ($jadwalsAktif->where('is_hadir', false)->isEmpty())
-<div class="bg-blue-50 border-2 border-blue-400 text-blue-800 p-6 rounded-xl shadow-md mb-8 flex items-center gap-4">
-    <svg class="w-12 h-12 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-    </svg>
-    <div>
-        <p class="font-bold text-lg mb-1"> Semua Presensi Sudah Lengkap!</p>
-        <p class="text-sm">Anda sudah melakukan presensi untuk semua jadwal hari ini. Terima kasih!</p>
+<div class="bg-white border border-gray-200 rounded-xl shadow-sm p-8 mb-8">
+    <div class="flex flex-col items-center justify-center text-center">
+        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Belum Ada Jadwal Tersedia</h3>
+        <p class="text-gray-600 text-sm max-w-md">
+            Jadwal presensi untuk hari ini belum dibuat. Silakan hubungi admin atau cek kembali nanti.
+        </p>
     </div>
 </div>
+
+{{-- ================= JIKA SEMUA SUDAH PRESENSI ================= --}}
+@elseif ($jadwalsAktif->where('is_hadir', false)->isEmpty())
+<div class="bg-white border-2 border-blue-200 rounded-xl shadow-sm p-6 mb-8">
+    <div class="flex items-center gap-4">
+        <div class="flex-shrink-0">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+        </div>
+        <div class="flex-1">
+            <h3 class="text-lg font-semibold text-gray-800 mb-1">Presensi Hari Ini Sudah Lengkap</h3>
+            <p class="text-gray-600 text-sm">
+                Anda sudah melakukan presensi untuk semua jadwal pada {{ now()->translatedFormat('l, d F Y') }}
+            </p>
+        </div>
+        <div class="flex-shrink-0">
+            <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Selesai</span>
+        </div>
+    </div>
+</div>
+
+{{-- ================= JIKA ADA YANG BELUM PRESENSI ================= --}}
 @else
 
-{{-- ================= SECTION 1: CARDS PRESENSI (VERTIKAL) ================= --}}
+{{-- ================= CARDS PRESENSI ================= --}}
 <div class="space-y-4 mb-10" id="presensiCards">
 
 @foreach ($jadwalsAktif as $jadwal)
@@ -87,7 +110,7 @@
 @endphp
 
 {{-- ================= CARD PRESENSI ================= --}}
-<div class="bg-[#f8f9fa] rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 presensi-card" data-jadwal-id="{{ $jadwal->id }}">
+<div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 presensi-card" data-jadwal-id="{{ $jadwal->id }}">
     
     <div class="p-6">
         {{-- HEADER: Judul & Badge --}}
@@ -112,16 +135,15 @@
 
         {{-- Lokasi Lab --}}
         <div class="flex items-center gap-3 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-black-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
+            <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
             </svg>
             <span>{{ $jadwal->ruang_lab }} (Kapasitas: {{ $jadwal->kapasitas }} siswa)</span>
         </div>
 
         {{-- Hari --}}
         <div class="flex items-center gap-3 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-black-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <rect x="3" y="4" width="18" height="18" rx="2"/>
                 <line x1="16" y1="2" x2="16" y2="6"/>
                 <line x1="8" y1="2" x2="8" y2="6"/>
@@ -132,7 +154,7 @@
 
         {{-- Jam --}}
         <div class="flex items-center gap-3 text-sm text-gray-700">
-            <svg class="w-5 h-5 text-black-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
             </svg>
@@ -149,11 +171,7 @@
 
             <button type="submit"
                 @if($buttonDisabled) disabled @endif
-                class="w-full md:w-auto px-8 py-3 rounded-xl text-sm font-semibold shadow-sm
-                transition-all duration-200
-                {{ $buttonDisabled 
-                    ? 'bg-gray-400 cursor-not-allowed text-white' 
-                    : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md' }}">
+                class="w-full md:w-auto px-8 py-3 rounded-xl text-sm font-semibold shadow-sm transition-all duration-200 {{ $buttonDisabled ? 'bg-gray-400 cursor-not-allowed text-white' : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md' }}">
                 {{ $buttonText }}
             </button>
 
@@ -251,22 +269,20 @@
 {{-- ================= JAVASCRIPT ================= --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto hide alert setelah 1.5 detik (lebih cepat)
+    // Auto hide alert setelah 2.5 detik
     const successAlert = document.getElementById('successAlert');
     const errorAlert = document.getElementById('errorAlert');
     
     if (successAlert) {
         setTimeout(() => {
-            successAlert.style.opacity = '0';
-            successAlert.style.transform = 'translate(-50%, -20px)';
+            successAlert.classList.add('opacity-0', '-translate-y-4');
             setTimeout(() => successAlert.remove(), 300);
         }, 2500); 
     }
     
     if (errorAlert) {
         setTimeout(() => {
-            errorAlert.style.opacity = '0';
-            errorAlert.style.transform = 'translate(-50%, -20px)';
+            errorAlert.classList.add('opacity-0', '-translate-y-4');
             setTimeout(() => errorAlert.remove(), 300);
         }, 2500); 
     }
@@ -278,25 +294,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const card = document.querySelector(`.presensi-card[data-jadwal-id="${jadwalId}"]`);
             
             if (card) {
-                card.style.opacity = '0';
-                card.style.transform = 'translateX(-20px)';
+                card.classList.add('opacity-0', '-translate-x-4');
                 setTimeout(() => {
-                    card.style.display = 'none';
+                    card.classList.add('hidden');
                 }, 300);
             }
         });
     });
 });
 </script>
-
-<style>
-#successAlert, #errorAlert {
-    transition: all 0.3s ease-in-out;
-}
-
-.presensi-card {
-    transition: all 0.3s ease-in-out;
-}
-</style>
 
 @endsection

@@ -81,23 +81,127 @@
                 <h2 class="text-xl font-bold text-gray-800">AKTIVITAS SAYA</h2>
             </div>
 
-            {{-- List aktivitas dengan link --}}
-            <ul class="space-y-3">
-                <li class="flex items-start gap-2">
-                    <span class="text-blue-600 font-bold">•</span>
-                    <a href="{{ route('siswa.presensi.form') }}" class="text-blue-600 hover:underline text-sm">
-                        Daftar Jadwal 
-                    </a>
-                </li>
-                <li class="flex items-start gap-2">
-                    <span class="text-blue-600 font-bold">•</span>
-                    <a href="{{ route('siswa.riwayat.index') }}" class="text-blue-600 hover:underline text-sm">
-                        Kehadiran
-                    </a>
-                </li>
-            </ul>
+            {{-- List aktivitas dengan collapsible sections --}}
+            <div class="space-y-4">
+                
+                {{-- MATERI HARI INI --}}
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleSection('materiSection')" class="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+                            </svg>
+                            <span class="font-semibold text-gray-800 text-sm">Materi Hari Ini</span>
+                        </div>
+                        <svg id="materiArrow" class="w-5 h-5 text-gray-500 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                    
+                    <div id="materiSection" class="hidden border-t border-gray-200">
+                        @if(!$jadwalTerdekat)
+                            <div class="p-4 text-center">
+                                <p class="text-gray-500 text-sm">Tidak ada jadwal untuk hari ini</p>
+                            </div>
+                        @else
+                            <a href="{{ route('siswa.presensi.form') }}" class="block p-4 hover:bg-blue-50 transition-colors">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-800 text-base mb-1">{{ $jadwalTerdekat->mata_pelajaran }}</p>
+                                        <p class="text-sm text-gray-600 mb-2">{{ $jadwalTerdekat->nama_guru }}</p>
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <polyline points="12 6 12 12 16 14"/>
+                                            </svg>
+                                            <span class="text-sm text-gray-600">{{ substr($jadwalTerdekat->waktu_mulai, 0, 5) }} - {{ substr($jadwalTerdekat->waktu_selesai, 0, 5) }}</span>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- KEHADIRAN --}}
+                <div class="border border-gray-200 rounded-lg">
+                    <button onclick="toggleSection('kehadiranSection')" class="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                            </svg>
+                            <span class="font-semibold text-gray-800 text-sm">Kehadiran</span>
+                        </div>
+                        <svg id="kehadiranArrow" class="w-5 h-5 text-gray-500 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                    
+                    <div id="kehadiranSection" class="hidden border-t border-gray-200">
+                        @if(!$presensiTerbaru)
+                            <div class="p-4 text-center">
+                                <p class="text-gray-500 text-sm">Belum ada riwayat presensi</p>
+                            </div>
+                        @else
+                            @php
+                                $statusColor = 'text-gray-700';
+                                $statusBg = 'bg-gray-100';
+                                
+                                if ($presensiTerbaru->status == 'Hadir') {
+                                    $statusColor = 'text-green-700';
+                                    $statusBg = 'bg-green-100';
+                                } elseif ($presensiTerbaru->status == 'Sakit' || $presensiTerbaru->status == 'Izin') {
+                                    $statusColor = 'text-yellow-700';
+                                    $statusBg = 'bg-yellow-100';
+                                } elseif ($presensiTerbaru->status == 'Alfa') {
+                                    $statusColor = 'text-red-700';
+                                    $statusBg = 'bg-red-100';
+                                }
+                            @endphp
+                            <a href="{{ route('siswa.riwayat.index') }}" class="block p-4 hover:bg-blue-50 transition-colors">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-800 text-base mb-1">
+                                            {{ $presensiTerbaru->jadwal->mata_pelajaran ?? 'Jadwal Dihapus' }}
+                                        </p>
+                                        <p class="text-sm text-gray-600 mb-2">
+                                            {{ \Carbon\Carbon::parse($presensiTerbaru->tanggal)->format('d/m/Y') }} • {{ substr($presensiTerbaru->waktu, 0, 5) }}
+                                        </p>
+                                        <span class="{{ $statusBg }} {{ $statusColor }} text-xs font-semibold px-2 py-1 rounded-full inline-block">
+                                            {{ $presensiTerbaru->status }}
+                                        </span>
+                                    </div>
+                                    <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+
+            </div>
         </div>
 
     </div>
+
+    {{-- JavaScript untuk Toggle Sections --}}
+    <script>
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        const arrow = document.getElementById(sectionId.replace('Section', 'Arrow'));
+        
+        if (section.classList.contains('hidden')) {
+            section.classList.remove('hidden');
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            section.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+    </script>
 
 @endsection

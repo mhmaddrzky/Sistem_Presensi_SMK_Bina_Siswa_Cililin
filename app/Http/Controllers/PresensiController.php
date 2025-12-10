@@ -15,7 +15,36 @@ class PresensiController extends Controller
     /** Menampilkan Dashboard Siswa */
     public function showSiswaDashboard()
     {
-        return view('siswa.dashboard');
+        $siswa = Auth::user()->siswa;
+        
+        if (!$siswa) {
+            return redirect('/')->with('error', 'Data Siswa tidak ditemukan.');
+        }
+
+        $hariIni = Carbon::now()->locale('id')->dayName;
+        $now = Carbon::now();
+        
+        // Ambil jadwal siswa untuk hari ini
+        $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
+        
+        // Ambil 1 jadwal terdekat (yang akan datang atau sedang berlangsung)
+        $jadwalTerdekat = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)
+                                      ->where('hari', $hariIni)
+                                      ->get()
+                                      ->sortBy('waktu_mulai')
+                                      ->filter(function ($jadwal) use ($now) {
+                                          $waktuSelesai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_selesai);
+                                          return $now->lessThan($waktuSelesai);
+                                      })
+                                      ->first();
+        
+        // Ambil 1 presensi terbaru
+        $presensiTerbaru = Presensi::where('siswa_id', $siswa->id)
+                                    ->orderBy('created_at', 'desc')
+                                    ->with('jadwal')
+                                    ->first();
+        
+        return view('siswa.dashboard', compact('jadwalTerdekat', 'presensiTerbaru'));
     }
 
     /** Menampilkan Jadwal yang tersedia untuk Presensi */
