@@ -120,4 +120,5 @@ Route::middleware(['auth'])->group(function () {
         // 3. Riwayat Presensi Siswa
         Route::get('/siswa/riwayat', [PresensiController::class, 'showRiwayat'])->name('siswa.riwayat.index');
     });
+
 });

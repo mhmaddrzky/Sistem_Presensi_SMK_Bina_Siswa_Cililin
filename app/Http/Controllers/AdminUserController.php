@@ -38,12 +38,12 @@ class AdminUserController extends Controller
         'nama' => 'required|string|max:100',
         'username' => 'required|string|unique:users|max:50',
         'password' => 'required|string|min:6',
-        'role' => ['required', \Illuminate\Validation\Rule::in(['Guru', 'AsistenLab', 'Kepsek'])], 
+        'role' => ['required', Rule::in(['Guru', 'AsistenLab', 'Kepsek'])], 
         'id_pengelola' => 'required|string|unique:admins,id_admin', 
     ]);
 
     // 2. Cek Admin
-    if (!\Illuminate\Support\Facades\Auth::check() || !\Illuminate\Support\Facades\Auth::user()->admin) {
+    if (!Auth::check() || !Auth::user()->admin) {
         return back()->with('error', 'Akun pengelola tidak terverifikasi.');
     }
 
@@ -51,15 +51,15 @@ class AdminUserController extends Controller
         DB::beginTransaction();
 
         // 3. Buat record di tabel users
-        $user = \App\Models\User::create([
+        $user = User::create([
             'username' => $request->username,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => Hash::make($request->password),
             'role' => $request->role,
             'name' => $request->nama, // Jika model User memiliki kolom 'name'
         ]);
 
         // 4. Buat record di tabel admins
-        \App\Models\Admin::create([
+            Admin::create([
             'user_id' => $user->id,
             'id_admin' => $request->id_pengelola, 
             'nama' => $request->nama,
@@ -67,7 +67,7 @@ class AdminUserController extends Controller
 
         DB::commit();
 
-        // 🛑 FIX UTAMA: Redirect ke halaman daftar (index) setelah berhasil.
+        // FIX UTAMA: Redirect ke halaman daftar (index) setelah berhasil.
         return redirect()->route('admin.users.index')->with('success', 'Akun ' . $request->role . ' baru berhasil dibuat.');
 
     } catch (\Exception $e) {

@@ -27,14 +27,25 @@
     @endif
 
     {{-- FORM FILTER --}}
-    @php
-        $labelJurusan = $jurusanFilter === 'all' ? 'Semua Jurusan' : $jurusanFilter;
-        $labelPeriode = [
-            'mingguan'    => 'Minggu Ini',
-            'bulanan'     => 'Bulan Ini',
-            'keseluruhan' => 'Keseluruhan',
-        ][$periode] ?? 'Minggu Ini';
-    @endphp
+@php
+    
+    $periode = $periode ?? 'mingguan'; // Fallback jika $periode datang dari Controller sebagai null
+    
+    // 2. Label untuk Jurusan (String)
+    $labelJurusan = $jurusanFilter ?? 'all'; // Fallback jika $jurusanFilter null
+    $labelJurusan = $labelJurusan === 'all' ? 'Semua Jurusan' : $labelJurusan;
+    
+    // 3. Array Mapping Periode (Array)
+    $periodeOptions = [
+        'mingguan'      => 'Minggu Ini',
+        'bulanan'       => 'Bulan Ini',
+        'keseluruhan'   => 'Keseluruhan',
+    ]; 
+    
+    // 4. Label untuk Periode Aktif (String tunggal)
+    // FIX UTAMA: Pastikan $periode adalah key yang valid
+    $labelPeriode = $periodeOptions[$periode] ?? 'Minggu Ini';
+@endphp
 
     <form action="{{ route('admin.laporan.index') }}" method="GET" id="form_laporan_filter">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 px-4 md:px-6 py-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -99,8 +110,8 @@
                             onclick="togglePeriodeFilter()"
                             class="w-full flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-800
                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <span id="periode_label" class="truncate">
-                            {{ $labelPeriode }}
+                       <span id="periode_label" class="truncate">
+                             {{ $labelPeriode }}
                         </span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"

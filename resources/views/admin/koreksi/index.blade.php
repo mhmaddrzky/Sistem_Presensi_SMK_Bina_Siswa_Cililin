@@ -103,104 +103,88 @@
         {{-- Table Responsif --}}
         <div class="overflow-x-auto bg-white shadow-md rounded-xl border">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-[#0D47C9] text-white">
-                    <tr>
-                        <th class="p-3 text-left font-semibold">NIS</th>
-                        <th class="p-3 text-left font-semibold">Nama</th>
-                        <th class="p-3 text-left font-semibold">Kelas</th>
-                        <th class="p-3 text-left font-semibold">Status Otomatis</th>
-                        <th class="p-3 text-left font-semibold">Koreksi Menjadi</th>
-                    </tr>
-                </thead>
+    <thead class="bg-[#0D47C9] text-white">
+        <tr>
+            {{-- HEADER: Ubah text-left menjadi text-center --}}
+            <th class="p-3 text-center font-semibold">NIS</th>
+            <th class="p-3 text-center font-semibold">Nama</th>
+            <th class="p-3 text-center font-semibold">Kelas</th>
+            <th class="p-3 text-center font-semibold">Status Otomatis</th>
+            <th class="p-3 text-center font-semibold">Koreksi Menjadi</th>
+        </tr>
+    </thead>
 
-                <tbody class="divide-y">
-                    @forelse ($rekapKoreksi as $i => $koreksi)
-                        @php
-                            $currentStatus = $koreksi['status_otomatis'] ?? 'Alfa';
-                        @endphp
+    <tbody class="divide-y">
+        @forelse ($rekapKoreksi as $i => $koreksi)
+            @php
+                $currentStatus = $koreksi['status_otomatis'] ?? 'Alfa';
+            @endphp
 
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 whitespace-nowrap">{{ $koreksi['siswa_id'] }}</td>
-                            <td class="p-3 whitespace-nowrap">{{ $koreksi['nama'] }}</td>
-                            <td class="p-3 whitespace-nowrap">{{ $koreksi['kelas'] }}</td>
+            <tr class="hover:bg-gray-50">
+                {{-- DATA: Tambahkan text-center --}}
+                <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['siswa_id'] }}</td>
+                <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['nama'] }}</td>
+                <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['kelas'] }}</td>
 
-                            <td class="p-3 font-bold whitespace-nowrap">
-    <span id="label_otomatis_{{ $i }}"
-          class="px-3 py-1 rounded-lg text-white
-          {{ $currentStatus == 'Hadir' ? 'bg-green-500' : '' }}
-          {{ $currentStatus == 'Izin' ? 'bg-yellow-500' : '' }}
-          {{ $currentStatus == 'Sakit' ? 'bg-blue-500' : '' }}
-          {{ $currentStatus == 'Alfa' ? 'bg-red-500' : '' }}">
-        {{ $currentStatus }}
-    </span>
-</td>
+                <td class="p-3 font-bold whitespace-nowrap text-center">
+                    <span id="label_otomatis_{{ $i }}"
+                          class="px-3 py-1 rounded-lg text-white
+                          {{ $currentStatus == 'Hadir' ? 'bg-green-500' : '' }}
+                          {{ $currentStatus == 'Izin' ? 'bg-yellow-500' : '' }}
+                          {{ $currentStatus == 'Sakit' ? 'bg-blue-500' : '' }}
+                          {{ $currentStatus == 'Alfa' ? 'bg-red-500' : '' }}">
+                        {{ $currentStatus }}
+                    </span>
+                </td>
 
+                {{-- Koreksi Menjadi: PENTING! Untuk Koreksi Menjadi, kita set text-center pada div di dalamnya agar tombolnya rata tengah --}}
+                <td class="p-3 whitespace-nowrap">
+                    {{-- Hidden Input tetap di sini --}}
+                    <input type="hidden" name="koreksi[{{ $i }}][siswa_id]" value="{{ $koreksi['siswa_id'] }}">
+                    <input type="hidden"
+                           name="koreksi[{{ $i }}][status]"
+                           id="status_input_{{ $i }}"
+                           value="{{ $currentStatus }}">
 
-                            {{-- Koreksi Menjadi: H I S A --}}
-                            <td class="p-3 whitespace-nowrap">
-                                {{-- id siswa --}}
-                                <input type="hidden" name="koreksi[{{ $i }}][siswa_id]" value="{{ $koreksi['siswa_id'] }}">
-
-                                {{-- nilai status yang akan dikirim --}}
-                                <input type="hidden"
-                                       name="koreksi[{{ $i }}][status]"
-                                       id="status_input_{{ $i }}"
-                                       value="{{ $currentStatus }}">
-
-                                <div class="flex items-center gap-2">
-                                    {{-- H --}}
-                                    <button type="button"
-                                        class="status-dot {{ $currentStatus == 'Hadir' ? 'status-h' : '' }}"
-                                        data-row="{{ $i }}"
-                                        data-status="Hadir"
-                                        onclick="pickKoreksi({{ $i }}, 'Hadir')">
-                                        H
-                                    </button>
-
-                                    {{-- I --}}
-                                    <button type="button"
-                                        class="status-dot {{ $currentStatus == 'Izin' ? 'status-i' : '' }}"
-                                        data-row="{{ $i }}"
-                                        data-status="Izin"
-                                        onclick="pickKoreksi({{ $i }}, 'Izin')">
-                                        I
-                                    </button>
-
-                                    {{-- S --}}
-                                    <button type="button"
-                                        class="status-dot {{ $currentStatus == 'Sakit' ? 'status-s' : '' }}"
-                                        data-row="{{ $i }}"
-                                        data-status="Sakit"
-                                        onclick="pickKoreksi({{ $i }}, 'Sakit')">
-                                        S
-                                    </button>
-
-                                    {{-- A --}}
-                                    <button type="button"
-                                        class="status-dot {{ $currentStatus == 'Alfa' ? 'status-a' : '' }}"
-                                        data-row="{{ $i }}"
-                                        data-status="Alfa"
-                                        onclick="pickKoreksi({{ $i }}, 'Alfa')">
-                                        A
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="p-5 text-center text-gray-500">
-                                Tidak ada data siswa untuk sesi ini.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    <div class="flex items-center gap-2 justify-center"> 
+                        {{-- H --}}
+                        <button type="button"
+                            class="status-dot {{ $currentStatus == 'Hadir' ? 'status-h' : '' }}"
+                            data-row="{{ $i }}" data-status="Hadir" onclick="pickKoreksi({{ $i }}, 'Hadir')"> H
+                        </button>
+                        {{-- I --}}
+                        <button type="button"
+                            class="status-dot {{ $currentStatus == 'Izin' ? 'status-i' : '' }}"
+                            data-row="{{ $i }}" data-status="Izin" onclick="pickKoreksi({{ $i }}, 'Izin')"> I
+                        </button>
+                        {{-- S --}}
+                        <button type="button"
+                            class="status-dot {{ $currentStatus == 'Sakit' ? 'status-s' : '' }}"
+                            data-row="{{ $i }}" data-status="Sakit" onclick="pickKoreksi({{ $i }}, 'Sakit')"> S
+                        </button>
+                        {{-- A --}}
+                        <button type="button"
+                            class="status-dot {{ $currentStatus == 'Alfa' ? 'status-a' : '' }}"
+                            data-row="{{ $i }}" data-status="Alfa" onclick="pickKoreksi({{ $i }}, 'Alfa')"> A
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5" class="p-5 text-center text-gray-500">
+                    Tidak ada data siswa untuk sesi ini.
+                </td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
         </div>
 
         {{-- Submit --}}
         <button type="submit"
                 class="px-6 py-3 bg-[#0D47C9] text-white rounded-lg shadow hover:bg-[#0D47C9] text-white transition w-full sm:w-auto">
-            Simpan Koreksi Final
+            Simpan Absen 
         </button>
     </form>
 
