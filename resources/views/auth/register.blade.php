@@ -41,35 +41,55 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
-            {{-- SET INPUT STYLE --}}
+            {{-- STYLE INPUT --}}
             @php
-            $inputClass = "w-full bg-gray-100 border border-gray-300 rounded-xl px-3 py-2.5 mb-2.5
-                           text-[12.5px] focus:outline-none focus:border-blue-600";
-        @endphp
-        
-        
+                $inputClass = "w-full bg-gray-100 border border-gray-300 rounded-xl px-3 py-2.5 mb-1.5
+                               text-[12.5px] focus:outline-none focus:border-blue-600";
+            @endphp
 
-            <input type="text" name="nama" placeholder="Nama Lengkap" class="{{ $inputClass }}" required>
+            {{-- NAMA --}}
+            <input type="text" name="nama" value="{{ old('nama') }}" placeholder="Nama Lengkap" class="{{ $inputClass }}" required>
+            @error('nama')
+                <p class="text-red-600 text-xs text-left mb-2 ml-1">{{ $message }}</p>
+            @enderror
 
-            <input type="text" name="username" placeholder="Username" class="{{ $inputClass }}" required>
+            {{-- USERNAME --}}
+            <input type="text" name="username" value="{{ old('username') }}" placeholder="Username" class="{{ $inputClass }}" required>
+            @error('username')
+                <p class="text-red-600 text-xs text-left mb-2 ml-1">{{ $message }}</p>
+            @enderror
 
-            <input type="text" name="nis" placeholder="NIS" class="{{ $inputClass }}" required>
+            {{-- NIS --}}
+            <input type="text" name="nis" value="{{ old('nis') }}" placeholder="NIS" class="{{ $inputClass }}" required>
+            @error('nis')
+                <p class="text-red-600 text-xs text-left mb-2 ml-1">{{ $message }}</p>
+            @enderror
 
+            {{-- KONFIRMASI NIS --}}
             <input type="text" name="nis_confirmation" placeholder="Konfirmasi NIS" class="{{ $inputClass }}" required>
+            @error('nis_confirmation')
+                <p class="text-red-600 text-xs text-left mb-2 ml-1">{{ $message }}</p>
+            @enderror
 
-            <input type="text" name="kelas" placeholder="Kelas" class="{{ $inputClass }}" required>
+            {{-- KELAS --}}
+            <input type="text" name="kelas" value="{{ old('kelas') }}" placeholder="Kelas" class="{{ $inputClass }}" required>
+            @error('kelas')
+                <p class="text-red-600 text-xs text-left mb-2 ml-1">{{ $message }}</p>
+            @enderror
 
+            {{-- JURUSAN --}}
             <select name="jurusan"
-    class="w-full bg-gray-100 border border-gray-300 rounded-xl px-3 py-2.5 mb-3
-           text-[12.5px] focus:outline-none focus:border-blue-600"
-    required>
-
+                class="w-full bg-gray-100 border border-gray-300 rounded-xl px-3 py-2.5 mb-1.5
+                       text-[12.5px] focus:outline-none focus:border-blue-600"
+                required>
                 <option value="">-- Pilih Jurusan --</option>
-                <option value="TKJ">TKJ</option>
-                <option value="TBSM">TBSM</option>
+                <option value="TKJ" {{ old('jurusan') == 'TKJ' ? 'selected' : '' }}>TKJ</option>
+                <option value="TBSM" {{ old('jurusan') == 'TBSM' ? 'selected' : '' }}>TBSM</option>
             </select>
+            @error('jurusan')
+                <p class="text-red-600 text-xs text-left mb-2 ml-1">{{ $message }}</p>
+            @enderror
 
-            
             {{-- BUTTON --}}
             <button type="submit"
                 class="w-full bg-[#2163F6] hover:bg-blue-700 text-white rounded-xl py-2.5 text-[13px]

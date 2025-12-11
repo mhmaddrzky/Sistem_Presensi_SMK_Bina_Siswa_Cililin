@@ -144,19 +144,46 @@
 
         {{-- Bar Graph --}}
         <div class="mt-4 h-3 w-full rounded-full bg-slate-100 overflow-hidden flex">
-            <div class="h-full bg-emerald-500" style="width: {{ $wHadir }}%"></div>
-            <div class="h-full bg-amber-400" style="width: {{ $wSakit }}%"></div>
-            <div class="h-full bg-orange-400" style="width: {{ $wIzin }}%"></div>
-            <div class="h-full bg-rose-500" style="width: {{ $wAlpha }}%"></div>
+            {{-- Hadir (Hijau #22c55e) --}}
+            <div class="h-full bg-green-500" style="width: {{ $wHadir }}%"></div>
+        
+            {{-- Izin (Kuning #fbbf24) --}}
+            <div class="h-full bg-amber-400" style="width: {{ $wIzin }}%"></div>
+        
+            {{-- Sakit (Biru #3b82f6) --}}
+            <div class="h-full bg-blue-500" style="width: {{ $wSakit }}%"></div>
+        
+            {{-- Alfa (Merah #ef4444) --}}
+            <div class="h-full bg-red-500" style="width: {{ $wAlpha }}%"></div>
         </div>
+        
 
-        {{-- Legend --}}
-        <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px]">
-            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Hadir ({{ $hadirHariIni }})</div>
-            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-400"></span> Sakit ({{ $sakitHariIni }})</div>
-            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-400"></span> Izin ({{ $izinHariIni }})</div>
-            <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-rose-500"></span> Alpha ({{ $alphaHariIni }})</div>
-        </div>
+       {{-- Legend --}}
+<div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px]">
+
+    {{-- Hadir --}}
+    <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+        Hadir ({{ $hadirHariIni }})
+    </div>
+
+    {{-- Sakit --}}
+    <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+        Sakit ({{ $sakitHariIni }})
+    </div>
+
+    {{-- Izin --}}
+    <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+        Izin ({{ $izinHariIni }})
+    </div>
+
+    {{-- Alfa --}}
+    <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+        Alpha ({{ $alphaHariIni }})
+    </div>
     </div>
 
 @endsection

@@ -4,57 +4,68 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;  // WAJIB ditambah untuk cek username
 
 class AuthController extends Controller
 {
-    // Menampilkan halaman login
+    // Halaman Login
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
 
-public function login(Request $request)
-{
-    // 1. Validasi Input
-    $credentials = $request->validate([
-        'username' => 'required|string',
-        'password' => 'required|string',
-    ]);
 
-    // 2. Coba Otentikasi
-    if (Auth::attempt($credentials)) {
+    public function login(Request $request)
+    {
+        // 1. Validasi Input
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        // 2. Cek apakah username ada
+        $user = User::where('username', $request->username)->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'username' => 'Akun tidak terdaftar.',
+            ])->onlyInput('username');
+        }
+
+        // 3. Coba Autentikasi (cek password)
+        if (!Auth::attempt($request->only('username', 'password'))) {
+            return back()->withErrors([
+                'password' => 'Password salah.',
+            ])->onlyInput('username');
+        }
+
+        // 4. Login sukses → regenerate session
         $request->session()->regenerate();
-        
-        // 3. 🛑 LOGIKA REDIRECT BERDASARKAN ROLE (Final Fix)
-        $user = Auth::user();
-        $role = $user->role;
-        
-        // Kepsek diarahkan langsung ke Laporan
-        if ($role === 'Kepsek') { 
-            return redirect()->intended('/admin/laporan'); 
+
+        // 5. Redirect sesuai role (punya kamu tetap dipakai)
+        $role = Auth::user()->role;
+
+        if ($role === 'Kepsek') {
+            return redirect()->intended('/admin/laporan');
         }
-        
-        // Admin, Guru, AsistenLab diarahkan ke Dashboard Admin
-        if ($role === 'Admin' || $role === 'Guru' || $role === 'AsistenLab') {
-            return redirect()->intended('/admin/dashboard'); 
+
+        if (in_array($role, ['Admin', 'Guru', 'AsistenLab'])) {
+            return redirect()->intended('/admin/dashboard');
         }
-        
-        // Siswa diarahkan ke Dashboard Siswa
-        return redirect()->intended('/siswa/dashboard'); 
+
+        return redirect()->intended('/siswa/dashboard');
     }
 
-    return back()->withErrors([
-        'username' => 'Username atau Password tidak sesuai.',
-    ])->onlyInput('username');
-}
+
+
+
     // Logout
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect('/');
     }
 }

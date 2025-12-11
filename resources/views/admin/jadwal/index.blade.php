@@ -97,37 +97,43 @@
                                     {{ $jadwal->admin->nama ?? 'N/A' }}
                                 </td>
 
+                                {{-- Bagian Aksi dengan Icon Buttons --}}
                                 <td class="px-4 py-3">
                                     @if ($allowedToManage)
-                                        <div class="flex items-center justify-center gap-3">
+                                        <div class="flex items-center justify-center gap-2">
 
-                                            {{-- Edit --}}
+                                            {{-- Tombol Edit dengan Icon --}}
                                             <a href="{{ route('admin.jadwal.edit', $jadwal->id) }}"
-                                               class="inline-flex items-center gap-1 text-[11px] md:text-xs font-semibold text-blue-600 hover:underline">
-                                                <i class="fas fa-edit"></i>
-                                                <span>Edit</span>
+                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200 group"
+                                            title="Edit Jadwal">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
                                             </a>
 
-                                            {{-- Separator --}}
-                                            <span class="hidden md:inline text-slate-300">|</span>
-
-                                            {{-- Hapus --}}
+                                            {{-- Tombol Hapus dengan Icon --}}
                                             <form action="{{ route('admin.jadwal.destroy', $jadwal->id) }}"
-                                                  method="POST"
-                                                  onsubmit="return confirm('Yakin ingin menghapus jadwal ini? Tindakan tidak dapat dibatalkan.');">
+                                                method="POST"
+                                                class="inline-block"
+                                                onsubmit="return confirm('⚠️ Yakin ingin menghapus jadwal ini?\n\nJadwal: {{ $jadwal->mata_pelajaran }}\nHari: {{ $jadwal->hari }}\nWaktu: {{ substr($jadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->waktu_selesai, 0, 5) }}\n\nTindakan ini tidak dapat dibatalkan!');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
-                                                        class="inline-flex items-center gap-1 text-[11px] md:text-xs font-semibold text-rose-600 hover:underline">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                    <span>Hapus</span>
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200 group"
+                                                        title="Hapus Jadwal">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
                                                 </button>
                                             </form>
+
                                         </div>
                                     @else
-                                        <span class="text-[11px] text-slate-400 italic">
-                                            Tidak ada aksi
-                                        </span>
+                                        <div class="flex items-center justify-center">
+                                            <span class="text-xs text-slate-400 italic">
+                                                —
+                                            </span>
+                                        </div>
                                     @endif
                                 </td>
                             </tr>

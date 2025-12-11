@@ -175,59 +175,162 @@
             </div>
         </div>
 
-        {{-- Tabel Siswa --}}
-        <div class="bg-white shadow-md border rounded-xl">
-            <div class="px-5 py-3 font-semibold text-gray-700 border-b">
-                2. Tentukan Peserta Sesi
-            </div>
-
-            {{-- SCROLL RESPONSIF --}}
-            <div class="overflow-x-auto w-full">
-                <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm">
-                    <thead class="bg-[#0D47C9] text-white">
-                        <tr>
-                            <th class="p-3 text-center font-semibold w-16">Pilih</th>
-                            <th class="p-3 text-left font-semibold">NIS</th>
-                            <th class="p-3 text-left font-semibold">Nama</th>
-                            <th class="p-3 text-left font-semibold">Kelas</th>
-                            <th class="p-3 text-left font-semibold">Jurusan</th>
-                            <th class="p-3 text-left font-semibold">Status Sesi</th>
-                        </tr>
-                    </thead>
-
-                    <tbody class="divide-y">
-                        @foreach ($siswas as $siswa)
-                        <tr class="hover:bg-gray-50">
-                            <td class="p-3 text-center">
-                                <input type="checkbox"
-                                    name="siswa_ids[]"
-                                    value="{{ $siswa->id }}"
-                                    data-siswa-id="{{ $siswa->id }}"
-                                    class="w-4 h-4 md:w-5 md:h-5">
-                            </td>
-
-                            <td class="p-3 whitespace-nowrap">{{ $siswa->nis }}</td>
-                            <td class="p-3">{{ $siswa->nama }}</td>
-                            <td class="p-3 whitespace-nowrap">{{ $siswa->kelas }}</td>
-                            <td class="p-3 whitespace-nowrap">{{ $siswa->jurusan }}</td>
-
-                            <td class="p-3" id="status-{{ $siswa->id }}">
-                                <span class="text-gray-400">Belum dimuat</span>
-                            </td>
-                        </tr>
-                        @endforeach
-
-                        @if ($siswas->count() == 0)
-                        <tr>
-                            <td colspan="6" class="p-4 text-center text-gray-500">
-                                Tidak ada data.
-                            </td>
-                        </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
+      {{-- Tabel Siswa --}}
+<div class="bg-white shadow-md border rounded-xl">
+    <div class="px-5 py-3 font-semibold text-gray-700 border-b flex items-center justify-between">
+        <span>2. Tentukan Peserta Sesi</span>
+        
+        {{-- FITUR PILIH SEMUA --}}
+        <div class="flex items-center gap-2">
+            <label class="flex items-center gap-2 cursor-pointer text-sm font-normal text-gray-600 hover:text-blue-600 transition">
+                <input type="checkbox" 
+                    id="select_all_checkbox"
+                    class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    onchange="toggleSelectAll(this)">
+                <span class="select-none">Pilih Semua</span>
+            </label>
         </div>
+    </div>
+
+    {{-- SCROLL RESPONSIF --}}
+    <div class="overflow-x-auto w-full">
+        <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm">
+            <thead class="bg-[#0D47C9] text-white">
+                <tr>
+                    <th class="p-3 text-center font-semibold w-16">Pilih</th>
+                    <th class="p-3 text-left font-semibold">NIS</th>
+                    <th class="p-3 text-left font-semibold">Nama</th>
+                    <th class="p-3 text-left font-semibold">Kelas</th>
+                    <th class="p-3 text-left font-semibold">Jurusan</th>
+                    <th class="p-3 text-left font-semibold">Status Sesi</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y">
+                @foreach ($siswas as $siswa)
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 text-center">
+                        <input type="checkbox"
+                            name="siswa_ids[]"
+                            value="{{ $siswa->id }}"
+                            data-siswa-id="{{ $siswa->id }}"
+                            class="siswa-checkbox w-4 h-4 md:w-5 md:h-5"
+                            onchange="updateSelectAllState()">
+                    </td>
+
+                    <td class="p-3 whitespace-nowrap">{{ $siswa->nis }}</td>
+                    <td class="p-3">{{ $siswa->nama }}</td>
+                    <td class="p-3 whitespace-nowrap">{{ $siswa->kelas }}</td>
+                    <td class="p-3 whitespace-nowrap">{{ $siswa->jurusan }}</td>
+
+                    <td class="p-3" id="status-{{ $siswa->id }}">
+                        <span class="text-gray-400">Belum dimuat</span>
+                    </td>
+                </tr>
+                @endforeach
+
+                @if ($siswas->count() == 0)
+                <tr>
+                    <td colspan="6" class="p-4 text-center text-gray-500">
+                        Tidak ada data.
+                    </td>
+                </tr>
+                @endif
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{-- SCRIPT TAMBAHAN UNTUK FITUR PILIH SEMUA --}}
+<script>
+    // ===== FITUR PILIH SEMUA =====
+    function toggleSelectAll(masterCheckbox) {
+        const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
+        const isChecked = masterCheckbox.checked;
+        
+        allCheckboxes.forEach(checkbox => {
+            // Hanya centang checkbox yang enabled (tidak disabled)
+            if (!checkbox.disabled) {
+                checkbox.checked = isChecked;
+            }
+        });
+    }
+
+    // Update state checkbox "Pilih Semua" berdasarkan checkbox siswa
+    function updateSelectAllState() {
+        const masterCheckbox = document.getElementById('select_all_checkbox');
+        const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
+        const enabledCheckboxes = Array.from(allCheckboxes).filter(cb => !cb.disabled);
+        
+        if (enabledCheckboxes.length === 0) {
+            masterCheckbox.checked = false;
+            masterCheckbox.indeterminate = false;
+            return;
+        }
+        
+        const checkedCount = enabledCheckboxes.filter(cb => cb.checked).length;
+        
+        if (checkedCount === 0) {
+            masterCheckbox.checked = false;
+            masterCheckbox.indeterminate = false;
+        } else if (checkedCount === enabledCheckboxes.length) {
+            masterCheckbox.checked = true;
+            masterCheckbox.indeterminate = false;
+        } else {
+            masterCheckbox.checked = false;
+            masterCheckbox.indeterminate = true;
+        }
+    }
+
+    // ===== MODIFIKASI FUNGSI loadSessionData YANG SUDAH ADA =====
+    function loadSessionData() {
+        // reset status
+        document.querySelectorAll('[id^="status-"]').forEach(el => {
+            el.innerHTML = '<span class="text-gray-400">Tidak terdaftar</span>';
+        });
+
+        // uncheck semua
+        document.querySelectorAll('input[type="checkbox"]').forEach(ch => {
+            ch.checked = false;
+            ch.disabled = false; // Reset disabled state
+        });
+
+        // Reset master checkbox
+        const masterCheckbox = document.getElementById('select_all_checkbox');
+        if (masterCheckbox) {
+            masterCheckbox.checked = false;
+            masterCheckbox.indeterminate = false;
+        }
+
+        const selectedJadwalId = document.getElementById('jadwal_id').value;
+        if (!selectedJadwalId) return;
+
+        document.querySelectorAll('.siswa-checkbox').forEach(checkbox => {
+            const siswaId = checkbox.dataset.siswaId;
+
+            for (const jadwalId in mappingData) {
+                const found = mappingData[jadwalId].find(m => m.siswa_id == siswaId);
+
+                if (found) {
+                    const status = document.getElementById('status-' + siswaId);
+
+                    if (jadwalId == selectedJadwalId) {
+                        checkbox.checked = true;
+                        status.innerHTML =
+                            '<span class="text-blue-600 font-semibold">Sesi ini</span>';
+                    } else {
+                        const j = allJadwals[jadwalId];
+                        status.innerHTML =
+                            `<span class="text-orange-600 font-medium">Terdaftar di ${j.mata_pelajaran}</span>`;
+                    }
+                }
+            }
+        });
+        
+        // Update state master checkbox setelah load data
+        updateSelectAllState();
+    }
+</script>
 
         {{-- Tombol Submit --}}
         <div>
