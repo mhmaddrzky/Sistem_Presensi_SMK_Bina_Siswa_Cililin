@@ -57,6 +57,21 @@
                                 {{ '@' . auth()->user()->username }}
                             </p>
                         </div>
+                        
+                        {{-- MENU RIWAYAT PRESENSI --}}
+                        <div class="px-2 py-2">
+                            <a href="{{ route('siswa.riwayat.index') }}"
+                               class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                                </svg>
+                                Riwayat Presensi
+                            </a>
+                        </div>
+                        
+                        <div class="border-t border-gray-200"></div>
+                        
                         <form method="POST" action="{{ route('logout') }}" class="px-2 py-2">
                             @csrf
                             <button
@@ -98,9 +113,9 @@
                         @if(request()->routeIs('siswa.presensi.form')) underline font-bold @endif">
                     JADWAL
                 </a>
-                <a href="{{ route('siswa.riwayat.index') }}"
+                <a href="{{ route('siswa.presensi.index') }}"
                    class="hover:underline transition
-                        @if(request()->routeIs('siswa.riwayat.index')) underline font-bold @endif">
+                        @if(request()->routeIs('siswa.presensi.index')) underline font-bold @endif">
                     PRESENSI
                 </a>
             </div>
@@ -119,10 +134,24 @@
                        {{ request()->routeIs('siswa.presensi.form') ? 'bg-white/20' : 'hover:bg-white/10' }}">
                     JADWAL
                 </a>
-                <a href="{{ route('siswa.riwayat.index') }}"
+                <a href="{{ route('siswa.presensi.index') }}"
                    class="block rounded-lg px-3 py-2
-                       {{ request()->routeIs('siswa.riwayat.index') ? 'bg-white/20' : 'hover:bg-white/10' }}">
+                       {{ request()->routeIs('siswa.presensi.index') ? 'bg-white/20' : 'hover:bg-white/10' }}">
                     PRESENSI
+                </a>
+
+                {{-- DIVIDER --}}
+                <div class="border-t border-white/30 my-2"></div>
+
+                {{-- MENU RIWAYAT DI MOBILE --}}
+                <a href="{{ route('siswa.riwayat.index') }}"
+                   class="block rounded-lg px-3 py-2 flex items-center gap-2
+                       {{ request()->routeIs('siswa.riwayat.index') ? 'bg-white/20' : 'hover:bg-white/10' }}">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                    </svg>
+                    Riwayat Presensi
                 </a>
 
                 {{-- Info user & logout di mobile --}}
@@ -197,4 +226,3 @@
 
 </body>
 </html>
-

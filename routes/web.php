@@ -110,15 +110,20 @@ Route::middleware(['auth'])->group(function () {
     });
 
 
-    // --- E. RUTE KHUSUS SISWA ---
-    Route::middleware('role:Siswa')->group(function () {
-        // 1. Dashboard Siswa
-        Route::get('/siswa/dashboard', [PresensiController::class, 'showSiswaDashboard'])->name('siswa.dashboard');
-        // 2. Rute Presensi
-        Route::get('/siswa/presensi', [PresensiController::class, 'showPresensiForm'])->name('siswa.presensi.form');
-        Route::post('/siswa/presensi', [PresensiController::class, 'storePresensi'])->name('siswa.presensi.store');
-        // 3. Riwayat Presensi Siswa
-        Route::get('/siswa/riwayat', [PresensiController::class, 'showRiwayat'])->name('siswa.riwayat.index');
-    });
+        // --- E. RUTE KHUSUS SISWA ---
+         Route::middleware('role:Siswa')->group(function () {
+            // 1. Dashboard Siswa
+            Route::get('/siswa/dashboard', [PresensiController::class, 'showSiswaDashboard'])->name('siswa.dashboard');
+            
+            // 2. Jadwal (Read Only - tanpa button)
+            Route::get('/siswa/jadwal', [PresensiController::class, 'showPresensiForm'])->name('siswa.presensi.form');
+            
+            // 3. Presensi (dengan button untuk absen)
+            Route::get('/siswa/presensi', [PresensiController::class, 'index'])->name('siswa.presensi.index');
+            Route::post('/siswa/presensi', [PresensiController::class, 'storePresensi'])->name('siswa.presensi.store');
+            
+            // 4. Riwayat Presensi Siswa (di dropdown user menu)
+            Route::get('/siswa/riwayat', [PresensiController::class, 'showRiwayat'])->name('siswa.riwayat.index');
+        });
 
 });

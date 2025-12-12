@@ -4,32 +4,38 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;  // WAJIB ditambah untuk cek username
+use App\Models\User;
 
 class AuthController extends Controller
 {
-    // Halaman Login
+    /**
+     * Menampilkan Halaman Login
+     */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-
-
+    /**
+     * Proses Login
+     */
     public function login(Request $request)
     {
-        // 1. Validasi Input
+        // 1. Validasi Input dengan pesan bahasa Indonesia
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
+        ], [
+            'username.required' => 'Username wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
-        // 2. Cek apakah username ada
+        // 2. Cek apakah username terdaftar
         $user = User::where('username', $request->username)->first();
 
         if (!$user) {
             return back()->withErrors([
-                'username' => 'Akun tidak terdaftar.',
+                'username' => 'Username tidak terdaftar.',
             ])->onlyInput('username');
         }
 
@@ -43,7 +49,7 @@ class AuthController extends Controller
         // 4. Login sukses → regenerate session
         $request->session()->regenerate();
 
-        // 5. Redirect sesuai role (punya kamu tetap dipakai)
+        // 5. Redirect sesuai role
         $role = Auth::user()->role;
 
         if ($role === 'Kepsek') {
@@ -57,15 +63,15 @@ class AuthController extends Controller
         return redirect()->intended('/siswa/dashboard');
     }
 
-
-
-
-    // Logout
+    /**
+     * Logout
+     */
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        
+        return redirect('/login')->with('success', 'Anda telah berhasil logout.');
     }
 }

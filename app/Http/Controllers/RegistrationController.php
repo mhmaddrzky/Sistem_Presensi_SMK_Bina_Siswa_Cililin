@@ -11,15 +11,20 @@ use Illuminate\Support\Facades\DB;
 
 class RegistrationController extends Controller
 {
-    // Tampilkan form registrasi untuk siswa
+    /**
+     * Tampilkan form registrasi untuk siswa
+     */
     public function showRegistrationForm()
     {
         return view('auth.register');
     }
 
-    // Proses pendaftaran siswa (oleh user)
+    /**
+     * Proses pendaftaran siswa (oleh user)
+     */
     public function register(Request $request)
     {
+        // Validasi dengan pesan bahasa Indonesia
         $request->validate([
             'username' => 'required|string|max:50|unique:users',
             'nis' => [
@@ -33,6 +38,32 @@ class RegistrationController extends Controller
             'nama' => 'required|string|max:100',
             'kelas' => 'required|string|max:10',
             'jurusan' => 'required|in:TKJ,TBSM',
+        ], [
+            // Username
+            'username.required' => 'Username wajib diisi.',
+            'username.max' => 'Username maksimal 50 karakter.',
+            'username.unique' => 'Username sudah digunakan, silakan gunakan username lain.',
+            
+            // NIS
+            'nis.required' => 'NIS wajib diisi.',
+            'nis.max' => 'NIS maksimal 20 karakter.',
+            'nis.unique' => 'NIS sudah terdaftar dalam sistem.',
+            'nis.same' => 'Konfirmasi NIS tidak cocok.',
+            
+            // NIS Confirmation
+            'nis_confirmation.required' => 'Konfirmasi NIS wajib diisi.',
+            
+            // Nama
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'nama.max' => 'Nama maksimal 100 karakter.',
+            
+            // Kelas
+            'kelas.required' => 'Kelas wajib diisi.',
+            'kelas.max' => 'Kelas maksimal 10 karakter.',
+            
+            // Jurusan
+            'jurusan.required' => 'Jurusan wajib dipilih.',
+            'jurusan.in' => 'Jurusan harus TKJ atau TBSM.',
         ]);
 
         try {
@@ -58,14 +89,16 @@ class RegistrationController extends Controller
 
             DB::commit();
 
-            return redirect()->route('login')->with('success', 'Pendaftaran berhasil. Silakan tunggu persetujuan dari Admin.');
+            return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silakan tunggu persetujuan dari admin.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Pendaftaran gagal: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Pendaftaran gagal. Silakan coba lagi. Error: ' . $e->getMessage());
         }
     }
 
-    // Daftar registrasi pending (admin)
+    /**
+     * Daftar registrasi pending (admin)
+     */
     public function index()
     {
         $registrations = Registrasi::with('siswa')
@@ -76,29 +109,32 @@ class RegistrationController extends Controller
         return view('admin.registrations.index', compact('registrations'));
     }
 
-    // Approve satu-satu
+    /**
+     * Approve satu-satu
+     */
     public function approve(Request $request, $id)
     {
         $registration = Registrasi::with('siswa')->find($id);
 
-        if (! $registration) {
+        if (!$registration) {
             return back()->with('error', 'Permintaan registrasi tidak ditemukan.');
         }
+
         if ($registration->status !== 'Pending') {
             return back()->with('error', 'Registrasi sudah diproses sebelumnya.');
         }
 
-        if (! auth()->check() || ! auth()->user()->admin) {
-            return back()->with('error', 'Gagal: Akun Admin tidak valid atau sesi berakhir.');
+        if (!auth()->check() || !auth()->user()->admin) {
+            return back()->with('error', 'Akses ditolak. Akun admin tidak valid atau sesi berakhir.');
         }
 
         try {
             DB::beginTransaction();
 
-            // cek username unik
+            // Cek username unik
             if (User::where('username', $registration->username_request)->exists()) {
                 DB::rollBack();
-                return back()->with('error', 'Username ' . $registration->username_request . ' sudah ada.');
+                return back()->with('error', 'Username "' . $registration->username_request . '" sudah digunakan.');
             }
 
             $user = User::create([
@@ -118,14 +154,16 @@ class RegistrationController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Registrasi Siswa berhasil disetujui. Akun login telah dibuat.');
+            return back()->with('success', 'Registrasi siswa berhasil disetujui. Akun login telah dibuat.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Persetujuan gagal karena error database: ' . $e->getMessage());
+            return back()->with('error', 'Persetujuan gagal. Error: ' . $e->getMessage());
         }
     }
 
-    // Reject (hapus)
+    /**
+     * Reject (hapus)
+     */
     public function reject($id)
     {
         $registration = Registrasi::findOrFail($id);
@@ -139,7 +177,7 @@ class RegistrationController extends Controller
             $registration->delete();
         });
 
-        return back()->with('success', 'Registrasi Siswa berhasil ditolak dan data dihapus.');
+        return back()->with('success', 'Registrasi siswa berhasil ditolak dan data telah dihapus.');
     }
 
     /**
@@ -147,8 +185,8 @@ class RegistrationController extends Controller
      */
     public function approveAll(Request $request)
     {
-        if (! auth()->check() || ! auth()->user()->admin) {
-            return back()->with('error', 'Gagal: Akun Admin tidak valid atau sesi berakhir.');
+        if (!auth()->check() || !auth()->user()->admin) {
+            return back()->with('error', 'Akses ditolak. Akun admin tidak valid atau sesi berakhir.');
         }
 
         $pendings = Registrasi::with('siswa')
@@ -157,7 +195,7 @@ class RegistrationController extends Controller
             ->get();
 
         if ($pendings->isEmpty()) {
-            return back()->with('error', 'Tidak ada registrasi yang bisa disetujui.');
+            return back()->with('error', 'Tidak ada registrasi yang perlu disetujui.');
         }
 
         $approvedCount = 0;
@@ -167,25 +205,25 @@ class RegistrationController extends Controller
             try {
                 DB::beginTransaction();
 
-                // jika username sudah ada -> skip
+                // Jika username sudah ada -> skip
                 $exists = User::where('username', $registration->username_request)->exists();
                 if ($exists) {
-                    $failures[] = "Username '" . $registration->username_request . "' sudah ada (ID Reg: " . $registration->id_reg . ").";
+                    $failures[] = "Username '" . $registration->username_request . "' sudah digunakan (ID: " . $registration->id_reg . ")";
                     DB::rollBack();
                     continue;
                 }
 
-                // buat user
+                // Buat user
                 $user = User::create([
                     'username' => $registration->username_request,
                     'password' => $registration->password_request,
                     'role'     => 'Siswa',
                 ]);
 
-                // cek siswa terkait
+                // Cek siswa terkait
                 $siswa = $registration->siswa;
-                if (! $siswa) {
-                    $failures[] = "Data Siswa tidak ditemukan untuk ID Reg: " . $registration->id_reg . ".";
+                if (!$siswa) {
+                    $failures[] = "Data siswa tidak ditemukan untuk ID registrasi: " . $registration->id_reg;
                     DB::rollBack();
                     continue;
                 }
@@ -202,18 +240,22 @@ class RegistrationController extends Controller
                 $approvedCount++;
             } catch (\Exception $e) {
                 DB::rollBack();
-                $failures[] = "Gagal memproses ID Reg " . $registration->id_reg . ": " . $e->getMessage();
+                $failures[] = "Gagal memproses ID " . $registration->id_reg . ": " . $e->getMessage();
                 continue;
             }
         }
 
+        // Buat pesan hasil
         $message = $approvedCount . " registrasi berhasil disetujui.";
+        
         if (count($failures) > 0) {
             $sample = array_slice($failures, 0, 5);
-            $message .= " Namun ada " . count($failures) . " gagal: " . implode(' | ', $sample);
+            $message .= " Terdapat " . count($failures) . " registrasi gagal: " . implode(' | ', $sample);
+            
             if (count($failures) > 5) {
                 $message .= " (dan " . (count($failures) - 5) . " lainnya...)";
             }
+            
             return back()->with('error', $message);
         }
 
