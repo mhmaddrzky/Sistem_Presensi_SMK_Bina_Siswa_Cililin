@@ -175,20 +175,38 @@
             </div>
         </div>
 
-      {{-- Tabel Siswa --}}
+    {{-- Tabel Siswa dengan Fitur Pilih Berdasarkan Jumlah --}}
 <div class="bg-white shadow-md border rounded-xl">
-    <div class="px-5 py-3 font-semibold text-gray-700 border-b flex items-center justify-between">
-        <span>2. Tentukan Peserta Sesi</span>
-        
-        {{-- FITUR PILIH SEMUA --}}
-        <div class="flex items-center gap-2">
-            <label class="flex items-center gap-2 cursor-pointer text-sm font-normal text-gray-600 hover:text-blue-600 transition">
-                <input type="checkbox" 
-                    id="select_all_checkbox"
-                    class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                    onchange="toggleSelectAll(this)">
-                <span class="select-none">Pilih Semua</span>
-            </label>
+    <div class="px-5 py-3 border-b bg-gray-50">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <h3 class="font-semibold text-gray-800">2. Tentukan Peserta Sesi</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Pilih siswa secara manual atau otomatis</p>
+            </div>
+            
+            {{-- FITUR PILIH BERDASARKAN JUMLAH - LAYOUT FINAL --}}
+            <div class="flex items-center gap-3">
+                {{-- Counter Siswa Terpilih (Hidden by default) --}}
+                <div id="selected_count_display" class="text-sm font-medium text-gray-700 hidden">
+                    <span class="font-bold text-blue-600" id="selected_count">0</span>/<span id="total_count">0</span> dipilih
+                </div>
+                
+                {{-- Input di tengah --}}
+                <input type="number" 
+                    id="select_count"
+                    min="1"
+                    placeholder="Jumlah"
+                    class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    oninput="validateSelectCount(this)"
+                    onkeypress="if(event.key === 'Enter') { event.preventDefault(); selectByCount(); }">
+                
+                {{-- Button Terapkan di pojok kanan --}}
+                <button type="button"
+                    onclick="selectByCount()"
+                    class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
+                    Terapkan
+                </button>
+            </div>
         </div>
     </div>
 
@@ -232,7 +250,7 @@
                 @if ($siswas->count() == 0)
                 <tr>
                     <td colspan="6" class="p-4 text-center text-gray-500">
-                        Tidak ada data.
+                        Tidak ada data siswa.
                     </td>
                 </tr>
                 @endif
@@ -241,72 +259,174 @@
     </div>
 </div>
 
-{{-- SCRIPT TAMBAHAN UNTUK FITUR PILIH SEMUA --}}
+{{-- SCRIPT LENGKAP --}}
 <script>
-    // ===== FITUR PILIH SEMUA =====
-    function toggleSelectAll(masterCheckbox) {
+    const mappingData = @json($mappingSesi);
+    const allJadwals = @json($jadwals->keyBy('id'));
+
+    // ===== VALIDASI INPUT JUMLAH =====
+    function validateSelectCount(input) {
         const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
-        const isChecked = masterCheckbox.checked;
+        const availableCount = Array.from(allCheckboxes).filter(cb => !cb.disabled).length;
         
-        allCheckboxes.forEach(checkbox => {
-            // Hanya centang checkbox yang enabled (tidak disabled)
-            if (!checkbox.disabled) {
-                checkbox.checked = isChecked;
-            }
-        });
+        // Batasi input tidak boleh melebihi jumlah siswa yang tersedia
+        if (parseInt(input.value) > availableCount) {
+            input.value = availableCount;
+        }
+        
+        // Tidak boleh negatif atau 0
+        if (parseInt(input.value) < 1) {
+            input.value = '';
+        }
     }
 
-    // Update state checkbox "Pilih Semua" berdasarkan checkbox siswa
-    function updateSelectAllState() {
-        const masterCheckbox = document.getElementById('select_all_checkbox');
-        const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
-        const enabledCheckboxes = Array.from(allCheckboxes).filter(cb => !cb.disabled);
+    // ===== PILIH BERDASARKAN JUMLAH =====
+    function selectByCount() {
+        const countInput = document.getElementById('select_count');
+        const targetCount = parseInt(countInput.value) || 0;
         
-        if (enabledCheckboxes.length === 0) {
-            masterCheckbox.checked = false;
-            masterCheckbox.indeterminate = false;
+        if (targetCount === 0 || targetCount < 1) {
+            alert('⚠️ Masukkan jumlah siswa yang ingin dipilih (minimal 1)');
+            countInput.focus();
             return;
         }
         
-        const checkedCount = enabledCheckboxes.filter(cb => cb.checked).length;
+        const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
+        const enabledCheckboxes = Array.from(allCheckboxes).filter(cb => !cb.disabled);
         
-        if (checkedCount === 0) {
-            masterCheckbox.checked = false;
-            masterCheckbox.indeterminate = false;
-        } else if (checkedCount === enabledCheckboxes.length) {
-            masterCheckbox.checked = true;
-            masterCheckbox.indeterminate = false;
-        } else {
-            masterCheckbox.checked = false;
-            masterCheckbox.indeterminate = true;
+        if (targetCount > enabledCheckboxes.length) {
+            alert(`⚠️ Jumlah siswa yang tersedia hanya ${enabledCheckboxes.length} siswa.\nAnda meminta ${targetCount} siswa.`);
+            countInput.value = enabledCheckboxes.length;
+            return;
+        }
+        
+        // Reset semua checkbox dulu
+        enabledCheckboxes.forEach(cb => cb.checked = false);
+        
+        // Pilih sejumlah checkbox sesuai target
+        for (let i = 0; i < targetCount && i < enabledCheckboxes.length; i++) {
+            enabledCheckboxes[i].checked = true;
+        }
+        
+        // Update counter
+        updateSelectedCount();
+        
+        // Clear input setelah berhasil
+        countInput.value = '';
+    }
+
+    // ===== UPDATE COUNTER SISWA TERPILIH =====
+    function updateSelectedCount() {
+        const checkedCount = document.querySelectorAll('.siswa-checkbox:checked').length;
+        const totalCount = document.querySelectorAll('.siswa-checkbox:not([disabled])').length;
+        
+        const countDisplay = document.getElementById('selected_count');
+        const totalDisplay = document.getElementById('total_count');
+        const countWrapper = document.getElementById('selected_count_display');
+        
+        if (countDisplay) {
+            countDisplay.textContent = checkedCount;
+        }
+        if (totalDisplay) {
+            totalDisplay.textContent = totalCount;
+        }
+        
+        // Tampilkan counter hanya jika ada siswa terpilih
+        if (countWrapper) {
+            if (checkedCount > 0) {
+                countWrapper.classList.remove('hidden');
+            } else {
+                countWrapper.classList.add('hidden');
+            }
         }
     }
 
-    // ===== MODIFIKASI FUNGSI loadSessionData YANG SUDAH ADA =====
+    // ===== UPDATE STATE (TANPA MASTER CHECKBOX) =====
+    function updateSelectAllState() {
+        updateSelectedCount();
+    }
+
+    // ===== DROPDOWN FILTER JURUSAN =====
+    function toggleJurusanFilter() {
+        const list = document.getElementById('jurusan_filter_list');
+        if (list) list.classList.toggle('hidden');
+    }
+
+    function pickJurusanFilter(btn) {
+        const value = btn.dataset.value;
+        const label = btn.dataset.label;
+
+        document.getElementById('jurusan_filter_input').value = value;
+        document.getElementById('jurusan_filter_label').textContent = label;
+
+        const list = document.getElementById('jurusan_filter_list');
+        if (list) list.classList.add('hidden');
+
+        btn.closest('form').submit();
+    }
+
+    // ===== DROPDOWN CUSTOM JADWAL SESI =====
+    function toggleJadwalListSesi() {
+        const list = document.getElementById('jadwal_list_sesi');
+        if (list) list.classList.toggle('hidden');
+    }
+
+    function pickJadwalSesi(btn) {
+        const id = btn.dataset.id;
+        const label = btn.dataset.label;
+
+        document.getElementById('jadwal_id').value = id;
+        document.getElementById('jadwal_selected_label_sesi').textContent = label;
+
+        const list = document.getElementById('jadwal_list_sesi');
+        if (list) list.classList.add('hidden');
+    }
+
+    // ===== KLIK DI LUAR DROPDOWN =====
+    document.addEventListener('click', function(e) {
+        const jurusanWrapper = document.getElementById('jurusanFilterWrapper');
+        const jurusanList = document.getElementById('jurusan_filter_list');
+        if (jurusanWrapper && jurusanList && !jurusanWrapper.contains(e.target)) {
+            jurusanList.classList.add('hidden');
+        }
+
+        const jadwalWrapper = document.getElementById('jadwalDropdownSesi');
+        const jadwalList = document.getElementById('jadwal_list_sesi');
+        if (jadwalWrapper && jadwalList && !jadwalWrapper.contains(e.target)) {
+            jadwalList.classList.add('hidden');
+        }
+    });
+
+    // ===== LOAD SESSION DATA =====
     function loadSessionData() {
-        // reset status
+        // Reset status
         document.querySelectorAll('[id^="status-"]').forEach(el => {
             el.innerHTML = '<span class="text-gray-400">Tidak terdaftar</span>';
         });
 
-        // uncheck semua
-        document.querySelectorAll('input[type="checkbox"]').forEach(ch => {
+        // Uncheck semua dan enable semua
+        document.querySelectorAll('.siswa-checkbox').forEach(ch => {
             ch.checked = false;
-            ch.disabled = false; // Reset disabled state
+            ch.disabled = false;
         });
 
-        // Reset master checkbox
-        const masterCheckbox = document.getElementById('select_all_checkbox');
-        if (masterCheckbox) {
-            masterCheckbox.checked = false;
-            masterCheckbox.indeterminate = false;
+        // Reset input jumlah
+        const selectCountInput = document.getElementById('select_count');
+        if (selectCountInput) {
+            selectCountInput.value = '';
         }
 
         const selectedJadwalId = document.getElementById('jadwal_id').value;
-        if (!selectedJadwalId) return;
+        if (!selectedJadwalId) {
+            alert('⚠️ Silakan pilih jadwal terlebih dahulu!');
+            updateSelectedCount();
+            return;
+        }
 
+        // Proses mapping data
         document.querySelectorAll('.siswa-checkbox').forEach(checkbox => {
             const siswaId = checkbox.dataset.siswaId;
+            let foundInSelectedJadwal = false;
 
             for (const jadwalId in mappingData) {
                 const found = mappingData[jadwalId].find(m => m.siswa_id == siswaId);
@@ -315,21 +435,32 @@
                     const status = document.getElementById('status-' + siswaId);
 
                     if (jadwalId == selectedJadwalId) {
+                        // Siswa sudah terdaftar di jadwal ini
                         checkbox.checked = true;
-                        status.innerHTML =
-                            '<span class="text-blue-600 font-semibold">Sesi ini</span>';
+                        foundInSelectedJadwal = true;
+                        status.innerHTML = '<span class="text-blue-600 font-semibold">Sesi ini</span>';
                     } else {
+                        // Siswa terdaftar di jadwal lain
                         const j = allJadwals[jadwalId];
-                        status.innerHTML =
-                            `<span class="text-orange-600 font-medium">Terdaftar di ${j.mata_pelajaran}</span>`;
+                        if (j) {
+                            status.innerHTML = `<span class="text-orange-600 font-medium">Terdaftar di ${j.mata_pelajaran}</span>`;
+                        }
                     }
                 }
             }
         });
         
-        // Update state master checkbox setelah load data
-        updateSelectAllState();
+        // Update counter setelah load data
+        updateSelectedCount();
     }
+    
+    // Initialize: sembunyikan counter saat page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const countWrapper = document.getElementById('selected_count_display');
+        if (countWrapper) {
+            countWrapper.classList.add('hidden');
+        }
+    });
 </script>
 
         {{-- Tombol Submit --}}
