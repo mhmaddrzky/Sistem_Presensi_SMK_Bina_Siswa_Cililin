@@ -47,7 +47,6 @@ class AdminDashboardController extends Controller
         // Asumsi kolom 'hari' di KelolaJadwal menggunakan bahasa Indonesia
       $dayOfWeek = $today->isoFormat('dddd'); 
 
-// 2. 🛑 FIX: Konversi ke huruf kecil untuk menghilangkan masalah Case Sensitivity 🛑
         $dayOfWeekLower = strtolower($dayOfWeek); 
 
         // FIX: Ambil dari database, pastikan kolom 'hari' di database juga dikonversi ke lowercase.

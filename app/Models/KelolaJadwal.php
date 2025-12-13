@@ -11,7 +11,6 @@ class KelolaJadwal extends Model
 
     protected $primaryKey = 'id'; 
     
-    // 🛑 PERBAIKAN: Hapus $fillable karena $guarded = [] sudah menonaktifkan proteksi
     // Menjamin semua kolom (hari, mata_pelajaran, admin_id, dll.) dapat diisi (Mass Assignment)
     protected $guarded = []; 
 

@@ -45,7 +45,7 @@ public function store(Request $request)
 
 
     // 1. Validasi Data
-    // 🛑 PENTING: Pastikan form HTML Anda memiliki input untuk 'jurusan' dan 'kapasitas'.
+    //  PENTING: Pastikan form HTML Anda memiliki input untuk 'jurusan' dan 'kapasitas'.
     $validatedData = $request->validate([
         'mata_pelajaran' => 'required|string|max:100',
         'nama_guru' => 'required|string|max:100',
@@ -58,7 +58,7 @@ public function store(Request $request)
     ]);
 
     try {
-        // Ambil admin_id dari user yang sedang login (harus ada relasi)
+        // Ambil admin_id dari user yang sedang login 
         $adminId = auth()->user()->admin->id; 
 
         // 2. Simpan Data ke Database
@@ -111,7 +111,7 @@ public function store(Request $request)
         $jadwal->update($request->only([
              'hari', 'sesi', 'ruang_lab', 'mata_pelajaran', 'nama_guru',
              'kapasitas', 'waktu_mulai', 'waktu_selesai', 
-             'jurusan' // 🛑 FIX: Tambahkan 'jurusan' ke array update
+             'jurusan' //  FIX: Tambahkan 'jurusan' ke array update
          ]));
          return redirect()->route('admin.jadwal.index')->with('success', 'Jadwal berhasil diperbarui.');
     } catch (\Exception $e) {

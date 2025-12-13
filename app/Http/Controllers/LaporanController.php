@@ -27,7 +27,6 @@ class LaporanController extends Controller
         $jurusanFilter = $request->input('jurusan_filter', 'all');
         $periode = $request->input('periode', 'mingguan'); 
         
-        // 🛑 FIX: HANYA HANYA HITUNG 'Hadir' untuk total kehadiran
         $statusesToCount = ['Hadir']; 
         $dataLaporan = []; 
         $now = Carbon::now();
@@ -60,7 +59,7 @@ class LaporanController extends Controller
 
         // 3. Hitung Total Sesi Hadir (HANYA STATUS 'Hadir' - FIX)
         $presensiAggregatQuery = Presensi::whereIn('siswa_id', $siswaIds)
-            ->where('status', 'Hadir'); // 🛑 FIX UTAMA DITERAPKAN DI SINI
+            ->where('status', 'Hadir'); 
             
         // Terapkan Filter Tanggal
         if ($startDate && $endDate) {
@@ -110,7 +109,6 @@ class LaporanController extends Controller
         $periode = $request->input('periode', 'keseluruhan');
         $jurusanFilter = $request->input('jurusan_filter', 'all');
         
-        // 🛑 FIX: HANYA HANYA HITUNG 'Hadir' untuk total kehadiran
         $statusesToCount = ['Hadir']; 
         $now = Carbon::now();
         $startDate = null; $endDate = null;
@@ -139,7 +137,7 @@ class LaporanController extends Controller
         $siswaIds = $semuaSiswa->pluck('id')->toArray();
         
         $presensiAggregatQuery = Presensi::whereIn('siswa_id', $siswaIds)
-            ->where('status', 'Hadir'); // 🛑 FIX UTAMA DITERAPKAN DI SINI
+            ->where('status', 'Hadir'); 
             
         if ($startDate && $endDate) {
             $presensiAggregatQuery->whereBetween('tanggal', [$startDate, $endDate]);
