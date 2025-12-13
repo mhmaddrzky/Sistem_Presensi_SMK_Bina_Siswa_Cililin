@@ -51,14 +51,14 @@
             </div>
         @endif
 
-        {{-- FORM REGISTRASI --}}
-        <form method="POST" action="{{ route('register') }}" class="space-y-4">
+        {{-- FORM REGISTRASI (novalidate untuk disable HTML5 validation) --}}
+        <form method="POST" action="{{ route('register') }}" novalidate class="space-y-4">
             @csrf
 
             {{-- NAMA LENGKAP --}}
             <div>
                 <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">
-                    Nama Lengkap
+                    Nama Lengkap <span class="text-red-500">*</span>
                 </label>
                 <input type="text"
                        id="nama"
@@ -68,8 +68,7 @@
                        class="w-full bg-white/80 border @error('nama') border-red-500 @else border-gray-300 @enderror
                               rounded-xl px-4 py-3 text-sm shadow-sm
                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                              placeholder:text-gray-400"
-                       required>
+                              placeholder:text-gray-400">
                 
                 @error('nama')
                     <p class="text-red-600 text-xs mt-1.5 ml-1">{{ $message }}</p>
@@ -79,18 +78,17 @@
             {{-- USERNAME --}}
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-1">
-                    Username
+                    Username <span class="text-red-500">*</span>
                 </label>
                 <input type="text"
                        id="username"
                        name="username"
                        value="{{ old('username') }}"
-                       placeholder="Buat username unik"
+                       placeholder="Buat username unik (contoh: dimas123)"
                        class="w-full bg-white/80 border @error('username') border-red-500 @else border-gray-300 @enderror
                               rounded-xl px-4 py-3 text-sm shadow-sm
                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                              placeholder:text-gray-400"
-                       required>
+                              placeholder:text-gray-400">
                 
                 @error('username')
                     <p class="text-red-600 text-xs mt-1.5 ml-1">{{ $message }}</p>
@@ -100,18 +98,19 @@
             {{-- NIS --}}
             <div>
                 <label for="nis" class="block text-sm font-medium text-gray-700 mb-1">
-                    NIS
+                    NIS (Nomor Induk Siswa) <span class="text-red-500">*</span>
                 </label>
                 <input type="text"
                        id="nis"
                        name="nis"
                        value="{{ old('nis') }}"
-                       placeholder="Nomor Induk Siswa"
+                       placeholder="Contoh: 12345 (minimal 3 digit)"
+                       maxlength="20"
+                       inputmode="numeric"
                        class="w-full bg-white/80 border @error('nis') border-red-500 @else border-gray-300 @enderror
                               rounded-xl px-4 py-3 text-sm shadow-sm
                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                              placeholder:text-gray-400"
-                       required>
+                              placeholder:text-gray-400">
                 
                 @error('nis')
                     <p class="text-red-600 text-xs mt-1.5 ml-1">{{ $message }}</p>
@@ -121,17 +120,18 @@
             {{-- KONFIRMASI NIS --}}
             <div>
                 <label for="nis_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
-                    Konfirmasi NIS
+                    Konfirmasi NIS <span class="text-red-500">*</span>
                 </label>
                 <input type="text"
                        id="nis_confirmation"
                        name="nis_confirmation"
-                       placeholder="Ketik ulang NIS"
+                       placeholder="Ketik ulang NIS yang sama"
+                       maxlength="20"
+                       inputmode="numeric"
                        class="w-full bg-white/80 border @error('nis_confirmation') border-red-500 @else border-gray-300 @enderror
                               rounded-xl px-4 py-3 text-sm shadow-sm
                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                              placeholder:text-gray-400"
-                       required>
+                              placeholder:text-gray-400">
                 
                 @error('nis_confirmation')
                     <p class="text-red-600 text-xs mt-1.5 ml-1">{{ $message }}</p>
@@ -141,18 +141,18 @@
             {{-- KELAS --}}
             <div>
                 <label for="kelas" class="block text-sm font-medium text-gray-700 mb-1">
-                    Kelas
+                    Kelas <span class="text-red-500">*</span>
                 </label>
                 <input type="text"
                        id="kelas"
                        name="kelas"
                        value="{{ old('kelas') }}"
-                       placeholder="Contoh: XII"
+                       placeholder="Contoh: XII, XI, X"
+                       maxlength="10"
                        class="w-full bg-white/80 border @error('kelas') border-red-500 @else border-gray-300 @enderror
                               rounded-xl px-4 py-3 text-sm shadow-sm
                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                              placeholder:text-gray-400"
-                       required>
+                              placeholder:text-gray-400">
                 
                 @error('kelas')
                     <p class="text-red-600 text-xs mt-1.5 ml-1">{{ $message }}</p>
@@ -162,14 +162,13 @@
             {{-- JURUSAN --}}
             <div>
                 <label for="jurusan" class="block text-sm font-medium text-gray-700 mb-1">
-                    Jurusan
+                    Jurusan <span class="text-red-500">*</span>
                 </label>
                 <select id="jurusan"
                         name="jurusan"
                         class="w-full bg-white/80 border @error('jurusan') border-red-500 @else border-gray-300 @enderror
                                rounded-xl px-4 py-3 text-sm shadow-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required>
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">-- Pilih Jurusan --</option>
                     <option value="TKJ" {{ old('jurusan') == 'TKJ' ? 'selected' : '' }}>
                         Teknik Komputer dan Jaringan (TKJ)

@@ -2,27 +2,27 @@
 
 @section('content')
 
-<div class="max-w-6xl mx-auto space-y-6">
+<div class="max-w-7xl mx-auto space-y-6">
 
     {{-- Header --}}
     <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-3">
+        <h1 class="text-2xl md:text-3xl font-bold text-blue-900 flex items-center gap-3">
             📚 Manajemen Pembagian Sesi Siswa (Kuota)
         </h1>
-        <p class="text-gray-500 text-sm md:text-base mt-1">
+        <p class="text-slate-600 text-sm md:text-base mt-1">
             Pilih jadwal dan tentukan siswa mana yang masuk ke sesi tersebut (maks. 20 siswa).
         </p>
     </div>
 
     {{-- Notifikasi --}}
     @if(session('success'))
-        <div class="p-3 rounded-lg bg-green-100 text-green-800 border border-green-300">
+        <div class="p-3 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm font-semibold flex items-center gap-2">
             ✅ {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
-        <div class="p-3 rounded-lg bg-red-100 text-red-800 border border-red-300">
+        <div class="p-3 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-sm font-semibold flex items-center gap-2">
             ❌ {{ session('error') }}
         </div>
     @endif
@@ -34,13 +34,13 @@
         if ($jurusanFilter === 'TBSM') $labelJurusan = 'TBSM';
     @endphp
 
-    <div class="bg-white shadow-md border rounded-xl px-5 py-4">
+    <div class="bg-white shadow-sm border border-slate-200 rounded-xl px-5 py-4">
         <form action="{{ route('admin.sesi.index') }}" method="GET"
               class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 
             <div>
-                <p class="font-semibold text-gray-700">Filter Jurusan</p>
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="font-semibold text-slate-700">Filter Jurusan</p>
+                <p class="text-xs text-slate-500 mt-1">
                     Pilih jurusan untuk mempermudah pemilihan siswa.
                 </p>
             </div>
@@ -52,11 +52,11 @@
 
                     <button type="button"
                         onclick="toggleJurusanFilter()"
-                        class="w-full flex items-center justify-between gap-2 px-3 py-2.5 border rounded-lg bg-gray-50 hover:bg-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <span id="jurusan_filter_label" class="truncate text-gray-700">
+                        class="w-full flex items-center justify-between gap-2 px-3 py-2.5 border rounded-lg bg-slate-50 hover:bg-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700">
+                        <span id="jurusan_filter_label" class="truncate">
                             {{ $labelJurusan }}
                         </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                   d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
                                   clip-rule="evenodd" />
@@ -64,18 +64,18 @@
                     </button>
 
                     <div id="jurusan_filter_list"
-                        class="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden hidden z-30 text-sm">
-                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50"
+                        class="absolute left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden hidden z-30 text-sm">
+                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50 text-slate-700"
                             data-value="all" data-label="Semua Siswa"
                             onclick="pickJurusanFilter(this)">
                             Semua Siswa
                         </button>
-                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50"
+                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50 text-slate-700"
                             data-value="TKJ" data-label="TKJ"
                             onclick="pickJurusanFilter(this)">
                             TKJ
                         </button>
-                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50"
+                        <button type="button" class="w-full text-left px-3 py-2 hover:bg-blue-50 text-slate-700"
                             data-value="TBSM" data-label="TBSM"
                             onclick="pickJurusanFilter(this)">
                             TBSM
@@ -84,8 +84,8 @@
                 </div>
 
                 @if ($jurusanFilter !== 'all')
-                    <span class="hidden md:inline text-blue-700 text-sm font-medium">
-                        Menampilkan: {{ $jurusanFilter }}
+                    <span class="hidden md:inline text-blue-700 text-sm font-medium bg-blue-50 px-3 py-1 rounded-full">
+                        {{ $jurusanFilter }}
                     </span>
                 @endif
             </div>
@@ -96,11 +96,11 @@
     @csrf
 
         {{-- Card Jadwal --}}
-        <div class="bg-white shadow-md border rounded-xl px-5 py-4">
+        <div class="bg-white shadow-sm border border-slate-200 rounded-xl px-5 py-4">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
-                    <p class="font-semibold text-gray-700">1. Pilih Jadwal/Sesi</p>
-                    <p class="text-xs text-gray-500 mt-1">
+                    <p class="font-semibold text-slate-700">1. Pilih Jadwal/Sesi</p>
+                    <p class="text-xs text-slate-500 mt-1">
                         Pilih jadwal praktikum yang akan diisi oleh siswa.
                     </p>
                 </div>
@@ -132,13 +132,13 @@
                     {{-- tombol utama (seperti select) --}}
                     <button type="button"
                         onclick="toggleJadwalListSesi()"
-                        class="p-3 border rounded-lg w-full bg-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base">
-                        <span id="jadwal_selected_label_sesi" class="text-gray-700 truncate">
+                        class="p-3 border border-slate-300 rounded-lg w-full bg-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base text-slate-700">
+                        <span id="jadwal_selected_label_sesi" class="truncate">
                             {{ $selectedJadwalLabel }}
                         </span>
 
                         {{-- icon panah --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0"
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 text-slate-500"
                              viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                   d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
@@ -148,7 +148,7 @@
 
                     {{-- list jadwal --}}
                     <div id="jadwal_list_sesi"
-                        class="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto hidden z-30 text-sm">
+                        class="absolute left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto hidden z-30 text-sm">
                         @foreach ($jadwals as $jadwal)
                             @php
                                 $label = '['.$jadwal->jurusan.'] '.$jadwal->hari.', '.
@@ -157,7 +157,7 @@
                             @endphp
 
                             <button type="button"
-                                class="w-full text-left px-3 py-2 hover:bg-blue-50 {{ old('jadwal_id') == $jadwal->id ? 'bg-blue-50 font-semibold' : '' }}"
+                                class="w-full text-left px-3 py-2 hover:bg-blue-50 text-slate-700 {{ old('jadwal_id') == $jadwal->id ? 'bg-blue-50 font-semibold' : '' }}"
                                 data-id="{{ $jadwal->id }}"
                                 data-label="{{ $label }}"
                                 onclick="pickJadwalSesi(this)">
@@ -167,96 +167,111 @@
                     </div>
                 </div>
 
+                {{-- TOMBOL MUAT SISWA --}}
                 <button type="button"
                     onclick="loadSessionData()"
-                    class="px-5 py-3 bg-[#0D47C9] text-white rounded-lg hover:bg-blue-700 shadow text-sm md:text-base md:w-auto w-full">
+                    class="px-5 py-3 bg-[#0D47C9] text-white rounded-lg hover:bg-blue-800 shadow-md text-sm md:text-base md:w-auto w-full font-semibold transition-all">
                     Muat Siswa
                 </button>
             </div>
         </div>
 
-    {{-- Tabel Siswa dengan Fitur Pilih Berdasarkan Jumlah --}}
-<div class="bg-white shadow-md border rounded-xl">
-    <div class="px-5 py-3 border-b bg-gray-50">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-                <h3 class="font-semibold text-gray-800">2. Tentukan Peserta Sesi</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Pilih siswa secara manual atau otomatis</p>
-            </div>
-            
-            {{-- FITUR PILIH BERDASARKAN JUMLAH - LAYOUT FINAL --}}
-            <div class="flex items-center gap-3">
-                {{-- Counter Siswa Terpilih (Hidden by default) --}}
-                <div id="selected_count_display" class="text-sm font-medium text-gray-700 hidden">
-                    <span class="font-bold text-blue-600" id="selected_count">0</span>/<span id="total_count">0</span> dipilih
+        {{-- Tabel Siswa dengan Fitur Pilih Berdasarkan Jumlah --}}
+        <div class="bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200 bg-slate-50/50">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                        <h3 class="font-semibold text-slate-800">2. Tentukan Peserta Sesi</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Pilih siswa secara manual atau otomatis</p>
+                    </div>
+                    
+                    {{-- FITUR PILIH BERDASARKAN JUMLAH --}}
+                    <div class="flex items-center gap-3">
+                        <div id="selected_count_display" class="text-sm font-medium text-slate-600 hidden">
+                            <span class="font-bold text-blue-700" id="selected_count">0</span>/<span id="total_count">0</span> dipilih
+                        </div>
+                        
+                        {{-- Input Jumlah --}}
+                        <input type="number" 
+                            id="select_count"
+                            min="1"
+                            placeholder="Jumlah"
+                            class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            oninput="validateSelectCount(this)"
+                            onkeypress="if(event.key === 'Enter') { event.preventDefault(); selectByCount(); }">
+                        
+                        {{-- Button Terapkan --}}
+                        <button type="button"
+                            onclick="selectByCount()"
+                            class="px-5 py-2 bg-[#0D47C9] text-white rounded-lg text-sm font-semibold hover:bg-blue-800 transition-all shadow-sm">
+                            Terapkan
+                        </button>
+                    </div>
                 </div>
-                
-                {{-- Input di tengah --}}
-                <input type="number" 
-                    id="select_count"
-                    min="1"
-                    placeholder="Jumlah"
-                    class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    oninput="validateSelectCount(this)"
-                    onkeypress="if(event.key === 'Enter') { event.preventDefault(); selectByCount(); }">
-                
-                {{-- Button Terapkan di pojok kanan --}}
-                <button type="button"
-                    onclick="selectByCount()"
-                    class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
-                    Terapkan
-                </button>
+            </div>
+
+            {{-- TABLE SISWA --}}
+            <div class="overflow-x-auto w-full">
+                <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm">
+                    <thead class="bg-[#0D47C9] text-white">
+                        <tr>
+                            <th class="p-3 text-center font-semibold w-16">Pilih</th>
+                            <th class="p-3 text-left font-semibold">NIS</th>
+                            <th class="p-3 text-left font-semibold">Nama</th>
+                            <th class="p-3 text-left font-semibold">Kelas</th>
+                            <th class="p-3 text-left font-semibold">Jurusan</th>
+                            <th class="p-3 text-left font-semibold">Status Sesi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        @foreach ($siswas as $siswa)
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3 text-center">
+                                <input type="checkbox"
+                                    name="siswa_ids[]"
+                                    value="{{ $siswa->id }}"
+                                    data-siswa-id="{{ $siswa->id }}"
+                                    class="siswa-checkbox w-4 h-4 md:w-5 md:h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                    onchange="updateSelectAllState()">
+                            </td>
+
+                            <td class="p-3 whitespace-nowrap text-slate-700">{{ $siswa->nis }}</td>
+                            <td class="p-3 text-slate-800 font-medium">{{ $siswa->nama }}</td>
+                            <td class="p-3 whitespace-nowrap text-slate-600">{{ $siswa->kelas }}</td>
+                            <td class="p-3 whitespace-nowrap">
+                                <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-600/20">
+                                    {{ $siswa->jurusan }}
+                                </span>
+                            </td>
+
+                            <td class="p-3" id="status-{{ $siswa->id }}">
+                                <span class="text-slate-400 italic text-xs">Belum dimuat</span>
+                            </td>
+                        </tr>
+                        @endforeach
+
+                        @if ($siswas->count() == 0)
+                        <tr>
+                            <td colspan="6" class="p-8 text-center text-slate-500">
+                                Tidak ada data siswa yang tersedia untuk jurusan ini.
+                            </td>
+                        </tr>
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
 
-    {{-- SCROLL RESPONSIF --}}
-    <div class="overflow-x-auto w-full">
-        <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm">
-            <thead class="bg-[#0D47C9] text-white">
-                <tr>
-                    <th class="p-3 text-center font-semibold w-16">Pilih</th>
-                    <th class="p-3 text-left font-semibold">NIS</th>
-                    <th class="p-3 text-left font-semibold">Nama</th>
-                    <th class="p-3 text-left font-semibold">Kelas</th>
-                    <th class="p-3 text-left font-semibold">Jurusan</th>
-                    <th class="p-3 text-left font-semibold">Status Sesi</th>
-                </tr>
-            </thead>
+        {{-- Tombol Submit --}}
+        <div>
+            <button type="submit"
+                class="px-6 py-3 bg-emerald-600 text-white rounded-lg shadow-md hover:bg-emerald-700 transition font-semibold text-sm md:text-base w-full md:w-auto">
+                Simpan Pembagian Sesi
+            </button>
+        </div>
 
-            <tbody class="divide-y">
-                @foreach ($siswas as $siswa)
-                <tr class="hover:bg-gray-50">
-                    <td class="p-3 text-center">
-                        <input type="checkbox"
-                            name="siswa_ids[]"
-                            value="{{ $siswa->id }}"
-                            data-siswa-id="{{ $siswa->id }}"
-                            class="siswa-checkbox w-4 h-4 md:w-5 md:h-5"
-                            onchange="updateSelectAllState()">
-                    </td>
-
-                    <td class="p-3 whitespace-nowrap">{{ $siswa->nis }}</td>
-                    <td class="p-3">{{ $siswa->nama }}</td>
-                    <td class="p-3 whitespace-nowrap">{{ $siswa->kelas }}</td>
-                    <td class="p-3 whitespace-nowrap">{{ $siswa->jurusan }}</td>
-
-                    <td class="p-3" id="status-{{ $siswa->id }}">
-                        <span class="text-gray-400">Belum dimuat</span>
-                    </td>
-                </tr>
-                @endforeach
-
-                @if ($siswas->count() == 0)
-                <tr>
-                    <td colspan="6" class="p-4 text-center text-gray-500">
-                        Tidak ada data siswa.
-                    </td>
-                </tr>
-                @endif
-            </tbody>
-        </table>
-    </div>
+    </form>
 </div>
 
 {{-- SCRIPT LENGKAP --}}
@@ -269,53 +284,61 @@
         const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
         const availableCount = Array.from(allCheckboxes).filter(cb => !cb.disabled).length;
         
-        // Batasi input tidak boleh melebihi jumlah siswa yang tersedia
         if (parseInt(input.value) > availableCount) {
             input.value = availableCount;
         }
-        
-        // Tidak boleh negatif atau 0
         if (parseInt(input.value) < 1) {
             input.value = '';
         }
     }
 
-    // ===== PILIH BERDASARKAN JUMLAH =====
+    // ===== PILIH BERDASARKAN JUMLAH (DENGAN POPUP HIJAU) =====
     function selectByCount() {
         const countInput = document.getElementById('select_count');
         const targetCount = parseInt(countInput.value) || 0;
         
+        // Validasi Kosong
         if (targetCount === 0 || targetCount < 1) {
-            alert('⚠️ Masukkan jumlah siswa yang ingin dipilih (minimal 1)');
-            countInput.focus();
+            // Parameter: Title, Message, FormID, ButtonText, Color, Type
+            window.openModal(
+                'Perhatian', 
+                'Mohon masukkan jumlah siswa yang ingin dipilih (minimal 1).', 
+                null, 
+                'Mengerti', 
+                'emerald', // Warna tombol Hijau
+                'alert'    // Tipe Alert (hanya OK)
+            );
             return;
         }
         
         const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
         const enabledCheckboxes = Array.from(allCheckboxes).filter(cb => !cb.disabled);
         
+        // Validasi Stok Kurang
         if (targetCount > enabledCheckboxes.length) {
-            alert(`⚠️ Jumlah siswa yang tersedia hanya ${enabledCheckboxes.length} siswa.\nAnda meminta ${targetCount} siswa.`);
+            window.openModal(
+                'Stok Siswa Tidak Cukup', 
+                `Jumlah siswa tersedia hanya ${enabledCheckboxes.length}. Anda meminta ${targetCount} siswa.`, 
+                null, 
+                'Sesuaikan', 
+                'emerald', // Warna tombol Hijau
+                'alert'
+            );
             countInput.value = enabledCheckboxes.length;
             return;
         }
         
-        // Reset semua checkbox dulu
+        // Reset dan Pilih
         enabledCheckboxes.forEach(cb => cb.checked = false);
-        
-        // Pilih sejumlah checkbox sesuai target
         for (let i = 0; i < targetCount && i < enabledCheckboxes.length; i++) {
             enabledCheckboxes[i].checked = true;
         }
         
-        // Update counter
         updateSelectedCount();
-        
-        // Clear input setelah berhasil
         countInput.value = '';
     }
 
-    // ===== UPDATE COUNTER SISWA TERPILIH =====
+    // ===== UPDATE COUNTER =====
     function updateSelectedCount() {
         const checkedCount = document.querySelectorAll('.siswa-checkbox:checked').length;
         const totalCount = document.querySelectorAll('.siswa-checkbox:not([disabled])').length;
@@ -324,256 +347,103 @@
         const totalDisplay = document.getElementById('total_count');
         const countWrapper = document.getElementById('selected_count_display');
         
-        if (countDisplay) {
-            countDisplay.textContent = checkedCount;
-        }
-        if (totalDisplay) {
-            totalDisplay.textContent = totalCount;
-        }
+        if (countDisplay) countDisplay.textContent = checkedCount;
+        if (totalDisplay) totalDisplay.textContent = totalCount;
         
-        // Tampilkan counter hanya jika ada siswa terpilih
         if (countWrapper) {
-            if (checkedCount > 0) {
-                countWrapper.classList.remove('hidden');
-            } else {
-                countWrapper.classList.add('hidden');
-            }
+            if (checkedCount > 0) countWrapper.classList.remove('hidden');
+            else countWrapper.classList.add('hidden');
         }
     }
 
-    // ===== UPDATE STATE (TANPA MASTER CHECKBOX) =====
     function updateSelectAllState() {
         updateSelectedCount();
     }
 
-    // ===== DROPDOWN FILTER JURUSAN =====
+    // ===== DROPDOWN HELPER =====
     function toggleJurusanFilter() {
-        const list = document.getElementById('jurusan_filter_list');
-        if (list) list.classList.toggle('hidden');
+        document.getElementById('jurusan_filter_list').classList.toggle('hidden');
     }
 
     function pickJurusanFilter(btn) {
-        const value = btn.dataset.value;
-        const label = btn.dataset.label;
-
-        document.getElementById('jurusan_filter_input').value = value;
-        document.getElementById('jurusan_filter_label').textContent = label;
-
-        const list = document.getElementById('jurusan_filter_list');
-        if (list) list.classList.add('hidden');
-
+        document.getElementById('jurusan_filter_input').value = btn.dataset.value;
+        document.getElementById('jurusan_filter_label').textContent = btn.dataset.label;
+        document.getElementById('jurusan_filter_list').classList.add('hidden');
         btn.closest('form').submit();
     }
 
-    // ===== DROPDOWN CUSTOM JADWAL SESI =====
     function toggleJadwalListSesi() {
-        const list = document.getElementById('jadwal_list_sesi');
-        if (list) list.classList.toggle('hidden');
+        document.getElementById('jadwal_list_sesi').classList.toggle('hidden');
     }
 
     function pickJadwalSesi(btn) {
-        const id = btn.dataset.id;
-        const label = btn.dataset.label;
-
-        document.getElementById('jadwal_id').value = id;
-        document.getElementById('jadwal_selected_label_sesi').textContent = label;
-
-        const list = document.getElementById('jadwal_list_sesi');
-        if (list) list.classList.add('hidden');
+        document.getElementById('jadwal_id').value = btn.dataset.id;
+        document.getElementById('jadwal_selected_label_sesi').textContent = btn.dataset.label;
+        document.getElementById('jadwal_list_sesi').classList.add('hidden');
     }
 
-    // ===== KLIK DI LUAR DROPDOWN =====
     document.addEventListener('click', function(e) {
-        const jurusanWrapper = document.getElementById('jurusanFilterWrapper');
-        const jurusanList = document.getElementById('jurusan_filter_list');
-        if (jurusanWrapper && jurusanList && !jurusanWrapper.contains(e.target)) {
-            jurusanList.classList.add('hidden');
-        }
+        const jw = document.getElementById('jurusanFilterWrapper');
+        const jl = document.getElementById('jurusan_filter_list');
+        if (jw && jl && !jw.contains(e.target)) jl.classList.add('hidden');
 
-        const jadwalWrapper = document.getElementById('jadwalDropdownSesi');
-        const jadwalList = document.getElementById('jadwal_list_sesi');
-        if (jadwalWrapper && jadwalList && !jadwalWrapper.contains(e.target)) {
-            jadwalList.classList.add('hidden');
-        }
+        const sw = document.getElementById('jadwalDropdownSesi');
+        const sl = document.getElementById('jadwal_list_sesi');
+        if (sw && sl && !sw.contains(e.target)) sl.classList.add('hidden');
     });
 
-    // ===== LOAD SESSION DATA =====
+    // ===== LOAD SESSION LOGIC =====
     function loadSessionData() {
-        // Reset status
         document.querySelectorAll('[id^="status-"]').forEach(el => {
-            el.innerHTML = '<span class="text-gray-400">Tidak terdaftar</span>';
+            el.innerHTML = '<span class="text-slate-400 italic text-xs">Tidak terdaftar</span>';
         });
 
-        // Uncheck semua dan enable semua
         document.querySelectorAll('.siswa-checkbox').forEach(ch => {
             ch.checked = false;
             ch.disabled = false;
         });
 
-        // Reset input jumlah
-        const selectCountInput = document.getElementById('select_count');
-        if (selectCountInput) {
-            selectCountInput.value = '';
-        }
+        if(document.getElementById('select_count')) document.getElementById('select_count').value = '';
 
         const selectedJadwalId = document.getElementById('jadwal_id').value;
         if (!selectedJadwalId) {
-            alert('⚠️ Silakan pilih jadwal terlebih dahulu!');
+            // Peringatan jika belum pilih jadwal (Hijau juga)
+            window.openModal('Perhatian', 'Silakan pilih jadwal terlebih dahulu!', null, 'Mengerti', 'emerald', 'alert');
             updateSelectedCount();
             return;
         }
 
-        // Proses mapping data
         document.querySelectorAll('.siswa-checkbox').forEach(checkbox => {
             const siswaId = checkbox.dataset.siswaId;
             let foundInSelectedJadwal = false;
 
             for (const jadwalId in mappingData) {
                 const found = mappingData[jadwalId].find(m => m.siswa_id == siswaId);
-
                 if (found) {
                     const status = document.getElementById('status-' + siswaId);
-
                     if (jadwalId == selectedJadwalId) {
-                        // Siswa sudah terdaftar di jadwal ini
                         checkbox.checked = true;
                         foundInSelectedJadwal = true;
-                        status.innerHTML = '<span class="text-blue-600 font-semibold">Sesi ini</span>';
+                        status.innerHTML = '<span class="text-blue-600 font-bold text-xs">Sesi ini</span>';
                     } else {
-                        // Siswa terdaftar di jadwal lain
                         const j = allJadwals[jadwalId];
                         if (j) {
-                            status.innerHTML = `<span class="text-orange-600 font-medium">Terdaftar di ${j.mata_pelajaran}</span>`;
+                            status.innerHTML = `<span class="text-orange-600 font-medium text-xs">Terdaftar di ${j.mata_pelajaran}</span>`;
                         }
                     }
                 }
             }
         });
-        
-        // Update counter setelah load data
         updateSelectedCount();
     }
     
-    // Initialize: sembunyikan counter saat page load
     document.addEventListener('DOMContentLoaded', function() {
-        const countWrapper = document.getElementById('selected_count_display');
-        if (countWrapper) {
-            countWrapper.classList.add('hidden');
-        }
+        const cw = document.getElementById('selected_count_display');
+        if (cw) cw.classList.add('hidden');
     });
 </script>
 
-        {{-- Tombol Submit --}}
-        <div>
-            <button type="submit"
-                class="px-6 py-3 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition text-sm md:text-base">
-                Simpan Pembagian Sesi
-            </button>
-        </div>
-
-    </form>
-</div>
-
-{{-- STYLE KECIL UNTUK DROPDOWN --}}
-<style>
-    #jadwal_list_sesi button,
-    #jurusan_filter_list button {
-        transition: background 0.15s;
-    }
-</style>
-
-{{-- SCRIPT --}}
-<script>
-    const mappingData = @json($mappingSesi);
-    const allJadwals = @json($jadwals->keyBy('id'));
-
-    // ===== DROPDOWN FILTER JURUSAN =====
-    function toggleJurusanFilter() {
-        const list = document.getElementById('jurusan_filter_list');
-        if (list) list.classList.toggle('hidden');
-    }
-
-    function pickJurusanFilter(btn) {
-        const value = btn.dataset.value;
-        const label = btn.dataset.label;
-
-        document.getElementById('jurusan_filter_input').value = value;
-        document.getElementById('jurusan_filter_label').textContent = label;
-
-        const list = document.getElementById('jurusan_filter_list');
-        if (list) list.classList.add('hidden');
-
-        // submit form filter
-        btn.closest('form').submit();
-    }
-
-    // ===== DROPDOWN CUSTOM JADWAL SESI =====
-    function toggleJadwalListSesi() {
-        const list = document.getElementById('jadwal_list_sesi');
-        if (list) list.classList.toggle('hidden');
-    }
-
-    function pickJadwalSesi(btn) {
-        const id = btn.dataset.id;
-        const label = btn.dataset.label;
-
-        document.getElementById('jadwal_id').value = id;
-        document.getElementById('jadwal_selected_label_sesi').textContent = label;
-
-        const list = document.getElementById('jadwal_list_sesi');
-        if (list) list.classList.add('hidden');
-    }
-
-    // klik di luar dropdown -> tutup dua-duanya
-    document.addEventListener('click', function(e) {
-        const jurusanWrapper = document.getElementById('jurusanFilterWrapper');
-        const jurusanList = document.getElementById('jurusan_filter_list');
-        if (jurusanWrapper && jurusanList && !jurusanWrapper.contains(e.target)) {
-            jurusanList.classList.add('hidden');
-        }
-
-        const jadwalWrapper = document.getElementById('jadwalDropdownSesi');
-        const jadwalList = document.getElementById('jadwal_list_sesi');
-        if (jadwalWrapper && jadwalList && !jadwalWrapper.contains(e.target)) {
-            jadwalList.classList.add('hidden');
-        }
-    });
-
-    // ===== LOGIKA MUAT SESI (sama seperti sebelumnya) =====
-    function loadSessionData() {
-        // reset status
-        document.querySelectorAll('[id^="status-"]').forEach(el => {
-            el.innerHTML = '<span class="text-gray-400">Tidak terdaftar</span>';
-        });
-
-        // uncheck semua
-        document.querySelectorAll('input[type="checkbox"]').forEach(ch => ch.checked = false);
-
-        const selectedJadwalId = document.getElementById('jadwal_id').value;
-        if (!selectedJadwalId) return;
-
-        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            const siswaId = checkbox.dataset.siswaId;
-
-            for (const jadwalId in mappingData) {
-                const found = mappingData[jadwalId].find(m => m.siswa_id == siswaId);
-
-                if (found) {
-                    const status = document.getElementById('status-' + siswaId);
-
-                    if (jadwalId == selectedJadwalId) {
-                        checkbox.checked = true;
-                        status.innerHTML =
-                            '<span class="text-blue-600 font-semibold">Sesi ini</span>';
-                    } else {
-                        const j = allJadwals[jadwalId];
-                        status.innerHTML =
-                            `<span class="text-orange-600 font-medium">Terdaftar di ${j.mata_pelajaran}</span>`;
-                    }
-                }
-            }
-        });
-    }
-</script>
+{{-- INCLUDE COMPONENT MODAL --}}
+@include('components.modal-confirmation')
 
 @endsection

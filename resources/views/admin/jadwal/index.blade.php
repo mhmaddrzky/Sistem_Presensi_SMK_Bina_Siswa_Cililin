@@ -111,20 +111,26 @@
                                                 </svg>
                                             </a>
 
-                                            {{-- Tombol Hapus dengan Icon --}}
-                                            <form action="{{ route('admin.jadwal.destroy', $jadwal->id) }}"
+                                           {{-- Tombol Hapus dengan Icon & Modal --}}
+                                            <form id="delete-jadwal-{{ $jadwal->id }}"
+                                                action="{{ route('admin.jadwal.destroy', $jadwal->id) }}"
                                                 method="POST"
-                                                class="inline-block"
-                                                onsubmit="return confirm('⚠️ Yakin ingin menghapus jadwal ini?\n\nJadwal: {{ $jadwal->mata_pelajaran }}\nHari: {{ $jadwal->hari }}\nWaktu: {{ substr($jadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->waktu_selesai, 0, 5) }}\n\nTindakan ini tidak dapat dibatalkan!');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200 group"
-                                                        title="Hapus Jadwal">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
+                                                class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            
+                                            <button type="button"
+                                                    class="btn-confirm inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
+                                                    title="Hapus Jadwal"
+                                                    data-form-id="delete-jadwal-{{ $jadwal->id }}"
+                                                    data-title="Hapus Jadwal?"
+                                                    data-message="Hapus jadwal {{ $jadwal->mata_pelajaran }} ({{ $jadwal->hari }}, {{ substr($jadwal->waktu_mulai, 0, 5) }}-{{ substr($jadwal->waktu_selesai, 0, 5) }})? Data presensi terkait akan tetap tersimpan."
+                                                    data-btn-ok="Hapus"
+                                                    data-btn-color="rose">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
                                             </form>
 
                                         </div>
@@ -153,4 +159,8 @@
     @endif
 
 </div>
+
+{{-- INCLUDE MODAL KONFIRMASI --}}
+@include('components.modal-confirmation')
+
 @endsection

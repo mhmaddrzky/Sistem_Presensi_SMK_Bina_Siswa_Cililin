@@ -126,19 +126,25 @@
                                             </a>
 
                                             {{-- Tombol Hapus dengan Icon --}}
-                                            <form action="{{ route('admin.users.destroy', $user->id) }}"
+                                            <form id="delete-user-{{ $user->id }}"
+                                                action="{{ route('admin.users.destroy', $user->id) }}"
                                                 method="POST"
-                                                class="inline-block"
-                                                onsubmit="return confirm('⚠️ Yakin ingin menghapus akun ini?\n\nNama: {{ $adminDetail->nama ?? $user->username }}\nRole: {{ $user->role }}\nUsername: {{ $user->username }}\n\nTindakan ini tidak dapat dibatalkan!');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
-                                                        title="Hapus Akun">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
+                                                class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            
+                                            <button type="button"
+                                                    class="btn-confirm inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
+                                                    title="Hapus Akun"
+                                                    data-form-id="delete-user-{{ $user->id }}"
+                                                    data-title="Hapus Akun?"
+                                                    data-message="Hapus akun {{ $adminDetail->nama ?? $user->username }} ({{ $user->role }}, Username: {{ $user->username }})? Akun tidak dapat dipulihkan setelah dihapus."
+                                                    data-btn-ok="Hapus"
+                                                    data-btn-color="rose">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
                                             </form>
 
                                         </div>
@@ -158,4 +164,8 @@
     </div>
 
 </div>
+
+{{-- INCLUDE MODAL KONFIRMASI --}}
+@include('components.modal-confirmation')
+
 @endsection

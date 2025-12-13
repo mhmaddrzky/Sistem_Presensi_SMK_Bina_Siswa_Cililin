@@ -14,48 +14,50 @@ use Illuminate\Support\Facades\Auth; // Wajib di-import
 class KoreksiPresensiController extends Controller
 {
     /** Menampilkan form filter dan tabel koreksi absensi */
-    public function index(Request $request)
-    {
-        $jadwals = KelolaJadwal::orderBy('hari')->orderBy('waktu_mulai')->get();
-        $jadwalId = $request->input('jadwal_id');
-        $rekapKoreksi = collect();
-        $jadwalTerpilih = null;
-        
-        // 🛑 FIX TANGGAL 1: Selalu ambil tanggal hari ini untuk koreksi presensi yang baru terjadi
-        $tanggalKoreksi = Carbon::today()->toDateString(); 
+ /** Menampilkan form filter dan tabel koreksi absensi */
+ public function index(Request $request)
+ {
+     $jadwals = KelolaJadwal::orderBy('hari')->orderBy('waktu_mulai')->get();
+     $jadwalId = $request->input('jadwal_id');
+     $rekapKoreksi = collect();
+     $jadwalTerpilih = null;
+     
+     // 🛑 FIX TANGGAL 1: Selalu ambil tanggal hari ini untuk koreksi presensi yang baru terjadi
+     $tanggalKoreksi = Carbon::today()->toDateString(); 
 
-        if ($jadwalId) {
-            $jadwalTerpilih = KelolaJadwal::find($jadwalId);
-            
-            // 1. Ambil ID Siswa yang terdaftar untuk Jadwal ini
-            $siswaIdsSesi = SesiSiswa::where('jadwal_id', $jadwalId)->pluck('siswa_id');
+     if ($jadwalId) {
+         $jadwalTerpilih = KelolaJadwal::find($jadwalId);
+         
+         // 1. Ambil ID Siswa yang terdaftar untuk Jadwal ini
+         $siswaIdsSesi = SesiSiswa::where('jadwal_id', $jadwalId)->pluck('siswa_id');
 
-            // 2. Ambil semua data Siswa tersebut
-            $pesertaSesi = Siswa::whereIn('id', $siswaIdsSesi)->orderBy('kelas')->get();
+         // 2. Ambil semua data Siswa tersebut
+         $pesertaSesi = Siswa::whereIn('id', $siswaIdsSesi)->orderBy('kelas')->get();
 
-            // 3. Ambil data presensi yang sudah tercatat (Hadir Otomatis) untuk sesi ini
-            $presensiOtomatis = Presensi::where('jadwal_id', $jadwalId)
-                                        // 🛑 FIX TANGGAL 2: Filter data presensi HANYA untuk hari ini
-                                        ->where('tanggal', $tanggalKoreksi) 
-                                        ->get()
-                                        ->keyBy('siswa_id'); 
+         // 3. Ambil data presensi yang sudah tercatat (Hadir Otomatis) untuk sesi ini
+         $presensiOtomatis = Presensi::where('jadwal_id', $jadwalId)
+                                         // 🛑 FIX TANGGAL 2: Filter data presensi HANYA untuk hari ini
+                                         ->where('tanggal', $tanggalKoreksi) 
+                                         ->get()
+                                         ->keyBy('siswa_id'); 
 
-            // 4. Proses Rekap Koreksi
-            foreach ($pesertaSesi as $siswa) {
-                $presensi = $presensiOtomatis->get($siswa->id);
-                
-                $rekapKoreksi[] = [
-                    'siswa_id' => $siswa->id,
-                    'nama' => $siswa->nama,
-                    'kelas' => $siswa->kelas,
-                    'status_otomatis' => $presensi ? $presensi->status : 'Alfa', 
-                    'presensi_id' => $presensi ? $presensi->id_presensi : null, 
-                ];
-            }
-        }
+         // 4. Proses Rekap Koreksi
+         foreach ($pesertaSesi as $siswa) {
+             $presensi = $presensiOtomatis->get($siswa->id);
+             
+             $rekapKoreksi[] = [
+                 'siswa_id' => $siswa->id,
+                 'nis'      => $siswa->nis, // <--- TAMBAHAN: Agar NIS bisa ditampilkan di view
+                 'nama'     => $siswa->nama,
+                 'kelas'    => $siswa->kelas,
+                 'status_otomatis' => $presensi ? $presensi->status : 'Alfa', 
+                 'presensi_id'     => $presensi ? $presensi->id_presensi : null, 
+             ];
+         }
+     }
 
-        return view('admin.koreksi.index', compact('jadwals', 'rekapKoreksi', 'jadwalTerpilih'));
-    }
+     return view('admin.koreksi.index', compact('jadwals', 'rekapKoreksi', 'jadwalTerpilih'));
+ }
 
     /** Menyimpan koreksi status presensi manual (Sakit, Izin, Alfa) */
     public function store(Request $request)

@@ -47,7 +47,9 @@
                     if(request('jadwal_id')){
                         foreach($jadwals as $j){
                             if($j->id == request('jadwal_id')){
-                                $selectedLabel = '['.$j->jurusan.'] '.$j->hari.', '.substr($j->waktu_mulai,0,5).' - '.substr($j->waktu_selesai,0,5).' | Ruang: '.$j->ruang_lab;
+                                // UPDATE FORMAT LABEL TERPILIH AGAR SAMA DENGAN SESI
+                                // Format: [Jurusan] Hari, Jam | Mapel (Ruang)
+                                $selectedLabel = '['.$j->jurusan.'] '.$j->hari.', '.substr($j->waktu_mulai,0,5).' - '.substr($j->waktu_selesai,0,5).' | '.$j->mata_pelajaran.' ('.$j->ruang_lab.')';
                                 break;
                             }
                         }
@@ -72,7 +74,10 @@
 
                 @foreach($jadwals as $jadwal)
                     @php
-                        $label = '['.$jadwal->jurusan.'] '.$jadwal->hari.', '.substr($jadwal->waktu_mulai,0,5).' - '.substr($jadwal->waktu_selesai,0,5).' | Ruang: '.$jadwal->ruang_lab;
+                        // UPDATE FORMAT LIST AGAR SAMA DENGAN SESI
+                        // Lama: | Ruang: 5
+                        // Baru: | Mapel (5)
+                        $label = '['.$jadwal->jurusan.'] '.$jadwal->hari.', '.substr($jadwal->waktu_mulai,0,5).' - '.substr($jadwal->waktu_selesai,0,5).' | '.$jadwal->mata_pelajaran.' ('.$jadwal->ruang_lab.')';
                     @endphp
 
                     <button type="button"
@@ -92,7 +97,7 @@
 {{-- Jika jadwal dipilih --}}
 @if(isset($jadwalTerpilih))
 
-    <h2 class="text-xl font-bold text-gray-800 mb-4">
+    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
         Daftar Peserta Sesi: <span class="text-blue-600">{{ $jadwalTerpilih->hari }}</span>
     </h2>
 
@@ -103,82 +108,84 @@
         {{-- Table Responsif --}}
         <div class="overflow-x-auto bg-white shadow-md rounded-xl border">
             <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-[#0D47C9] text-white">
-        <tr>
-            {{-- HEADER: Ubah text-left menjadi text-center --}}
-            <th class="p-3 text-center font-semibold">NIS</th>
-            <th class="p-3 text-center font-semibold">Nama</th>
-            <th class="p-3 text-center font-semibold">Kelas</th>
-            <th class="p-3 text-center font-semibold">Status Otomatis</th>
-            <th class="p-3 text-center font-semibold">Koreksi Menjadi</th>
-        </tr>
-    </thead>
+                <thead class="bg-[#0D47C9] text-white">
+                    <tr>
+                        <th class="p-3 text-center font-semibold">NIS</th>
+                        <th class="p-3 text-center font-semibold">Nama</th>
+                        <th class="p-3 text-center font-semibold">Kelas</th>
+                        <th class="p-3 text-center font-semibold">Status Otomatis</th>
+                        <th class="p-3 text-center font-semibold">Koreksi Menjadi</th>
+                    </tr>
+                </thead>
 
-    <tbody class="divide-y">
-        @forelse ($rekapKoreksi as $i => $koreksi)
-            @php
-                $currentStatus = $koreksi['status_otomatis'] ?? 'Alfa';
-            @endphp
+                <tbody class="divide-y">
+                    @forelse ($rekapKoreksi as $i => $koreksi)
+                        @php
+                            $currentStatus = $koreksi['status_otomatis'] ?? 'Alfa';
+                        @endphp
 
-            <tr class="hover:bg-gray-50">
-                {{-- DATA: Tambahkan text-center --}}
-                <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['siswa_id'] }}</td>
-                <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['nama'] }}</td>
-                <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['kelas'] }}</td>
+                        <tr class="hover:bg-gray-50">
+                            {{-- DATA: TAMPILKAN NIS --}}
+                            <td class="p-3 whitespace-nowrap text-center">
+                                {{ $koreksi['nis'] }}
+                            </td>
 
-                <td class="p-3 font-bold whitespace-nowrap text-center">
-                    <span id="label_otomatis_{{ $i }}"
-                          class="px-3 py-1 rounded-lg text-white
-                          {{ $currentStatus == 'Hadir' ? 'bg-green-500' : '' }}
-                          {{ $currentStatus == 'Izin' ? 'bg-yellow-500' : '' }}
-                          {{ $currentStatus == 'Sakit' ? 'bg-blue-500' : '' }}
-                          {{ $currentStatus == 'Alfa' ? 'bg-red-500' : '' }}">
-                        {{ $currentStatus }}
-                    </span>
-                </td>
+                            <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['nama'] }}</td>
+                            <td class="p-3 whitespace-nowrap text-center">{{ $koreksi['kelas'] }}</td>
 
-                {{-- Koreksi Menjadi: PENTING! Untuk Koreksi Menjadi, kita set text-center pada div di dalamnya agar tombolnya rata tengah --}}
-                <td class="p-3 whitespace-nowrap">
-                    {{-- Hidden Input tetap di sini --}}
-                    <input type="hidden" name="koreksi[{{ $i }}][siswa_id]" value="{{ $koreksi['siswa_id'] }}">
-                    <input type="hidden"
-                           name="koreksi[{{ $i }}][status]"
-                           id="status_input_{{ $i }}"
-                           value="{{ $currentStatus }}">
+                            <td class="p-3 font-bold whitespace-nowrap text-center">
+                                <span id="label_otomatis_{{ $i }}"
+                                      class="px-3 py-1 rounded-lg text-white
+                                      {{ $currentStatus == 'Hadir' ? 'bg-green-500' : '' }}
+                                      {{ $currentStatus == 'Izin' ? 'bg-yellow-500' : '' }}
+                                      {{ $currentStatus == 'Sakit' ? 'bg-blue-500' : '' }}
+                                      {{ $currentStatus == 'Alfa' ? 'bg-red-500' : '' }}">
+                                    {{ $currentStatus }}
+                                </span>
+                            </td>
 
-                    <div class="flex items-center gap-2 justify-center"> 
-                        {{-- H --}}
-                        <button type="button"
-                            class="status-dot {{ $currentStatus == 'Hadir' ? 'status-h' : '' }}"
-                            data-row="{{ $i }}" data-status="Hadir" onclick="pickKoreksi({{ $i }}, 'Hadir')"> H
-                        </button>
-                        {{-- I --}}
-                        <button type="button"
-                            class="status-dot {{ $currentStatus == 'Izin' ? 'status-i' : '' }}"
-                            data-row="{{ $i }}" data-status="Izin" onclick="pickKoreksi({{ $i }}, 'Izin')"> I
-                        </button>
-                        {{-- S --}}
-                        <button type="button"
-                            class="status-dot {{ $currentStatus == 'Sakit' ? 'status-s' : '' }}"
-                            data-row="{{ $i }}" data-status="Sakit" onclick="pickKoreksi({{ $i }}, 'Sakit')"> S
-                        </button>
-                        {{-- A --}}
-                        <button type="button"
-                            class="status-dot {{ $currentStatus == 'Alfa' ? 'status-a' : '' }}"
-                            data-row="{{ $i }}" data-status="Alfa" onclick="pickKoreksi({{ $i }}, 'Alfa')"> A
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="5" class="p-5 text-center text-gray-500">
-                    Tidak ada data siswa untuk sesi ini.
-                </td>
-            </tr>
-        @endforelse
-    </tbody>
-</table>
+                            {{-- Koreksi Menjadi --}}
+                            <td class="p-3 whitespace-nowrap">
+                                <input type="hidden" name="koreksi[{{ $i }}][siswa_id]" value="{{ $koreksi['siswa_id'] }}">
+                                
+                                <input type="hidden"
+                                       name="koreksi[{{ $i }}][status]"
+                                       id="status_input_{{ $i }}"
+                                       value="{{ $currentStatus }}">
+
+                                <div class="flex items-center gap-2 justify-center"> 
+                                    {{-- H --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Hadir' ? 'status-h' : '' }}"
+                                        data-row="{{ $i }}" data-status="Hadir" onclick="pickKoreksi({{ $i }}, 'Hadir')"> H
+                                    </button>
+                                    {{-- I --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Izin' ? 'status-i' : '' }}"
+                                        data-row="{{ $i }}" data-status="Izin" onclick="pickKoreksi({{ $i }}, 'Izin')"> I
+                                    </button>
+                                    {{-- S --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Sakit' ? 'status-s' : '' }}"
+                                        data-row="{{ $i }}" data-status="Sakit" onclick="pickKoreksi({{ $i }}, 'Sakit')"> S
+                                    </button>
+                                    {{-- A --}}
+                                    <button type="button"
+                                        class="status-dot {{ $currentStatus == 'Alfa' ? 'status-a' : '' }}"
+                                        data-row="{{ $i }}" data-status="Alfa" onclick="pickKoreksi({{ $i }}, 'Alfa')"> A
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="p-5 text-center text-gray-500">
+                                Tidak ada data siswa untuk sesi ini.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
         {{-- Submit --}}
@@ -195,28 +202,26 @@
 {{-- STYLE KECIL UNTUK BULATAN STATUS --}}
 <style>
     .status-dot {
-        width: 2rem;          /* w-8 */
-        height: 2rem;         /* h-8 */
+        width: 2rem;
+        height: 2rem;
         border-radius: 9999px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #e5e7eb;  /* abu-abu netral */
-        font-size: 0.75rem;   /* text-xs */
+        background: #e5e7eb;
+        font-size: 0.75rem;
         font-weight: 600;
-        color: #374151;       /* text-slate-700 */
+        color: #374151;
         cursor: pointer;
         transition: 0.15s;
     }
     .status-dot:hover {
         transform: scale(1.05);
     }
-
-    /* warna hanya untuk status terpilih */
-    .status-h { background-color: #22c55e; color: #fff; } /* Hadir hijau */
-    .status-i { background-color: #fbbf24; color: #fff; } /* Izin kuning */
-    .status-s { background-color: #3b82f6; color: #fff; } /* Sakit biru */
-    .status-a { background-color: #ef4444; color: #fff; } /* Alfa merah */
+    .status-h { background-color: #22c55e; color: #fff; }
+    .status-i { background-color: #fbbf24; color: #fff; }
+    .status-s { background-color: #3b82f6; color: #fff; }
+    .status-a { background-color: #ef4444; color: #fff; }
 </style>
 
 {{-- SCRIPT DROPDOWN + STATUS --}}
@@ -232,38 +237,27 @@
 
         document.getElementById('jadwal_id_input').value = id;
         document.getElementById('jadwal_selected_label').textContent = label;
-
         document.getElementById('jadwal_list').classList.add('hidden');
-
-        // auto submit form seperti onchange di select sebelumnya
         document.getElementById('form_koreksi_jadwal').submit();
     }
 
-    // klik di luar dropdown -> tutup list
     document.addEventListener('click', function (e) {
         const dropdown = document.getElementById('jadwalDropdown');
         const list = document.getElementById('jadwal_list');
-
         if (dropdown && list && !dropdown.contains(e.target)) {
             list.classList.add('hidden');
         }
     });
 
-    // ===== LOGIKA PILIH STATUS H / I / S / A =====
     function pickKoreksi(row, status) {
-        // set value hidden input
         const input = document.getElementById('status_input_' + row);
         if (input) {
             input.value = status;
         }
-
-        // reset semua bulatan di baris ini
         const btns = document.querySelectorAll('.status-dot[data-row="' + row + '"]');
         btns.forEach(btn => {
             btn.classList.remove('status-h', 'status-i', 'status-s', 'status-a');
         });
-
-        // aktifkan bulatan yang dipilih
         const active = document.querySelector('.status-dot[data-row="' + row + '"][data-status="' + status + '"]');
         if (!active) return;
 

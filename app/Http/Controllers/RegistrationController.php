@@ -24,41 +24,73 @@ class RegistrationController extends Controller
      */
     public function register(Request $request)
     {
-        // Validasi dengan pesan bahasa Indonesia
+        // Validasi dengan pesan bahasa Indonesia dan aturan ketat
         $request->validate([
-            'username' => 'required|string|max:50|unique:users',
+            'nama' => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+                'regex:/^[a-zA-Z\s]+$/', // Hanya huruf dan spasi
+            ],
+            'username' => [
+                'required',
+                'string',
+                'min:4',
+                'max:50',
+                'unique:users,username',
+                'regex:/^[a-zA-Z0-9_]+$/', // Hanya huruf, angka, underscore
+            ],
             'nis' => [
                 'required',
                 'string',
-                'max:20',
-                'unique:siswas',
-                'same:nis_confirmation'
+                'min:3', // Minimal 3 digit
+                'max:20', // Maksimal 20 digit
+                'unique:siswas,nis',
+                'regex:/^[0-9]+$/', // Hanya angka
             ],
-            'nis_confirmation' => 'required',
-            'nama' => 'required|string|max:100',
-            'kelas' => 'required|string|max:10',
-            'jurusan' => 'required|in:TKJ,TBSM',
+            'nis_confirmation' => [
+                'required',
+                'same:nis', // Harus sama dengan field nis
+            ],
+            'kelas' => [
+                'required',
+                'string',
+                'min:1',
+                'max:10',
+            ],
+            'jurusan' => [
+                'required',
+                'in:TKJ,TBSM',
+            ],
         ], [
+            // Nama
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'nama.min' => 'Nama minimal 3 karakter.',
+            'nama.max' => 'Nama maksimal 100 karakter.',
+            'nama.regex' => 'Nama hanya boleh berisi huruf dan spasi.',
+            
             // Username
             'username.required' => 'Username wajib diisi.',
+            'username.min' => 'Username minimal 4 karakter.',
             'username.max' => 'Username maksimal 50 karakter.',
             'username.unique' => 'Username sudah digunakan, silakan gunakan username lain.',
+            'username.regex' => 'Username hanya boleh berisi huruf, angka, dan underscore (_).',
             
             // NIS
             'nis.required' => 'NIS wajib diisi.',
-            'nis.max' => 'NIS maksimal 20 karakter.',
+            'nis.min' => 'NIS minimal 3 digit.',
+            'nis.max' => 'NIS maksimal 20 digit.',
             'nis.unique' => 'NIS sudah terdaftar dalam sistem.',
-            'nis.same' => 'Konfirmasi NIS tidak cocok.',
+            'nis.regex' => 'NIS hanya boleh berisi angka.',
             
             // NIS Confirmation
             'nis_confirmation.required' => 'Konfirmasi NIS wajib diisi.',
-            
-            // Nama
-            'nama.required' => 'Nama lengkap wajib diisi.',
-            'nama.max' => 'Nama maksimal 100 karakter.',
+            'nis_confirmation.same' => 'Konfirmasi NIS tidak cocok dengan NIS yang dimasukkan.',
             
             // Kelas
             'kelas.required' => 'Kelas wajib diisi.',
+            'kelas.min' => 'Kelas minimal 1 karakter.',
             'kelas.max' => 'Kelas maksimal 10 karakter.',
             
             // Jurusan
@@ -69,21 +101,24 @@ class RegistrationController extends Controller
         try {
             DB::beginTransaction();
 
+            // Password default = NIS
             $defaultPassword = $request->nis;
 
+            // Buat data siswa
             $siswa = Siswa::create([
                 'nis' => $request->nis,
-                'nama' => $request->nama,
-                'kelas' => $request->kelas,
+                'nama' => ucwords(strtolower(trim($request->nama))), // Format nama proper case
+                'kelas' => strtoupper(trim($request->kelas)), // Format kelas uppercase
                 'jurusan' => $request->jurusan,
                 'user_id' => null,
             ]);
 
+            // Buat permintaan registrasi
             Registrasi::create([
                 'siswa_id' => $siswa->id,
                 'tanggal_reg' => now()->toDateString(),
                 'status' => 'Pending',
-                'username_request' => $request->username,
+                'username_request' => strtolower(trim($request->username)), // Format username lowercase
                 'password_request' => Hash::make($defaultPassword),
             ]);
 
@@ -92,7 +127,7 @@ class RegistrationController extends Controller
             return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silakan tunggu persetujuan dari admin.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->with('error', 'Pendaftaran gagal. Silakan coba lagi. Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Pendaftaran gagal. Silakan coba lagi.');
         }
     }
 
