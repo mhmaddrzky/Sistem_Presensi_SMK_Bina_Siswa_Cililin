@@ -82,7 +82,7 @@ class KoreksiPresensiController extends Controller
 
                 // Hapus presensi otomatis (Hadir) jika status diubah menjadi Sakit/Izin/Alfa
                 if ($statusKoreksi !== 'Hadir') {
-                    // Hapus record yang ada di hari ini
+   
                     Presensi::where('siswa_id', $siswaId)
                             ->where('jadwal_id', $jadwalId)
                             ->where('tanggal', $tanggalKoreksi)
@@ -90,7 +90,6 @@ class KoreksiPresensiController extends Controller
                 }
 
                 // Cek apakah presensi koreksi (Sakit/Izin/Alfa) sudah ada
-                // Gunakan firstOrNew untuk membuat atau menemukan record berdasarkan TANGGAL KOREKSI
                 $presensiKoreksi = Presensi::firstOrNew([
                     'siswa_id' => $siswaId,
                     'jadwal_id' => $jadwalId,

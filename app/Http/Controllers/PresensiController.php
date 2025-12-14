@@ -47,125 +47,149 @@ class PresensiController extends Controller
         return view('siswa.dashboard', compact('jadwalTerdekat', 'presensiTerbaru'));
     }
 
-    /** Menampilkan Jadwal (Tanpa Button Presensi - Read Only) */
-    public function showPresensiForm()
-    {
-        $siswa = Auth::user()->siswa;
+/** Menampilkan Jadwal**/
+
+public function showPresensiForm()
+{
+    $siswa = Auth::user()->siswa;
+    if (!$siswa) return redirect('/')->with('error', 'Data Siswa tidak ditemukan.');
+
+    $hariIni = Carbon::now()->locale('id')->dayName;
+    $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
+
+    // 1. AMBIL DATA & SORTING (Sama seperti sebelumnya)
+    $rawJadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)->get();
+
+    $urutanHari = [
+        'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4,
+        'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
+    ];
+
+    $jadwals = $rawJadwals->sortBy(function ($item) use ($urutanHari) {
+        $nilaiHari = $urutanHari[$item->hari] ?? 99;
+        return [$nilaiHari, $item->waktu_mulai];
+    })->values();
+
+    // 2. LOGIKA PRESENSI
+    $presensiSiswa = Presensi::where('siswa_id', $siswa->id)
+                      ->whereDate('created_at', Carbon::today())
+                      ->get()
+                      ->keyBy('jadwal_id');
+
+    $jadwals = $jadwals->map(function ($jadwal) use ($presensiSiswa, $hariIni) {
+        $now = Carbon::now();
+        $isHariIni = $jadwal->hari === $hariIni;
+        $presensi = $presensiSiswa->get($jadwal->id);
         
-        if (!$siswa) {
-            return redirect('/')->with('error', 'Data Siswa tidak ditemukan.');
+        // Variabel penanda apakah waktu sudah habis
+        $sudahSelesai = false;
+
+        if ($isHariIni) {
+            $waktuMulai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_mulai);
+            $waktuSelesai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_selesai);
+            
+            if ($now->greaterThanOrEqualTo($waktuMulai) && $now->lessThan($waktuSelesai)) {
+                $statusWaktu = 'Sedang Berlangsung';
+            } elseif ($now->lessThan($waktuMulai)) {
+                $statusWaktu = 'Belum Dimulai';
+            } else {
+                // JIKA WAKTU HABIS
+                $statusWaktu = 'Selesai'; 
+                $sudahSelesai = true; 
+            }
+        } else {
+            $statusWaktu = 'Menunggu Hari: ' . $jadwal->hari;
         }
 
-        $hariIni = Carbon::now()->locale('id')->dayName; 
+        $jumlahHadir = Presensi::where('jadwal_id', $jadwal->id)
+                                ->whereDate('created_at', Carbon::today())
+                                ->count();
         
-        $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
+        $jadwal->is_penuh = $jumlahHadir >= $jadwal->kapasitas;
+        $jadwal->waktu_status = $statusWaktu;
+        
+        // --- LOGIKA UTAMA PERUBAHAN DISINI ---
+        if ($sudahSelesai) {
 
-        $jadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)->get()
-                                ->sortByDesc('created_at')
-                                ->values();
-        
-        // Ambil SEMUA presensi siswa (tidak hanya hari ini) untuk cek status dari guru
-        $presensiSiswa = Presensi::where('siswa_id', $siswa->id)
-                                  ->get()
-                                  ->keyBy('jadwal_id');
-        
-        $jadwals = $jadwals->map(function ($jadwal) use ($presensiSiswa, $hariIni) {
-            $now = Carbon::now();
-            $isHariIni = $jadwal->hari === $hariIni;
-            
-            // Cek apakah sudah ada presensi untuk jadwal ini (dari siswa atau guru)
-            $presensi = $presensiSiswa->get($jadwal->id);
-            
-            if ($isHariIni) {
-                $waktuMulai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_mulai);
-                $waktuSelesai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_selesai);
-                
-                if ($now->greaterThanOrEqualTo($waktuMulai) && $now->lessThan($waktuSelesai)) {
-                    $statusWaktu = 'Sedang Berlangsung';
-                } elseif ($now->lessThan($waktuMulai)) {
-                    $statusWaktu = 'Belum Dimulai';
-                } else {
-                    $statusWaktu = 'Selesai (Waktu Terlewat)';
-                }
-            } else {
-                $statusWaktu = 'Menunggu Hari: ' . $jadwal->hari;
-            }
-
-            $jumlahHadir = Presensi::where('jadwal_id', $jadwal->id)
-                                    ->whereDate('created_at', Carbon::today())
-                                    ->count();
-                                    
-            $jadwal->is_penuh = $jumlahHadir >= $jadwal->kapasitas;
-            $jadwal->waktu_status = $statusWaktu;
-            
-            // Set status dari presensi (bisa dari siswa atau guru)
+            $jadwal->is_hadir = false; 
+            $jadwal->status_presensi = null; 
+        } else {
+          
             $jadwal->is_hadir = $presensi ? true : false;
             $jadwal->status_presensi = $presensi ? $presensi->status : null;
-            
-            return $jadwal;
-        });
-
-        return view('siswa.presensi.form', ['jadwals' => $jadwals]);
-    }
-
-// halaman presensi
-    public function index()
-    {
-        $siswa = Auth::user()->siswa;
+        }
         
-        if (!$siswa) {
-            return redirect('/')->with('error', 'Data Siswa tidak ditemukan.');
+        return $jadwal;
+    });
+
+    return view('siswa.presensi.form', ['jadwals' => $jadwals]);
+}
+
+
+/** Halaman Presensi (Tombol Absen) */
+public function index()
+{
+    $siswa = Auth::user()->siswa;
+    if (!$siswa) return redirect('/')->with('error', 'Data Siswa tidak ditemukan.');
+
+    $hariIni = Carbon::now()->locale('id')->dayName;
+    $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
+
+    // === 1. AMBIL DATA JADWAL ===
+    $rawJadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)->get();
+
+    // === 2. SORTING CUSTOM (SENIN - MINGGU & WAKTU) ===
+    $urutanHari = [
+        'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4,
+        'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
+    ];
+
+    $jadwals = $rawJadwals->sortBy(function ($item) use ($urutanHari) {
+        $nilaiHari = $urutanHari[$item->hari] ?? 99;
+        return [$nilaiHari, $item->waktu_mulai];
+    })->values();
+
+    // === 3. LOGIKA PRESENSI ===
+    $presensiSiswa = Presensi::where('siswa_id', $siswa->id)
+                      ->whereDate('created_at', Carbon::today())
+                      ->get()
+                      ->keyBy('jadwal_id');
+    
+    $jadwalsAktif = $jadwals->map(function ($jadwal) use ($presensiSiswa, $hariIni) {
+        $now = Carbon::now();
+        $isHariIni = $jadwal->hari === $hariIni;
+        
+        $presensi = $presensiSiswa->get($jadwal->id);
+        
+        if ($isHariIni) {
+            $waktuMulai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_mulai);
+            $waktuSelesai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_selesai);
+            
+            if ($now->greaterThanOrEqualTo($waktuMulai) && $now->lessThan($waktuSelesai)) {
+                $statusWaktu = 'Sedang Berlangsung';
+            } elseif ($now->lessThan($waktuMulai)) {
+                $statusWaktu = 'Belum Dimulai';
+            } else {
+                $statusWaktu = 'Selesai (Waktu Terlewat)';
+            }
+        } else {
+            $statusWaktu = 'Menunggu Hari: ' . $jadwal->hari;
         }
 
-        $hariIni = Carbon::now()->locale('id')->dayName; 
-        
-        $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
+        $jumlahHadir = Presensi::where('jadwal_id', $jadwal->id)
+                                ->whereDate('created_at', Carbon::today())
+                                ->count();
 
-        $jadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)->get()
-                                ->sortByDesc('created_at')
-                                ->values();
+        $jadwal->is_penuh = $jumlahHadir >= $jadwal->kapasitas;
+        $jadwal->waktu_status = $statusWaktu;
+        $jadwal->is_hadir = $presensi ? true : false;
+        $jadwal->status_presensi = $presensi ? $presensi->status : null;
         
-        // Ambil SEMUA presensi siswa untuk cek status dari guru
-        $presensiSiswa = Presensi::where('siswa_id', $siswa->id)
-                                  ->get()
-                                  ->keyBy('jadwal_id');
-        
-        $jadwalsAktif = $jadwals->map(function ($jadwal) use ($presensiSiswa, $hariIni) {
-            $now = Carbon::now();
-            $isHariIni = $jadwal->hari === $hariIni;
-            
-            // Cek apakah sudah ada presensi untuk jadwal ini
-            $presensi = $presensiSiswa->get($jadwal->id);
-            
-            if ($isHariIni) {
-                $waktuMulai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_mulai);
-                $waktuSelesai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_selesai);
-                
-                if ($now->greaterThanOrEqualTo($waktuMulai) && $now->lessThan($waktuSelesai)) {
-                    $statusWaktu = 'Sedang Berlangsung';
-                } elseif ($now->lessThan($waktuMulai)) {
-                    $statusWaktu = 'Belum Dimulai';
-                } else {
-                    $statusWaktu = 'Selesai (Waktu Terlewat)';
-                }
-            } else {
-                $statusWaktu = 'Menunggu Hari: ' . $jadwal->hari;
-            }
+        return $jadwal;
+    });
 
-            $jumlahHadir = Presensi::where('jadwal_id', $jadwal->id)
-                                    ->whereDate('created_at', Carbon::today())
-                                    ->count();
-                                    
-            $jadwal->is_penuh = $jumlahHadir >= $jadwal->kapasitas;
-            $jadwal->waktu_status = $statusWaktu;
-            $jadwal->is_hadir = $presensi ? true : false;
-            $jadwal->status_presensi = $presensi ? $presensi->status : null;
-            
-            return $jadwal;
-        });
-
-        return view('siswa.presensi.index', compact('jadwalsAktif'));
-    }
+    return view('siswa.presensi.index', compact('jadwalsAktif'));
+}
 
     /** Memproses Presensi (Hadir Otomatis) */
     public function storePresensi(Request $request)
