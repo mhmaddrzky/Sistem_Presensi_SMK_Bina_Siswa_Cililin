@@ -45,7 +45,7 @@
     {{-- GRID CARD --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-        {{-- CARD: Siswa Pending Approval (Tampil untuk semua role) --}}
+        {{-- CARD: Siswa Pending Approval --}}
 <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-3">
     <div class="flex items-center justify-between">
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -144,16 +144,9 @@
 
         {{-- Bar Graph --}}
         <div class="mt-4 h-3 w-full rounded-full bg-slate-100 overflow-hidden flex">
-            {{-- Hadir (Hijau #22c55e) --}}
             <div class="h-full bg-green-500" style="width: {{ $wHadir }}%"></div>
-        
-            {{-- Izin (Kuning #fbbf24) --}}
             <div class="h-full bg-amber-400" style="width: {{ $wIzin }}%"></div>
-        
-            {{-- Sakit (Biru #3b82f6) --}}
             <div class="h-full bg-blue-500" style="width: {{ $wSakit }}%"></div>
-        
-            {{-- Alfa (Merah #ef4444) --}}
             <div class="h-full bg-red-500" style="width: {{ $wAlpha }}%"></div>
         </div>
         

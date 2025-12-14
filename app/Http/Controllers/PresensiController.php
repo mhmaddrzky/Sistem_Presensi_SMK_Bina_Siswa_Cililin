@@ -108,7 +108,7 @@ class PresensiController extends Controller
         return view('siswa.presensi.form', ['jadwals' => $jadwals]);
     }
 
-    /** 🆕 HALAMAN PRESENSI DENGAN BUTTON (yang ada di navbar PRESENSI) */
+// halaman presensi
     public function index()
     {
         $siswa = Auth::user()->siswa;
@@ -218,7 +218,7 @@ class PresensiController extends Controller
         }
     }
 
-    /** 🆕 Menampilkan HANYA Riwayat (tanpa card presensi) */
+    /** Menampilkan HANYA Riwayat */
     public function showRiwayat()
     {
         $siswa = Auth::user()->siswa;

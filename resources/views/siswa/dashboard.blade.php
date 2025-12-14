@@ -21,12 +21,9 @@
             {{-- Ilustrasi SVG di kanan (hidden di mobile) --}}
             <div class="hidden md:block ml-6">
                 <svg class="w-32 h-32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {{-- Matahari --}}
                     <circle cx="75" cy="25" r="15" fill="#FCD34D"/>
-                    {{-- Awan --}}
                     <ellipse cx="70" cy="35" rx="8" ry="5" fill="#EC4899" opacity="0.6"/>
                     <ellipse cx="78" cy="35" rx="8" ry="5" fill="#EC4899" opacity="0.6"/>
-                    {{-- Server/Database --}}
                     <rect x="35" y="45" width="30" height="35" rx="3" fill="#60A5FA"/>
                     <line x1="40" y1="52" x2="60" y2="52" stroke="white" stroke-width="1.5"/>
                     <line x1="40" y1="58" x2="60" y2="58" stroke="white" stroke-width="1.5"/>

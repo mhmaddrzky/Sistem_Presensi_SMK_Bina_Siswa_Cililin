@@ -110,7 +110,7 @@
 
                 {{-- DROPDOWN CUSTOM JADWAL --}}
                 <div class="relative w-full md:flex-1" id="jadwalDropdownSesi">
-                    {{-- input asli untuk dikirim ke backend --}}
+                  
                     <input type="hidden" name="jadwal_id" id="jadwal_id" value="{{ old('jadwal_id') }}">
 
                     @php
@@ -305,8 +305,8 @@
                 'Mohon masukkan jumlah siswa yang ingin dipilih (minimal 1).', 
                 null, 
                 'Mengerti', 
-                'emerald', // Warna tombol Hijau
-                'alert'    // Tipe Alert (hanya OK)
+                'emerald', 
+                'alert'   
             );
             return;
         }

@@ -82,9 +82,9 @@
 
         // Logika Tipe (Alert vs Confirm)
         if (type === 'alert') {
-            btnCancel.classList.add('hidden'); // Sembunyikan tombol batal
+            btnCancel.classList.add('hidden'); 
         } else {
-            btnCancel.classList.remove('hidden'); // Munculkan tombol batal
+            btnCancel.classList.remove('hidden'); 
         }
 
         // Action Tombol YES

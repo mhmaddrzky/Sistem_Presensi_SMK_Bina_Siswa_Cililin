@@ -107,8 +107,8 @@ class RegistrationController extends Controller
             // Buat data siswa
             $siswa = Siswa::create([
                 'nis' => $request->nis,
-                'nama' => ucwords(strtolower(trim($request->nama))), // Format nama proper case
-                'kelas' => strtoupper(trim($request->kelas)), // Format kelas uppercase
+                'nama' => ucwords(strtolower(trim($request->nama))), 
+                'kelas' => strtoupper(trim($request->kelas)), 
                 'jurusan' => $request->jurusan,
                 'user_id' => null,
             ]);
@@ -118,7 +118,7 @@ class RegistrationController extends Controller
                 'siswa_id' => $siswa->id,
                 'tanggal_reg' => now()->toDateString(),
                 'status' => 'Pending',
-                'username_request' => strtolower(trim($request->username)), // Format username lowercase
+                'username_request' => strtolower(trim($request->username)), 
                 'password_request' => Hash::make($defaultPassword),
             ]);
 

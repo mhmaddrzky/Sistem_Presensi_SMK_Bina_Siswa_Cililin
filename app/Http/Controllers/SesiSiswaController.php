@@ -17,7 +17,7 @@ class SesiSiswaController extends Controller
      */
     public function index(Request $request)
     {
-        // Validasi input filter jurusan
+
         $jurusanFilter = $request->input('jurusan_filter', 'all');
         
         // Whitelist untuk keamanan - hanya terima value yang valid
@@ -65,7 +65,7 @@ class SesiSiswaController extends Controller
                 'required',
                 'array',
                 'min:1',
-                'max:100', // Batasi maksimal 100 untuk mencegah abuse
+                'max:100', 
             ],
             'siswa_ids.*' => [
                 'required',
@@ -104,7 +104,7 @@ class SesiSiswaController extends Controller
 
             // 4. AMBIL DATA SISWA YANG DIPILIH (dengan validasi exists)
             $siswaDipilih = Siswa::whereIn('id', $validated['siswa_ids'])
-                ->whereNotNull('user_id') // Pastikan siswa sudah approve
+                ->whereNotNull('user_id')
                 ->get();
 
             // 5. VALIDASI: Cek apakah jumlah siswa yang ditemukan sesuai
@@ -173,7 +173,7 @@ class SesiSiswaController extends Controller
             DB::commit();
             
             return back()->with('success', 
-                '✅ Berhasil! Pembagian ' . $siswaDipilihCount . 
+                ' Berhasil! Pembagian ' . $siswaDipilihCount . 
                 ' siswa ke sesi ' . $jadwal->jurusan . ' - ' . 
                 $jadwal->mata_pelajaran . ' berhasil disimpan.'
             );

@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-md md:max-w-3xl mx-auto space-y-6">
 
-    {{-- HEADER + LINK KEMBALI --}}
+    {{-- HEADER --}}
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
             <h1 class="text-2xl md:text-3xl font-bold text-blue-900">
@@ -14,15 +14,6 @@
             </p>
         </div>
 
-        <a href="{{ route('admin.jadwal.index') }}"
-           class="inline-flex items-center gap-2 text-sm font-semibold text-blue-700 hover:text-blue-900">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Kembali ke Daftar Jadwal</span>
-        </a>
     </div>
 
     {{-- ERROR VALIDATION --}}
@@ -65,7 +56,7 @@
                                value="{{ old('mata_pelajaran', $jadwal->mata_pelajaran) }}" required
                                placeholder="Contoh: Pemrograman Web Lanjut"
                                class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         @error('mata_pelajaran')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror
@@ -80,7 +71,7 @@
                                value="{{ old('nama_guru', $jadwal->nama_guru) }}" required
                                placeholder="Contoh: Pak Muhammad Rizky"
                                class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         @error('nama_guru')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror
@@ -112,7 +103,7 @@
                                value="{{ old('kapasitas', $jadwal->kapasitas) }}" required
                                placeholder="Contoh: 20" min="1" max="20"
                                class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         @error('kapasitas')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror
@@ -156,7 +147,7 @@
                             <input type="time" id="waktu_mulai" name="waktu_mulai"
                                    value="{{ old('waktu_mulai', $jadwal->waktu_mulai ? substr($jadwal->waktu_mulai, 0, 5) : '') }}" required
                                    class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             @error('waktu_mulai')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
@@ -169,7 +160,7 @@
                             <input type="time" id="waktu_selesai" name="waktu_selesai"
                                    value="{{ old('waktu_selesai', $jadwal->waktu_selesai ? substr($jadwal->waktu_selesai, 0, 5) : '') }}" required
                                    class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             @error('waktu_selesai')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
@@ -185,7 +176,7 @@
                                value="{{ old('ruang_lab', $jadwal->ruang_lab) }}" required
                                placeholder="Contoh: Lab 1"
                                class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         @error('ruang_lab')
                             <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                         @enderror

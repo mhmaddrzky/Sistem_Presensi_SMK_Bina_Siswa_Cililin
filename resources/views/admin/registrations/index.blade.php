@@ -152,7 +152,7 @@
 
 </div>
 
-{{-- PANGGIL COMPONENT MODAL DISINI (Satu baris saja) --}}
+{{-- PANGGIL COMPONENT MODAL --}}
 @include('components.modal-confirmation')
 
 @endsection

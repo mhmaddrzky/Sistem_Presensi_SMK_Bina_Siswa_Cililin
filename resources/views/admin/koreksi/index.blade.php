@@ -47,8 +47,7 @@
                     if(request('jadwal_id')){
                         foreach($jadwals as $j){
                             if($j->id == request('jadwal_id')){
-                                // UPDATE FORMAT LABEL TERPILIH AGAR SAMA DENGAN SESI
-                                // Format: [Jurusan] Hari, Jam | Mapel (Ruang)
+
                                 $selectedLabel = '['.$j->jurusan.'] '.$j->hari.', '.substr($j->waktu_mulai,0,5).' - '.substr($j->waktu_selesai,0,5).' | '.$j->mata_pelajaran.' ('.$j->ruang_lab.')';
                                 break;
                             }
@@ -74,9 +73,7 @@
 
                 @foreach($jadwals as $jadwal)
                     @php
-                        // UPDATE FORMAT LIST AGAR SAMA DENGAN SESI
-                        // Lama: | Ruang: 5
-                        // Baru: | Mapel (5)
+                     
                         $label = '['.$jadwal->jurusan.'] '.$jadwal->hari.', '.substr($jadwal->waktu_mulai,0,5).' - '.substr($jadwal->waktu_selesai,0,5).' | '.$jadwal->mata_pelajaran.' ('.$jadwal->ruang_lab.')';
                     @endphp
 

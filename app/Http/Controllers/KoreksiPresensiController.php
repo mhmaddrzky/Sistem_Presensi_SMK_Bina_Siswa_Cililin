@@ -9,12 +9,12 @@ use App\Models\SesiSiswa;
 use App\Models\Presensi;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth; // Wajib di-import
+use Illuminate\Support\Facades\Auth;
 
 class KoreksiPresensiController extends Controller
 {
-    /** Menampilkan form filter dan tabel koreksi absensi */
- /** Menampilkan form filter dan tabel koreksi absensi */
+
+
  public function index(Request $request)
  {
      $jadwals = KelolaJadwal::orderBy('hari')->orderBy('waktu_mulai')->get();
@@ -22,7 +22,7 @@ class KoreksiPresensiController extends Controller
      $rekapKoreksi = collect();
      $jadwalTerpilih = null;
      
-     // 🛑 FIX TANGGAL 1: Selalu ambil tanggal hari ini untuk koreksi presensi yang baru terjadi
+
      $tanggalKoreksi = Carbon::today()->toDateString(); 
 
      if ($jadwalId) {
@@ -36,7 +36,7 @@ class KoreksiPresensiController extends Controller
 
          // 3. Ambil data presensi yang sudah tercatat (Hadir Otomatis) untuk sesi ini
          $presensiOtomatis = Presensi::where('jadwal_id', $jadwalId)
-                                         // 🛑 FIX TANGGAL 2: Filter data presensi HANYA untuk hari ini
+    
                                          ->where('tanggal', $tanggalKoreksi) 
                                          ->get()
                                          ->keyBy('siswa_id'); 
@@ -47,7 +47,7 @@ class KoreksiPresensiController extends Controller
              
              $rekapKoreksi[] = [
                  'siswa_id' => $siswa->id,
-                 'nis'      => $siswa->nis, // <--- TAMBAHAN: Agar NIS bisa ditampilkan di view
+                 'nis'      => $siswa->nis,
                  'nama'     => $siswa->nama,
                  'kelas'    => $siswa->kelas,
                  'status_otomatis' => $presensi ? $presensi->status : 'Alfa', 
@@ -70,7 +70,7 @@ class KoreksiPresensiController extends Controller
         ]);
 
         $jadwalId = $request->jadwal_id;
-        // 🛑 FIX TANGGAL 3: Tanggal presensi adalah TANGGAL HARI INI
+
         $tanggalKoreksi = Carbon::today()->toDateString(); 
 
         try {
