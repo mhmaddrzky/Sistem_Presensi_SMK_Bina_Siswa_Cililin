@@ -107,10 +107,8 @@
             </div>
 
             <div class="flex flex-col md:flex-row gap-3 mt-4">
-
                 {{-- DROPDOWN CUSTOM JADWAL --}}
                 <div class="relative w-full md:flex-1" id="jadwalDropdownSesi">
-                  
                     <input type="hidden" name="jadwal_id" id="jadwal_id" value="{{ old('jadwal_id') }}">
 
                     @php
@@ -129,15 +127,12 @@
                         }
                     @endphp
 
-                    {{-- tombol utama (seperti select) --}}
                     <button type="button"
                         onclick="toggleJadwalListSesi()"
                         class="p-3 border border-slate-300 rounded-lg w-full bg-white flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm md:text-base text-slate-700">
                         <span id="jadwal_selected_label_sesi" class="truncate">
                             {{ $selectedJadwalLabel }}
                         </span>
-
-                        {{-- icon panah --}}
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 text-slate-500"
                              viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -146,7 +141,6 @@
                         </svg>
                     </button>
 
-                    {{-- list jadwal --}}
                     <div id="jadwal_list_sesi"
                         class="absolute left-0 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto hidden z-30 text-sm">
                         @foreach ($jadwals as $jadwal)
@@ -176,46 +170,68 @@
             </div>
         </div>
 
-        {{-- Tabel Siswa dengan Fitur Pilih Berdasarkan Jumlah --}}
+        {{-- Tabel Siswa --}}
         <div class="bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden">
             <div class="px-5 py-3 border-b border-slate-200 bg-slate-50/50">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div class="flex flex-col gap-4">
+                    {{-- Judul --}}
                     <div>
                         <h3 class="font-semibold text-slate-800">2. Tentukan Peserta Sesi</h3>
                         <p class="text-xs text-slate-500 mt-0.5">Pilih siswa secara manual atau otomatis</p>
                     </div>
                     
-                    {{-- FITUR PILIH BERDASARKAN JUMLAH --}}
-                    <div class="flex items-center gap-3">
-                        <div id="selected_count_display" class="text-sm font-medium text-slate-600 hidden">
-                            <span class="font-bold text-blue-700" id="selected_count">0</span>/<span id="total_count">0</span> dipilih
+                    {{-- ROW FILTER & SEARCH --}}
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        
+                        {{-- SEARCH BAR --}}
+                        <div class="relative w-full md:w-72">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            {{-- UPDATE: PLACEHOLDER HANYA NAMA ATAU KELAS --}}
+                            <input type="text" id="searchInput" onkeyup="filterTableSesi()" 
+                                class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="Cari Nama atau Kelas...">
                         </div>
-                        
-                        {{-- Input Jumlah --}}
-                        <input type="number" 
-                            id="select_count"
-                            min="1"
-                            placeholder="Jumlah"
-                            class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            oninput="validateSelectCount(this)"
-                            onkeypress="if(event.key === 'Enter') { event.preventDefault(); selectByCount(); }">
-                        
-                        {{-- Button Terapkan --}}
-                        <button type="button"
-                            onclick="selectByCount()"
-                            class="px-5 py-2 bg-[#0D47C9] text-white rounded-lg text-sm font-semibold hover:bg-blue-800 transition-all shadow-sm">
-                            Terapkan
-                        </button>
+
+                        {{-- FITUR PILIH JUMLAH --}}
+                        <div class="flex items-center gap-3">
+                            <div id="selected_count_display" class="text-sm font-medium text-slate-600 hidden">
+                                <span class="font-bold text-blue-700" id="selected_count">0</span>/<span id="total_count">0</span> dipilih
+                            </div>
+                            
+                            <input type="number" 
+                                id="select_count"
+                                min="1"
+                                placeholder="Jumlah"
+                                class="w-24 px-3 py-2 border border-slate-300 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                oninput="validateSelectCount(this)"
+                                onkeypress="if(event.key === 'Enter') { event.preventDefault(); selectByCount(); }">
+                            
+                            <button type="button"
+                                onclick="selectByCount()"
+                                class="px-5 py-2 bg-[#0D47C9] text-white rounded-lg text-sm font-semibold hover:bg-blue-800 transition-all shadow-sm">
+                                Terapkan
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {{-- TABLE SISWA --}}
             <div class="overflow-x-auto w-full">
-                <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm" id="tableSiswa">
                     <thead class="bg-[#0D47C9] text-white">
                         <tr>
-                            <th class="p-3 text-center font-semibold w-16">Pilih</th>
+                            <th class="p-3 text-center font-semibold w-16">
+                                {{-- CHECKBOX ALL --}}
+                                <div class="flex items-center justify-center gap-1">
+                                    <input type="checkbox" id="masterCheckbox" onclick="toggleAllCheckboxes()"
+                                        class="w-4 h-4 text-blue-600 rounded border-gray-200 focus:ring-blue-500 cursor-pointer">
+                                </div>
+                            </th>
                             <th class="p-3 text-left font-semibold">NIS</th>
                             <th class="p-3 text-left font-semibold">Nama</th>
                             <th class="p-3 text-left font-semibold">Kelas</th>
@@ -226,7 +242,7 @@
 
                     <tbody class="divide-y divide-slate-100 bg-white">
                         @foreach ($siswas as $siswa)
-                        <tr class="hover:bg-slate-50 transition-colors">
+                        <tr class="hover:bg-slate-50 transition-colors student-row">
                             <td class="p-3 text-center">
                                 <input type="checkbox"
                                     name="siswa_ids[]"
@@ -236,9 +252,9 @@
                                     onchange="updateSelectAllState()">
                             </td>
 
-                            <td class="p-3 whitespace-nowrap text-slate-700">{{ $siswa->nis }}</td>
-                            <td class="p-3 text-slate-800 font-medium">{{ $siswa->nama }}</td>
-                            <td class="p-3 whitespace-nowrap text-slate-600">{{ $siswa->kelas }}</td>
+                            <td class="p-3 whitespace-nowrap text-slate-700 col-nis">{{ $siswa->nis }}</td>
+                            <td class="p-3 text-slate-800 font-medium col-nama">{{ $siswa->nama }}</td>
+                            <td class="p-3 whitespace-nowrap text-slate-600 col-kelas">{{ $siswa->kelas }}</td>
                             <td class="p-3 whitespace-nowrap">
                                 <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-600/20">
                                     {{ $siswa->jurusan }}
@@ -258,6 +274,13 @@
                             </td>
                         </tr>
                         @endif
+                        
+                        {{-- Row Kosong utk Search Not Found --}}
+                        <tr id="noResultRow" class="hidden">
+                             <td colspan="6" class="p-8 text-center text-slate-500 italic">
+                                Data siswa tidak ditemukan.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -274,15 +297,72 @@
     </form>
 </div>
 
-{{-- SCRIPT LENGKAP --}}
 <script>
     const mappingData = @json($mappingSesi);
     const allJadwals = @json($jadwals->keyBy('id'));
 
+    // ===== SEARCH FUNCTION (REVISI: HANYA NAMA & KELAS) =====
+    function filterTableSesi() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const rows = document.querySelectorAll('.student-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            // NIS diabaikan dalam pencarian
+            const nama = row.querySelector('.col-nama').textContent.toLowerCase();
+            const kelas = row.querySelector('.col-kelas').textContent.toLowerCase();
+
+            // Cek hanya Nama dan Kelas
+            if (nama.includes(filter) || kelas.includes(filter)) {
+                row.style.display = ""; // Tampilkan
+                visibleCount++;
+            } else {
+                row.style.display = "none"; // Sembunyikan
+            }
+        });
+
+        // Tampilkan pesan jika tidak ada hasil
+        const noResult = document.getElementById('noResultRow');
+        if (visibleCount === 0 && rows.length > 0) {
+            noResult.classList.remove('hidden');
+        } else {
+            noResult.classList.add('hidden');
+        }
+        
+        // Update counter agar sesuai yang terlihat
+        updateSelectedCount();
+    }
+
+    // ===== MASTER CHECKBOX (SELECT ALL) =====
+    function toggleAllCheckboxes() {
+        const master = document.getElementById('masterCheckbox');
+        const isChecked = master.checked;
+        
+        // Hanya pilih checkbox yang barisnya TERLIHAT (display != none)
+        const rows = document.querySelectorAll('.student-row');
+        
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const cb = row.querySelector('.siswa-checkbox');
+                if (!cb.disabled) {
+                    cb.checked = isChecked;
+                }
+            }
+        });
+        
+        updateSelectedCount();
+    }
+
     // ===== VALIDASI INPUT JUMLAH =====
     function validateSelectCount(input) {
-        const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
-        const availableCount = Array.from(allCheckboxes).filter(cb => !cb.disabled).length;
+        // Hitung hanya yang terlihat
+        const visibleCheckboxes = Array.from(document.querySelectorAll('.student-row'))
+            .filter(row => row.style.display !== 'none')
+            .map(row => row.querySelector('.siswa-checkbox'))
+            .filter(cb => !cb.disabled);
+            
+        const availableCount = visibleCheckboxes.length;
         
         if (parseInt(input.value) > availableCount) {
             input.value = availableCount;
@@ -292,43 +372,31 @@
         }
     }
 
-    // ===== PILIH BERDASARKAN JUMLAH (DENGAN POPUP HIJAU) =====
+    // ===== PILIH BERDASARKAN JUMLAH  =====
     function selectByCount() {
         const countInput = document.getElementById('select_count');
         const targetCount = parseInt(countInput.value) || 0;
         
-        // Validasi Kosong
         if (targetCount === 0 || targetCount < 1) {
-            // Parameter: Title, Message, FormID, ButtonText, Color, Type
-            window.openModal(
-                'Perhatian', 
-                'Mohon masukkan jumlah siswa yang ingin dipilih (minimal 1).', 
-                null, 
-                'Mengerti', 
-                'emerald', 
-                'alert'   
-            );
+            window.openModal('Perhatian', 'Mohon masukkan jumlah siswa yang ingin dipilih (minimal 1).', null, 'Mengerti', 'emerald', 'alert');
             return;
         }
         
-        const allCheckboxes = document.querySelectorAll('.siswa-checkbox');
-        const enabledCheckboxes = Array.from(allCheckboxes).filter(cb => !cb.disabled);
+        // Ambil checkbox dari baris yang TERLIHAT saja
+        const visibleRows = Array.from(document.querySelectorAll('.student-row'))
+            .filter(row => row.style.display !== 'none');
+            
+        const enabledCheckboxes = visibleRows
+            .map(row => row.querySelector('.siswa-checkbox'))
+            .filter(cb => !cb.disabled);
         
-        // Validasi Stok Kurang
         if (targetCount > enabledCheckboxes.length) {
-            window.openModal(
-                'Stok Siswa Tidak Cukup', 
-                `Jumlah siswa tersedia hanya ${enabledCheckboxes.length}. Anda meminta ${targetCount} siswa.`, 
-                null, 
-                'Sesuaikan', 
-                'emerald', // Warna tombol Hijau
-                'alert'
-            );
+            window.openModal('Stok Siswa Tidak Cukup', `Jumlah siswa tersedia (di hasil pencarian) hanya ${enabledCheckboxes.length}.`, null, 'Sesuaikan', 'emerald', 'alert');
             countInput.value = enabledCheckboxes.length;
             return;
         }
         
-        // Reset dan Pilih
+        // Reset hanya yang terlihat, lalu pilih ulang
         enabledCheckboxes.forEach(cb => cb.checked = false);
         for (let i = 0; i < targetCount && i < enabledCheckboxes.length; i++) {
             enabledCheckboxes[i].checked = true;
@@ -354,6 +422,15 @@
             if (checkedCount > 0) countWrapper.classList.remove('hidden');
             else countWrapper.classList.add('hidden');
         }
+        
+        // Uncheck master jika ada satu yang tidak terpilih
+        const visibleRows = Array.from(document.querySelectorAll('.student-row'))
+            .filter(row => row.style.display !== 'none');
+        const visibleCheckboxes = visibleRows.map(row => row.querySelector('.siswa-checkbox')).filter(cb => !cb.disabled);
+        
+        const allChecked = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
+        const master = document.getElementById('masterCheckbox');
+        if(master) master.checked = allChecked;
     }
 
     function updateSelectAllState() {
@@ -402,12 +479,16 @@
             ch.checked = false;
             ch.disabled = false;
         });
+        
+        // Reset Search
+        document.getElementById('searchInput').value = '';
+        filterTableSesi(); 
+        if(document.getElementById('masterCheckbox')) document.getElementById('masterCheckbox').checked = false;
 
         if(document.getElementById('select_count')) document.getElementById('select_count').value = '';
 
         const selectedJadwalId = document.getElementById('jadwal_id').value;
         if (!selectedJadwalId) {
-            // Peringatan jika belum pilih jadwal (Hijau juga)
             window.openModal('Perhatian', 'Silakan pilih jadwal terlebih dahulu!', null, 'Mengerti', 'emerald', 'alert');
             updateSelectedCount();
             return;
@@ -415,15 +496,13 @@
 
         document.querySelectorAll('.siswa-checkbox').forEach(checkbox => {
             const siswaId = checkbox.dataset.siswaId;
-            let foundInSelectedJadwal = false;
-
+            
             for (const jadwalId in mappingData) {
                 const found = mappingData[jadwalId].find(m => m.siswa_id == siswaId);
                 if (found) {
                     const status = document.getElementById('status-' + siswaId);
                     if (jadwalId == selectedJadwalId) {
                         checkbox.checked = true;
-                        foundInSelectedJadwal = true;
                         status.innerHTML = '<span class="text-blue-600 font-bold text-xs">Sesi ini</span>';
                     } else {
                         const j = allJadwals[jadwalId];
@@ -443,7 +522,6 @@
     });
 </script>
 
-{{-- INCLUDE COMPONENT MODAL --}}
 @include('components.modal-confirmation')
 
 @endsection
