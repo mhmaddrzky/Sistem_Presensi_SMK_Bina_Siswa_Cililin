@@ -123,3 +123,4 @@ class LaporanController extends Controller
         return Excel::download(new LaporanPresensiExport($periode, $jurusanFilter), $fileName);
     }
 }
+
