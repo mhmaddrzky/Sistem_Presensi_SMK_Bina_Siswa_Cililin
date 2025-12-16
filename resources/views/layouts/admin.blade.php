@@ -13,10 +13,10 @@
     // --- LOGIKA DATA USER ---
     $user = Auth::user();
     $routeName = Route::currentRouteName();
-    
+
     // Nama Lengkap (Cek apakah relasi admin ada untuk menghindari error)
     $namaLengkap = $user->admin->nama ?? $user->username;
-    
+
     // Data Akun
     $username = $user->username;
     $userRole = $user->role;
@@ -89,7 +89,7 @@
                     <div class="py-2">
                         {{-- REVISI: Menu Approval HANYA muncul untuk Admin --}}
                         @if($userRole === 'Admin')
-                            <a href="{{ route('admin.registrations.index') }}" 
+                            <a href="{{ route('admin.registrations.index') }}"
                                class="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors group">
                                 <div class="flex items-center gap-3">
                                     <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-50 text-orange-600 group-hover:bg-orange-100 transition-colors">
@@ -113,7 +113,7 @@
 
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" 
+                            <button type="submit"
                                     class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition-colors group text-left">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 group-hover:bg-red-100 transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -156,8 +156,8 @@
             <a href="{{ route('admin.dashboard') }}" class="pb-1 border-b-2 {{ $routeName === 'admin.dashboard' ? 'border-white' : 'border-transparent hover:border-white/70' }}">Home</a>
             <a href="{{ route('admin.jadwal.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.jadwal') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Jadwal</a>
             <a href="{{ route('admin.sesi.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.sesi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Sesi</a>
-            <a href="{{ route('admin.koreksi.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.koreksi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Absensi</a>
-            <a href="{{ route('admin.laporan.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.laporan') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Rekap Absen</a>
+            <a href="{{ route('admin.koreksi.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.koreksi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Presensi</a>
+            <a href="{{ route('admin.laporan.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.laporan') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Rekap Presensi</a>
             @if ($userRole === 'Admin')
                 <a href="{{ route('admin.users.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.users') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Management Akun</a>
             @endif
@@ -184,7 +184,7 @@
                 </div>
             </div>
         </div>
-        
+
         <nav class="max-w-6xl mx-auto px-4 py-4 space-y-1 text-[11px] font-semibold uppercase tracking-[0.20em]">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ $routeName === 'admin.dashboard' ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Home</span>
@@ -192,7 +192,7 @@
             <a href="{{ route('admin.jadwal.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.jadwal') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Jadwal</span>
             </a>
-            
+
             @if($userRole === 'Admin')
             <a href="{{ route('admin.registrations.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.registrations') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Approval</span>
@@ -208,12 +208,12 @@
                 <span>Sesi</span>
             </a>
             <a href="{{ route('admin.koreksi.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.koreksi') ? 'bg-white/15' : 'hover:bg-white/10' }}">
-                <span>Absensi</span>
+                <span>Presensi</span>
             </a>
             <a href="{{ route('admin.laporan.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.laporan') ? 'bg-white/15' : 'hover:bg-white/10' }}">
-                <span>Rekap Absen</span>
+                <span>Rekap Presensi</span>
             </a>
-            
+
             @if ($userRole === 'Admin')
                 <a href="{{ route('admin.users.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.users') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                     <span>Management Akun</span>
