@@ -154,8 +154,8 @@
                                 <span id="label_otomatis_{{ $i }}"
                                       class="px-3 py-1 rounded-lg text-white
                                       {{ $currentStatus == 'Hadir' ? 'bg-green-500' : '' }}
-                                      {{ $currentStatus == 'Izin' ? 'bg-yellow-500' : '' }}
-                                      {{ $currentStatus == 'Sakit' ? 'bg-blue-500' : '' }}
+                                      {{ $currentStatus == 'Izin' ? 'bg-blue-500' : '' }}
+                                      {{ $currentStatus == 'Sakit' ? 'bg-yellow-500' : '' }}
                                       {{ $currentStatus == 'Alfa' ? 'bg-red-500' : '' }}">
                                     {{ $currentStatus }}
                                 </span>
@@ -237,8 +237,8 @@
         transform: scale(1.05);
     }
     .status-h { background-color: #22c55e; color: #fff; }
-    .status-i { background-color: #fbbf24; color: #fff; }
-    .status-s { background-color: #3b82f6; color: #fff; }
+    .status-i { background-color: #3b82f6; color: #fff; }
+    .status-s { background-color: #fbbf24; color: #fff; }
     .status-a { background-color: #ef4444; color: #fff; }
 </style>
 

@@ -145,8 +145,8 @@
         {{-- Bar Graph --}}
         <div class="mt-4 h-3 w-full rounded-full bg-slate-100 overflow-hidden flex">
             <div class="h-full bg-green-500" style="width: {{ $wHadir }}%"></div>
-            <div class="h-full bg-amber-400" style="width: {{ $wIzin }}%"></div>
-            <div class="h-full bg-blue-500" style="width: {{ $wSakit }}%"></div>
+            <div class="h-full bg-blue-400" style="width: {{ $wIzin }}%"></div>
+            <div class="h-full bg-yellow-500" style="width: {{ $wSakit }}%"></div>
             <div class="h-full bg-red-500" style="width: {{ $wAlpha }}%"></div>
         </div>
         
@@ -160,16 +160,16 @@
         Hadir ({{ $hadirHariIni }})
     </div>
 
-    {{-- Sakit --}}
-    <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded-full bg-blue-500"></span>
-        Sakit ({{ $sakitHariIni }})
-    </div>
-
     {{-- Izin --}}
     <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+        <span class="w-3 h-3 rounded-full bg-blue-400"></span>
         Izin ({{ $izinHariIni }})
+    </div>
+
+    {{-- Sakit --}}
+    <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+        Sakit ({{ $sakitHariIni }})
     </div>
 
     {{-- Alfa --}}

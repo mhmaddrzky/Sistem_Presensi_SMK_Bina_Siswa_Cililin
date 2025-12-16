@@ -31,7 +31,10 @@
                         if ($riwayat->status == 'Hadir') {
                             $statusColor = 'text-green-700';
                             $statusBg = 'bg-green-100';
-                        } elseif ($riwayat->status == 'Sakit' || $riwayat->status == 'Izin') {
+                        } elseif ($riwayat->status == 'Izin') {
+                            $statusColor = 'text-blue-700';
+                            $statusBg = 'bg-blue-100';
+                        } elseif ($riwayat->status == 'Sakit') {
                             $statusColor = 'text-yellow-700';
                             $statusBg = 'bg-yellow-100';
                         } elseif ($riwayat->status == 'Alfa') {

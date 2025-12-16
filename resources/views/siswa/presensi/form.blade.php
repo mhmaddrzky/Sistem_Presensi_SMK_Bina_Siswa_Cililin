@@ -42,7 +42,7 @@
             $badgeColor = 'bg-yellow-500 text-white border-transparent';
             $badgeText = 'Sakit';
         } elseif ($statusPresensi == 'Izin') {
-            $badgeColor = 'bg-yellow-500 text-white border-transparent';
+            $badgeColor = 'bg-blue-500 text-white border-transparent';
             $badgeText = 'Izin';
         } elseif ($statusPresensi == 'Alfa') {
             $badgeColor = 'bg-red-600 text-white border-transparent';
