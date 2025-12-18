@@ -61,7 +61,7 @@
                 <h2 class="text-xl font-bold text-gray-800">PENGUMUMAN</h2>
             </div>
             
-            {{-- Konten pengumuman (bisa dinamis dari database) --}}
+            {{-- Konten pengumuman  --}}
             <div class="text-gray-600 text-sm leading-relaxed">
                 <p class="mb-2">🔔 Tidak ada pengumuman saat ini.</p>
                 <p class="text-xs text-gray-400 italic">Periksa kembali nanti untuk informasi terbaru.</p>
@@ -150,13 +150,22 @@
                                 if ($presensiTerbaru->status == 'Hadir') {
                                     $statusColor = 'text-green-700';
                                     $statusBg = 'bg-green-100';
-                                } elseif ($presensiTerbaru->status == 'Sakit' || $presensiTerbaru->status == 'Izin') {
+                                } elseif ($presensiTerbaru->status == 'Izin') {
+                                    $statusColor = 'text-blue-700'; 
+                                    $statusBg = 'bg-blue-100';
+                                } elseif ($presensiTerbaru->status == 'Sakit') {
                                     $statusColor = 'text-yellow-700';
                                     $statusBg = 'bg-yellow-100';
                                 } elseif ($presensiTerbaru->status == 'Alfa') {
                                     $statusColor = 'text-red-700';
                                     $statusBg = 'bg-red-100';
                                 }
+
+                                // 1. AMBIL HARI DARI JADWAL
+                                $namaHari = $presensiTerbaru->jadwal->hari ?? '-';
+                                
+                                // 2. AMBIL TANGGAL REALTIME
+                                $tanggalFormatted = \Carbon\Carbon::parse($presensiTerbaru->tanggal)->format('d/m/Y');
                             @endphp
                             <a href="{{ route('siswa.riwayat.index') }}" class="block p-4 hover:bg-blue-50 transition-colors">
                                 <div class="flex items-start justify-between gap-3">
@@ -165,7 +174,8 @@
                                             {{ $presensiTerbaru->jadwal->mata_pelajaran ?? 'Jadwal Dihapus' }}
                                         </p>
                                         <p class="text-sm text-gray-600 mb-2">
-                                            {{ \Carbon\Carbon::parse($presensiTerbaru->tanggal)->format('d/m/Y') }} • {{ substr($presensiTerbaru->waktu, 0, 5) }}
+                                            {{-- TAMPILKAN HARI, TANGGAL • JAM --}}
+                                            {{ $namaHari }}, {{ $tanggalFormatted }} • {{ substr($presensiTerbaru->waktu, 0, 5) }}
                                         </p>
                                         <span class="{{ $statusBg }} {{ $statusColor }} text-xs font-semibold px-2 py-1 rounded-full inline-block">
                                             {{ $presensiTerbaru->status }}
