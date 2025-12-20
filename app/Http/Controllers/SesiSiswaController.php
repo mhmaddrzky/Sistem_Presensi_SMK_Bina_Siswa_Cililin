@@ -13,72 +13,59 @@ use Illuminate\Routing\Controller;
 class SesiSiswaController extends Controller
 {
     /**
-     * Menampilkan form pembagian sesi
+     * Menampilkan form pembagian sesi dengan Pagination & Search
      */
     public function index(Request $request)
     {
-
         $jurusanFilter = $request->input('jurusan_filter', 'all');
-        
-        // Whitelist untuk keamanan - hanya terima value yang valid
+        $search = $request->input('search');
+
+        // Whitelist Filter
         $allowedFilters = ['all', 'TKJ', 'TBSM'];
         if (!in_array($jurusanFilter, $allowedFilters)) {
             $jurusanFilter = 'all';
         }
 
-        // Query Siswa (Siswa yang sudah di-approve)
+        // Query Dasar
         $siswasQuery = Siswa::whereNotNull('user_id')
             ->orderBy('kelas')
             ->orderBy('nama');
 
-        // Terapkan Filter Jurusan
+        // Filter Jurusan
         if ($jurusanFilter && $jurusanFilter !== 'all') {
             $siswasQuery->where('jurusan', $jurusanFilter);
         }
+
+        // Filter Pencarian (LIVE SEARCH - HANYA NAMA & KELAS)
+        if ($search) {
+            $siswasQuery->where(function($q) use ($search) {
+                $q->where('nama', 'LIKE', "%{$search}%")
+                  ->orWhere('kelas', 'LIKE', "%{$search}%");
+            });
+        }
         
-        $siswas = $siswasQuery->get();
+        // Gunakan Paginate agar tabel rapi per 10 baris
+        $siswas = $siswasQuery->paginate(20)->withQueryString();
         
-        // Ambil SEMUA Jadwal yang tersedia
-        $jadwals = KelolaJadwal::orderBy('hari')
-            ->orderBy('waktu_mulai')
-            ->get();
-        
-        // Ambil data mapping yang sudah ada
+        $jadwals = KelolaJadwal::orderBy('hari')->orderBy('waktu_mulai')->get();
         $mappingSesi = SesiSiswa::get()->groupBy('jadwal_id');
 
         return view('admin.sesi.index', compact('siswas', 'jadwals', 'mappingSesi', 'jurusanFilter'));
     }
 
     /**
-     * Menyimpan pembagian sesi siswa dengan validasi ketat
+     * Menyimpan pembagian sesi siswa dengan validasi KETAT (RESTORED)
      */
     public function store(Request $request)
     {
-        // 1. VALIDASI INPUT KETAT
+        // 1. VALIDASI INPUT DASAR
         $validated = $request->validate([
-            'jadwal_id' => [
-                'required',
-                'integer',
-                'exists:kelola_jadwals,id',
-            ],
-            'siswa_ids' => [
-                'required',
-                'array',
-                'min:1',
-                'max:100', 
-            ],
-            'siswa_ids.*' => [
-                'required',
-                'integer',
-                'exists:siswas,id',
-            ],
+            'jadwal_id' => ['required', 'integer', 'exists:kelola_jadwals,id'],
+            'siswa_ids' => ['required', 'array', 'min:1', 'max:100'], 
+            'siswa_ids.*' => ['required', 'integer', 'exists:siswas,id'],
         ], [
             'jadwal_id.required' => 'Jadwal harus dipilih.',
-            'jadwal_id.exists' => 'Jadwal yang dipilih tidak valid.',
             'siswa_ids.required' => 'Minimal pilih 1 siswa.',
-            'siswa_ids.min' => 'Minimal pilih 1 siswa.',
-            'siswa_ids.max' => 'Maksimal 100 siswa dalam satu transaksi.',
-            'siswa_ids.*.exists' => 'Data siswa tidak valid.',
         ]);
         
         try {
@@ -88,122 +75,72 @@ class SesiSiswaController extends Controller
 
             // 3. CEK KUOTA KAPASITAS
             if ($siswaDipilihCount > $jadwal->kapasitas) {
-                Log::warning('Percobaan melebihi kuota', [
-                    'jadwal_id' => $jadwal->id,
-                    'kapasitas' => $jadwal->kapasitas,
-                    'siswa_dipilih' => $siswaDipilihCount,
-                    'ip' => $request->ip(),
-                ]);
-                
                 return back()->with('error', 
                     'Gagal: Jumlah siswa yang dipilih (' . $siswaDipilihCount . 
-                    ') melebihi kuota maksimal (' . $jadwal->kapasitas . 
-                    ') untuk sesi ini.'
+                    ') melebihi kuota maksimal (' . $jadwal->kapasitas . ').'
                 )->withInput();
             }
 
-            // 4. AMBIL DATA SISWA YANG DIPILIH (dengan validasi exists)
-            $siswaDipilih = Siswa::whereIn('id', $validated['siswa_ids'])
-                ->whereNotNull('user_id')
-                ->get();
+            // 4. AMBIL DATA SISWA UNTUK VALIDASI JURUSAN
+            $siswaDipilih = Siswa::whereIn('id', $validated['siswa_ids'])->get();
 
-            // 5. VALIDASI: Cek apakah jumlah siswa yang ditemukan sesuai
+            // 5. VALIDASI JUMLAH DATA
             if ($siswaDipilih->count() !== $siswaDipilihCount) {
-                Log::warning('Percobaan dengan data siswa tidak valid', [
-                    'expected' => $siswaDipilihCount,
-                    'found' => $siswaDipilih->count(),
-                    'ip' => $request->ip(),
-                ]);
-                
-                return back()->with('error', 
-                    'Data tidak valid. Beberapa siswa yang dipilih tidak ditemukan atau belum di-approve.'
-                )->withInput();
+                 return back()->with('error', 'Data siswa tidak valid.')->withInput();
             }
 
-            // 6. KONTROL SILANG: Verifikasi Jurusan
+            // logika jurusan
             $siswaInvalidJurusan = [];
             foreach ($siswaDipilih as $siswa) {
+
                 if ($siswa->jurusan !== $jadwal->jurusan) {
-                    $siswaInvalidJurusan[] = $siswa->nama . ' (Jurusan: ' . $siswa->jurusan . ')';
+                    $siswaInvalidJurusan[] = $siswa->nama . ' (' . $siswa->jurusan . ')';
                 }
             }
 
             if (!empty($siswaInvalidJurusan)) {
-                Log::warning('Percobaan dengan jurusan tidak sesuai', [
-                    'jadwal_id' => $jadwal->id,
-                    'jadwal_jurusan' => $jadwal->jurusan,
-                    'siswa_invalid' => $siswaInvalidJurusan,
-                    'ip' => $request->ip(),
-                ]);
-                
                 return back()->with('error', 
-                    'Gagal menyimpan. Siswa berikut tidak sesuai dengan Jurusan Jadwal (' . 
-                    $jadwal->jurusan . '): ' . implode(', ', $siswaInvalidJurusan)
+                    'Gagal menyimpan! Jadwal ini khusus jurusan ' . $jadwal->jurusan . 
+                    '. Siswa berikut berbeda jurusan: ' . implode(', ', $siswaInvalidJurusan)
                 )->withInput();
             }
+            // ============================================================
 
-            // 7. PROSES PENYIMPANAN DALAM TRANSAKSI
+            // 7. PROSES PENYIMPANAN
             DB::beginTransaction();
 
-            // Hapus mapping lama untuk jadwal ini
-            SesiSiswa::where('jadwal_id', $jadwal->id)->delete();
-            
-            // Masukkan mapping baru
             $dataToInsert = [];
             foreach ($validated['siswa_ids'] as $siswaId) {
-                $dataToInsert[] = [
-                    'siswa_id' => $siswaId,
-                    'jadwal_id' => $jadwal->id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                // Cek agar tidak double entry di jadwal yang sama
+                $exists = SesiSiswa::where('jadwal_id', $jadwal->id)
+                    ->where('siswa_id', $siswaId)
+                    ->exists();
+                
+                if (!$exists) {
+                    $dataToInsert[] = [
+                        'siswa_id' => $siswaId,
+                        'jadwal_id' => $jadwal->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
             }
             
-            SesiSiswa::insert($dataToInsert);
-
-            // Log aktivitas berhasil
-            Log::info('Pembagian sesi berhasil', [
-                'jadwal_id' => $jadwal->id,
-                'jadwal_info' => $jadwal->jurusan . ' - ' . $jadwal->mata_pelajaran,
-                'jumlah_siswa' => $siswaDipilihCount,
-                'admin_id' => auth()->id(),
-                'ip' => $request->ip(),
-            ]);
+            if (count($dataToInsert) > 0) {
+                SesiSiswa::insert($dataToInsert);
+            }
 
             DB::commit();
             
             return back()->with('success', 
-                ' Berhasil! Pembagian ' . $siswaDipilihCount . 
-                ' siswa ke sesi ' . $jadwal->jurusan . ' - ' . 
-                $jadwal->mata_pelajaran . ' berhasil disimpan.'
+                'Berhasil! ' . count($dataToInsert) . ' siswa ditambahkan ke sesi ' . 
+                $jadwal->jurusan . ' - ' . $jadwal->mata_pelajaran . '.'
             );
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
-            
-            Log::error('Jadwal tidak ditemukan', [
-                'jadwal_id' => $request->jadwal_id,
-                'error' => $e->getMessage(),
-                'ip' => $request->ip(),
-            ]);
-            
-            return back()->with('error', 
-                'Jadwal tidak ditemukan. Silakan pilih jadwal yang valid.'
-            )->withInput();
-            
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            Log::error('Gagal menyimpan sesi', [
-                'jadwal_id' => $request->jadwal_id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'ip' => $request->ip(),
-            ]);
-            
-            return back()->with('error', 
-                'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.'
-            )->withInput();
+            Log::error('Error Simpan Sesi: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
         }
     }
 }

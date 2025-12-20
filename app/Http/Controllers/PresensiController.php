@@ -127,83 +127,76 @@ class PresensiController extends Controller
         $siswa = Auth::user()->siswa;
         if (!$siswa) return redirect('/')->with('error', 'Data Siswa tidak ditemukan.');
 
-        $hariIni = Carbon::now()->locale('id')->dayName;
+        // 1. SETTING HARI & WAKTU
+        $now = Carbon::now();
+        $hariIni = $now->locale('id')->dayName; // Senin, Selasa, dst.
+        
+        // 2. AMBIL ID JADWAL SISWA
         $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
 
-        // 1. AMBIL DATA
-        $rawJadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)->get();
+        // 3. AMBIL DATA JADWAL (HANYA HARI INI)
+       
+        $rawJadwals = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)
+                                  ->where('hari', $hariIni) 
+                                  ->orderBy('waktu_mulai', 'asc')
+                                  ->get();
 
-        // 2. SORTING
-        $urutanHari = [
-            'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4,
-            'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
-        ];
-
-        $jadwals = $rawJadwals->sortBy(function ($item) use ($urutanHari) {
-            $nilaiHari = $urutanHari[$item->hari] ?? 99;
-            return [$nilaiHari, $item->waktu_mulai];
-        })->values();
-
-        // 3. CEK PRESENSI HARI INI
-        $presensiSiswa = Presensi::where('siswa_id', $siswa->id)
-                          ->whereDate('created_at', Carbon::today())
-                          ->get()
-                          ->keyBy('jadwal_id');
         
-        // 4. MAPPING STATUS & FILTER
-        $jadwalsAktif = $jadwals->map(function ($jadwal) use ($presensiSiswa, $hariIni) {
-            $now = Carbon::now();
-            $isHariIni = $jadwal->hari === $hariIni;
+        $totalJadwalHariIni = $rawJadwals->count();
+
+        // 4. CEK DATA PRESENSI HARI INI (Untuk validasi button)
+        $presensiSiswa = Presensi::where('siswa_id', $siswa->id)
+                                 ->whereDate('created_at', Carbon::today())
+                                 ->get()
+                                 ->keyBy('jadwal_id');
+        
+        // 5. MAPPING & FILTERING (Logic Card Hilang)
+        $jadwalsAktif = $rawJadwals->map(function ($jadwal) use ($presensiSiswa, $now) {
             
             $presensi = $presensiSiswa->get($jadwal->id);
             
-            // Tentukan Status Waktu
-            if ($isHariIni) {
-                $waktuMulai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_mulai);
-                $waktuSelesai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_selesai);
-                
-                if ($now->greaterThanOrEqualTo($waktuMulai) && $now->lessThan($waktuSelesai)) {
-                    $statusWaktu = 'Sedang Berlangsung';
-                } elseif ($now->lessThan($waktuMulai)) {
-                    $statusWaktu = 'Belum Dimulai';
-                } else {
-                    $statusWaktu = 'Selesai';
-                }
+            // Cek Status Waktu
+            $waktuMulai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_mulai);
+            $waktuSelesai = Carbon::today()->setTimeFromTimeString($jadwal->waktu_selesai);
+            
+            if ($now->greaterThanOrEqualTo($waktuMulai) && $now->lessThan($waktuSelesai)) {
+                $statusWaktu = 'Sedang Berlangsung';
+            } elseif ($now->lessThan($waktuMulai)) {
+                $statusWaktu = 'Belum Dimulai';
             } else {
-                $statusWaktu = 'Menunggu Hari: ' . $jadwal->hari;
+                $statusWaktu = 'Selesai';
             }
 
+            // Cek Kapasitas
             $jumlahHadir = Presensi::where('jadwal_id', $jadwal->id)
-                                    ->whereDate('created_at', Carbon::today())
-                                    ->count();
+                                   ->whereDate('created_at', Carbon::today())
+                                   ->count();
 
             $jadwal->is_penuh = $jumlahHadir >= $jadwal->kapasitas;
             $jadwal->waktu_status = $statusWaktu;
             $jadwal->is_hadir = $presensi ? true : false;
-            $jadwal->status_presensi = $presensi ? $presensi->status : null;
             
             return $jadwal;
         })
         // === FILTER PEMBERSIH (CARD HILANG) ===
-        ->filter(function ($jadwal) use ($hariIni) {
-            $isHariIni = $jadwal->hari === $hariIni;
-
-            // 1. Jika SUDAH Presensi -> HILANGKAN
+        ->filter(function ($jadwal) {
+            // 1. Jika SUDAH Presensi -> HILANGKAN DARI LIST
             if ($jadwal->is_hadir) {
                 return false; 
             }
 
-            // 2. Jika HARI INI tapi WAKTU SUDAH HABIS
-            if ($isHariIni && $jadwal->waktu_status === 'Selesai') {
-                return false;
+            // 2. (Opsional) Jika WAKTU SUDAH HABIS tapi lupa absen -> HILANGKAN JUGA?
+            // Jika ingin tetap muncul walau telat, hapus if di bawah ini.
+            if ($jadwal->waktu_status === 'Selesai') {
+                 return false; 
             }
 
-            // 3. Sisanya TAMPILKAN
-            return true;
-            
+            return true; 
         })->values();
 
-        return view('siswa.presensi.index', compact('jadwalsAktif'));
+      
+        
+        return view('siswa.presensi.index', compact('jadwalsAktif', 'totalJadwalHariIni'));
     }
 
     /** Memproses Presensi */

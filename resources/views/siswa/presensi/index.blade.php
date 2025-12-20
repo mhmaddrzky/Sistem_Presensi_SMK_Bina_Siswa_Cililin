@@ -42,8 +42,10 @@
     <p class="text-gray-600 text-sm">Lakukan Absen ketika sesi dimulai</p>
 </div>
 
-{{-- ================= CEK JADWAL KOSONG ================= --}}
-@if ($jadwalsAktif->isEmpty())
+{{-- ================= LOGIKA TAMPILAN ================= --}}
+
+{{-- KONDISI 1: JADWAL KOSONG (Hari Libur / Memang tidak ada jadwal hari ini) --}}
+@if ($totalJadwalHariIni === 0)
 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-8 mb-8">
     <div class="flex flex-col items-center justify-center text-center">
         <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -53,13 +55,13 @@
         </div>
         <h3 class="text-lg font-semibold text-gray-800 mb-2">Belum Ada Jadwal Tersedia</h3>
         <p class="text-gray-600 text-sm max-w-md">
-            Jadwal presensi untuk hari ini belum dibuat.
+            Hari ini kamu tidak memiliki jadwal praktikum. Silakan istirahat!
         </p>
     </div>
 </div>
 
-{{-- ================= CEK JIKA SUDAH ABSEN SEMUA ================= --}}
-@elseif ($jadwalsAktif->where('is_hadir', false)->isEmpty())
+{{-- KONDISI 2: JADWAL ADA, TAPI LIST AKTIF KOSONG (Berarti SUDAH ABSEN SEMUA) --}}
+@elseif ($jadwalsAktif->isEmpty())
 <div class="bg-white border-2 border-blue-200 rounded-xl shadow-sm p-6 mb-8">
     <div class="flex items-center gap-4">
         <div class="flex-shrink-0">
@@ -70,9 +72,9 @@
             </div>
         </div>
         <div class="flex-1">
-            <h3 class="text-lg font-semibold text-gray-800 mb-1">Presensi Hari Ini Sudah Lengkap</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-1">Presensi Hari Ini Selesai</h3>
             <p class="text-gray-600 text-sm">
-                Anda sudah melakukan presensi untuk semua jadwal hari ini.
+                Kamu sudah melakukan presensi untuk semua jadwal hari ini.
             </p>
         </div>
         <div class="flex-shrink-0">
@@ -81,126 +83,117 @@
     </div>
 </div>
 
-{{-- ================= LIST JADWAL AKTIF ================= --}}
+{{-- KONDISI 3: MASIH ADA JADWAL YANG BELUM DIABSEN --}}
 @else
 
 <div class="space-y-4 mb-10" id="presensiCards">
-
-@foreach ($jadwalsAktif as $jadwal)
-
-{{-- HANYA TAMPILKAN YANG BELUM HADIR --}}
-@if(!$jadwal->is_hadir)
-
-@php
-    $isHadir = $jadwal->is_hadir;
-    $statusWaktu = $jadwal->waktu_status;
-    $isPenuh = $jadwal->is_penuh;
-
-    // Logic Button Disabled
-    $buttonDisabled = $isHadir || $isPenuh || ($statusWaktu !== 'Sedang Berlangsung');
-
-    // Default Badge Style
-    $badgeClass = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border';
-    $badgeColor = '';
+    @foreach ($jadwalsAktif as $jadwal)
     
-    // Teks Badge
-    $badgeText = $isHadir ? 'Sudah Hadir' : ($isPenuh ? 'Kuota Penuh' : $statusWaktu);
+        @php
+            $isHadir = $jadwal->is_hadir; // Harusnya false semua disini krn sudah difilter
+            $statusWaktu = $jadwal->waktu_status;
+            $isPenuh = $jadwal->is_penuh;
 
-    // --- WARNA KONTRAS DISINI ---
-    if (Str::contains($statusWaktu, 'Menunggu Hari')) {
-        $badgeColor = 'bg-gray-100 text-gray-500 border border-gray-200';
-    
-    } elseif (Str::contains($statusWaktu, 'Selesai')) {
-        $badgeColor = 'bg-blue-100 text-blue-700 border-blue-200';
-    
-    } elseif ($statusWaktu == 'Sedang Berlangsung') {
-        $badgeColor = 'bg-green-100 text-green-700 border-green-300 animate-pulse';
-    
-    } elseif ($statusWaktu == 'Belum Dimulai') {
-        $badgeColor = 'bg-yellow-100 text-yellow-700 border-yellow-300';
-    
-    } elseif ($isPenuh) {
-        $badgeColor = 'bg-red-100 text-red-700 border-red-300';
-    }
+            // Logic Button Disabled
+            $buttonDisabled = $isHadir || $isPenuh || ($statusWaktu !== 'Sedang Berlangsung');
 
-    // Button Text
-    $buttonText = 'Presensi';
-    if ($isHadir) $buttonText = 'Sudah Hadir';
-    elseif ($isPenuh) $buttonText = 'Kuota Penuh';
-    elseif ($statusWaktu == 'Belum Dimulai') $buttonText = 'Belum Dimulai';
-@endphp
+            // Default Badge Style
+            $badgeClass = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm border';
+            $badgeColor = '';
+            
+            // Teks Badge
+            $badgeText = $isHadir ? 'Sudah Hadir' : ($isPenuh ? 'Kuota Penuh' : $statusWaktu);
 
-{{-- ================= CARD ITEM ================= --}}
-<div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 presensi-card" data-jadwal-id="{{ $jadwal->id }}">
-    
-    <div class="p-6">
-        {{-- HEADER: Judul & Badge --}}
-        <div class="flex justify-between items-start gap-4 mb-4 pb-4 border-b border-gray-200">
-            <div class="min-w-0 flex-1">
-                <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $jadwal->mata_pelajaran }}</h3>
-                <p class="text-sm text-gray-600">{{ $jadwal->nama_guru }}</p>
-            </div>
+            // --- WARNA KONTRAS DISINI ---
+            if (Str::contains($statusWaktu, 'Menunggu Hari')) {
+                $badgeColor = 'bg-gray-100 text-gray-500 border border-gray-200';
+            } elseif (Str::contains($statusWaktu, 'Selesai')) {
+                $badgeColor = 'bg-blue-100 text-blue-700 border-blue-200';
+            } elseif ($statusWaktu == 'Sedang Berlangsung') {
+                $badgeColor = 'bg-green-100 text-green-700 border-green-300 animate-pulse';
+            } elseif ($statusWaktu == 'Belum Dimulai') {
+                $badgeColor = 'bg-yellow-100 text-yellow-700 border-yellow-300';
+            } elseif ($isPenuh) {
+                $badgeColor = 'bg-red-100 text-red-700 border-red-300';
+            }
 
-            {{-- BADGE STATUS --}}
-            <span class="{{ $badgeClass }} {{ $badgeColor }} flex-shrink-0">
-                {{ $badgeText }}
-            </span>
-        </div>
-       
-        {{-- BODY DETAIL + BUTTON --}}
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            // Button Text
+            $buttonText = 'Presensi';
+            if ($isHadir) $buttonText = 'Sudah Hadir';
+            elseif ($isPenuh) $buttonText = 'Kuota Penuh';
+            elseif ($statusWaktu == 'Belum Dimulai') $buttonText = 'Belum Dimulai';
+        @endphp
 
-            {{-- Detail Info --}}
-            <div class="space-y-3 flex-1">
-                {{-- Lokasi Lab --}}
-                <div class="flex items-center gap-3 text-sm text-gray-700">
-                    <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
-                    </svg>
-                    <span>{{ $jadwal->ruang_lab }} (Kapasitas: {{ $jadwal->kapasitas }} siswa)</span>
+        {{-- ================= CARD ITEM ================= --}}
+        <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 presensi-card" data-jadwal-id="{{ $jadwal->id }}">
+            
+            <div class="p-6">
+                {{-- HEADER: Judul & Badge --}}
+                <div class="flex justify-between items-start gap-4 mb-4 pb-4 border-b border-gray-200">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $jadwal->mata_pelajaran }}</h3>
+                        <p class="text-sm text-gray-600">{{ $jadwal->nama_guru }}</p>
+                    </div>
+
+                    {{-- BADGE STATUS --}}
+                    <span class="{{ $badgeClass }} {{ $badgeColor }} flex-shrink-0">
+                        {{ $badgeText }}
+                    </span>
                 </div>
+            
+                {{-- BODY DETAIL + BUTTON --}}
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
-                {{-- Hari --}}
-                <div class="flex items-center gap-3 text-sm text-gray-700">
-                    <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <rect x="3" y="4" width="18" height="18" rx="2"/>
-                        <line x1="16" y1="2" x2="16" y2="6"/>
-                        <line x1="8" y1="2" x2="8" y2="6"/>
-                        <line x1="3" y1="10" x2="21" y2="10"/>
-                    </svg>
-                    <span>{{ $jadwal->hari }}</span>
+                    {{-- Detail Info --}}
+                    <div class="space-y-3 flex-1">
+                        {{-- Lokasi Lab --}}
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>
+                            </svg>
+                            <span>{{ $jadwal->ruang_lab }} (Kapasitas: {{ $jadwal->kapasitas }} siswa)</span>
+                        </div>
+
+                        {{-- Hari --}}
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            <span>{{ $jadwal->hari }}</span>
+                        </div>
+
+                        {{-- Jam --}}
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <span>{{ substr($jadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->waktu_selesai, 0, 5) }}</span>
+                        </div>
+                    </div>
+
+                    {{-- Button Presensi --}}
+                    <div class="flex-shrink-0 md:self-center">
+                        <form action="{{ route('siswa.presensi.store') }}" method="POST" class="presensi-form" data-jadwal-id="{{ $jadwal->id }}">
+                            @csrf
+                            <input type="hidden" name="jadwal_id" value="{{ $jadwal->id }}">
+
+                            <button type="submit"
+                                @if($buttonDisabled) disabled @endif
+                                class="w-full md:w-auto px-8 py-3 rounded-xl text-sm font-semibold shadow-sm transition-all duration-200 {{ $buttonDisabled ? 'bg-gray-400 cursor-not-allowed text-white' : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md' }}">
+                                {{ $buttonText }}
+                            </button>
+
+                        </form>
+                    </div>
                 </div>
-
-                {{-- Jam --}}
-                <div class="flex items-center gap-3 text-sm text-gray-700">
-                    <svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                    <span>{{ substr($jadwal->waktu_mulai, 0, 5) }} - {{ substr($jadwal->waktu_selesai, 0, 5) }}</span>
-                </div>
-            </div>
-
-            {{-- Button Presensi --}}
-            <div class="flex-shrink-0 md:self-center">
-                <form action="{{ route('siswa.presensi.store') }}" method="POST" class="presensi-form" data-jadwal-id="{{ $jadwal->id }}">
-                    @csrf
-                    <input type="hidden" name="jadwal_id" value="{{ $jadwal->id }}">
-
-                    <button type="submit"
-                        @if($buttonDisabled) disabled @endif
-                        class="w-full md:w-auto px-8 py-3 rounded-xl text-sm font-semibold shadow-sm transition-all duration-200 {{ $buttonDisabled ? 'bg-gray-400 cursor-not-allowed text-white' : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md' }}">
-                        {{ $buttonText }}
-                    </button>
-
-                </form>
             </div>
         </div>
-    </div>
-</div>
-
-@endif
-@endforeach
+        
+    @endforeach
 </div>
 @endif
 
