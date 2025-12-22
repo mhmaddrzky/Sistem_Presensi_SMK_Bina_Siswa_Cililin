@@ -44,7 +44,7 @@ class SesiSiswaController extends Controller
             });
         }
         
-        // Gunakan Paginate agar tabel rapi per 10 baris
+        // Gunakan Paginate agar tabel rapi 
         $siswas = $siswasQuery->paginate(20)->withQueryString();
         
         $jadwals = KelolaJadwal::orderBy('hari')->orderBy('waktu_mulai')->get();

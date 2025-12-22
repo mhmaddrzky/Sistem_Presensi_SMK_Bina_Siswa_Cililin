@@ -185,13 +185,6 @@
                     </table>
                 </div>
 
-                {{-- PAGINATION LINKS --}}
-                <div class="px-5 py-4 border-t border-slate-200 bg-slate-50 rounded-b-xl">
-                    {{ $siswas->links() }}
-                </div>
-            </div>
-        </div>
-
         <div>
             <button type="submit" class="px-6 py-3 bg-emerald-600 text-white rounded-lg shadow-md hover:bg-emerald-700 transition font-semibold w-full md:w-auto">
                 Simpan Pembagian Sesi

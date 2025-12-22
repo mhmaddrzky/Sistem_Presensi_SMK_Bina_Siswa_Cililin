@@ -12,7 +12,7 @@ use Carbon\Carbon;
 
 class PresensiController extends Controller
 {
-    /** Menampilkan Dashboard Siswa */
+    /** Menampilkan Dashboard Siswa */      
     public function showSiswaDashboard()
     {
         $siswa = Auth::user()->siswa;
@@ -24,10 +24,9 @@ class PresensiController extends Controller
         $hariIni = Carbon::now()->locale('id')->dayName;
         $now = Carbon::now();
         
-        // Ambil jadwal siswa
+        // --- LOGIC 1: JADWAL & HISTORI (KODE LAMA TETAP ADA) ---
         $jadwalIdsSiswa = SesiSiswa::where('siswa_id', $siswa->id)->pluck('jadwal_id');
         
-        // Ambil 1 jadwal terdekat hari ini yang belum lewat jamnya
         $jadwalTerdekat = KelolaJadwal::whereIn('id', $jadwalIdsSiswa)
                                       ->where('hari', $hariIni)
                                       ->get()
@@ -38,13 +37,35 @@ class PresensiController extends Controller
                                       })
                                       ->first();
         
-        // Ambil 1 presensi terbaru untuk histori mini
         $presensiTerbaru = Presensi::where('siswa_id', $siswa->id)
                                    ->orderBy('created_at', 'desc')
                                    ->with('jadwal')
                                    ->first();
+
+        // --- LOGIC 2: TAMBAHAN UNTUK STATISTIK (BARU) ---
+        // Kita hitung jumlah masing-masing status
+        $stats = Presensi::where('siswa_id', $siswa->id)
+                ->selectRaw('status, count(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+        // Set default 0 jika belum ada datanya
+        $hadir = $stats['Hadir'] ?? 0;
+        $izin = $stats['Izin'] ?? 0;
+        $sakit = $stats['Sakit'] ?? 0;
+        $alpha = $stats['Alpha'] ?? 0; // Asumsi ada status Alpha
+
+        // Hitung total dan persentase kehadiran
+        $totalPertemuan = $hadir + $izin + $sakit + $alpha;
+        $persentaseHadir = $totalPertemuan > 0 ? round(($hadir / $totalPertemuan) * 100) : 0;
         
-        return view('siswa.dashboard', compact('jadwalTerdekat', 'presensiTerbaru'));
+        // Kirim semua variabel ke View
+        return view('siswa.dashboard', compact(
+            'jadwalTerdekat', 
+            'presensiTerbaru',
+            'hadir', 'izin', 'sakit', 'alpha', 'persentaseHadir'
+        ));
     }
 
     /** Menampilkan Halaman Jadwal (Read Only) */

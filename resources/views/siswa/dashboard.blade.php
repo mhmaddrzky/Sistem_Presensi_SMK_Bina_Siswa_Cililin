@@ -1,24 +1,19 @@
 @extends('layouts.siswa')
 
 @section('content')
-    {{-- ================= SECTION SAMBUTAN ================= --}}
+    {{-- ================= SECTION SAMBUTAN (TIDAK BERUBAH) ================= --}}
     <div class="bg-white rounded-xl shadow-md p-8 mb-6">
         <div class="flex items-center justify-between">
-            
-            {{-- Konten teks di tengah --}}
             <div class="flex-1 text-center">
                 <h1 class="text-2xl font-bold text-gray-800 mb-2">
                     SELAMAT DATANG, <span class="text-blue-600">{{ strtoupper(auth()->user()->siswa->nama ?? auth()->user()->username) }}</span>
                 </h1>
-                {{-- Quote motivasi --}}
                 <p class="text-gray-600 italic text-sm leading-relaxed">
                     My Father Always Told Me That All Businessmen Were Sons Of Bitches,<br>
                     But I Never Believed It Till Now<br>
                     <span class="text-gray-500">- John F. Kennedy</span>
                 </p>
             </div>
-            
-            {{-- Ilustrasi SVG di kanan (hidden di mobile) --}}
             <div class="hidden md:block ml-6">
                 <svg class="w-32 h-32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="75" cy="25" r="15" fill="#FCD34D"/>
@@ -29,7 +24,6 @@
                     <line x1="40" y1="58" x2="60" y2="58" stroke="white" stroke-width="1.5"/>
                     <line x1="40" y1="64" x2="60" y2="64" stroke="white" stroke-width="1.5"/>
                     <line x1="40" y1="70" x2="60" y2="70" stroke="white" stroke-width="1.5"/>
-                    {{-- Dekorasi bulat --}}
                     <circle cx="20" cy="70" r="8" fill="#EC4899" opacity="0.7"/>
                     <circle cx="85" cy="60" r="6" fill="#FCD34D" opacity="0.7"/>
                 </svg>
@@ -37,7 +31,7 @@
         </div>
     </div>
 
-    {{-- ================= ALERT SUCCESS (jika ada) ================= --}}
+    {{-- ================= ALERT SUCCESS ================= --}}
     @if(session('success'))
     <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg flex items-center">
         <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -47,39 +41,104 @@
     </div>
     @endif
 
-    {{-- ================= GRID 2 KOLOM (Pengumuman & Aktivitas) ================= --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    {{-- ================= GRID UTAMA (EQUAL HEIGHT) ================= --}}
+    {{-- 'items-stretch' memastikan kedua kolom tingginya dipaksa sama --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
         
-        {{-- CARD PENGUMUMAN --}}
-        <div class="bg-white rounded-xl shadow-md p-6">
-            {{-- Header card dengan icon --}}
-            <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-gray-200">
-                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
-                    <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
-                </svg>
-                <h2 class="text-xl font-bold text-gray-800">PENGUMUMAN</h2>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        {{-- CARD 1: STATISTIK SAYA --}}
+        {{-- 'flex flex-col h-full' memastikan card mengisi seluruh ruang tinggi yang tersedia --}}
+        <div class="bg-white rounded-xl shadow-md p-6 flex flex-col h-full">
+            
+            {{-- HEADER: Agar garis sejajar, struktur header disamakan persis --}}
+            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 h-20">
+                <div class="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 leading-tight">STATISTIK</h2>
+                    <p class="text-xs text-gray-500 mt-1">Ringkasan performa semester ini</p>
+                </div>
             </div>
             
-            {{-- Konten pengumuman  --}}
-            <div class="text-gray-600 text-sm leading-relaxed">
-                <p class="mb-2">🔔 Tidak ada pengumuman saat ini.</p>
-                <p class="text-xs text-gray-400 italic">Periksa kembali nanti untuk informasi terbaru.</p>
+            {{-- CONTENT: Menggunakan flex-1 agar mengisi sisa ruang --}}
+            <div class="flex flex-col sm:flex-row items-center gap-6 flex-1 justify-center">
+                
+                {{-- Grafik Donat --}}
+                <div class="relative w-36 h-36 flex-shrink-0">
+                    <canvas id="attendanceChart"></canvas>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span class="text-xl font-bold text-gray-800">{{ $persentaseHadir }}%</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-wider">Hadir</span>
+                    </div>
+                </div>
+
+                {{-- Detail Legend (Kotak-kotak berwarna sesuai request 'sebelumnya') --}}
+                {{-- Grid 2 kolom yang rapi --}}
+                <div class="w-full grid grid-cols-2 gap-3">
+                    
+                    {{-- Item Hadir --}}
+                    <div class="bg-green-50 p-3 rounded-lg border border-green-100 hover:shadow-sm transition-shadow">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="text-xs text-gray-600 font-medium">Hadir</span>
+                        </div>
+                        <p class="text-lg font-bold text-green-700">{{ $hadir }}</p>
+                    </div>
+
+                    {{-- Item Izin --}}
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 hover:shadow-sm transition-shadow">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span class="text-xs text-gray-600 font-medium">Izin</span>
+                        </div>
+                        <p class="text-lg font-bold text-blue-700">{{ $izin }}</p>
+                    </div>
+
+                    {{-- Item Sakit --}}
+                    <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-100 hover:shadow-sm transition-shadow">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                            <span class="text-xs text-gray-600 font-medium">Sakit</span>
+                        </div>
+                        <p class="text-lg font-bold text-yellow-700">{{ $sakit }}</p>
+                    </div>
+
+                    {{-- Item Alpha --}}
+                    <div class="bg-red-50 p-3 rounded-lg border border-red-100 hover:shadow-sm transition-shadow">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <span class="text-xs text-gray-600 font-medium">Alpha</span>
+                        </div>
+                        <p class="text-lg font-bold text-red-700">{{ $alpha }}</p>
+                    </div>
+
+                </div>
             </div>
         </div>
 
-        {{-- CARD AKTIVITAS SAYA --}}
-        <div class="bg-white rounded-xl shadow-md p-6">
-            {{-- Header card dengan icon --}}
-            <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-gray-200">
-                <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-                <h2 class="text-xl font-bold text-gray-800">AKTIVITAS SAYA</h2>
+        {{-- CARD 2: AKTIVITAS SAYA --}}
+        <div class="bg-white rounded-xl shadow-md p-6 flex flex-col h-full">
+            
+            {{-- HEADER: Struktur sama persis dengan Statistik, termasuk tinggi (h-20) --}}
+            <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 h-20">
+                <div class="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                    <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 leading-tight">AKTIVITAS SAYA</h2>
+                    <p class="text-xs text-gray-500 mt-1">Agenda & presensi terbaru</p> {{-- Ditambahkan dummy subtitle agar alignment 100% sama --}}
+                </div>
             </div>
 
-            {{-- List aktivitas dengan collapsible sections --}}
-            <div class="space-y-4">
+            {{-- List aktivitas --}}
+            <div class="space-y-4 flex-1">
                 
                 {{-- MATERI HARI INI --}}
                 <div class="border border-gray-200 rounded-lg">
@@ -161,10 +220,7 @@
                                     $statusBg = 'bg-red-100';
                                 }
 
-                                // 1. AMBIL HARI DARI JADWAL
                                 $namaHari = $presensiTerbaru->jadwal->hari ?? '-';
-                                
-                                // 2. AMBIL TANGGAL REALTIME
                                 $tanggalFormatted = \Carbon\Carbon::parse($presensiTerbaru->tanggal)->format('d/m/Y');
                             @endphp
                             <a href="{{ route('siswa.riwayat.index') }}" class="block p-4 hover:bg-blue-50 transition-colors">
@@ -174,7 +230,6 @@
                                             {{ $presensiTerbaru->jadwal->mata_pelajaran ?? 'Jadwal Dihapus' }}
                                         </p>
                                         <p class="text-sm text-gray-600 mb-2">
-                                            {{-- TAMPILKAN HARI, TANGGAL • JAM --}}
                                             {{ $namaHari }}, {{ $tanggalFormatted }} • {{ substr($presensiTerbaru->waktu, 0, 5) }}
                                         </p>
                                         <span class="{{ $statusBg }} {{ $statusColor }} text-xs font-semibold px-2 py-1 rounded-full inline-block">
@@ -189,13 +244,11 @@
                         @endif
                     </div>
                 </div>
-
             </div>
         </div>
-
     </div>
 
-    {{-- JavaScript untuk Toggle Sections --}}
+    {{-- Javascript (TIDAK BERUBAH) --}}
     <script>
     function toggleSection(sectionId) {
         const section = document.getElementById(sectionId);
@@ -209,6 +262,46 @@
             arrow.style.transform = 'rotate(0deg)';
         }
     }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            
+            const dataHadir = {{ $hadir }};
+            const dataIzin = {{ $izin }};
+            const dataSakit = {{ $sakit }};
+            const dataAlpha = {{ $alpha }};
+
+            const totalData = dataHadir + dataIzin + dataSakit + dataAlpha;
+            const chartData = totalData === 0 ? [1] : [dataHadir, dataIzin, dataSakit, dataAlpha];
+            // Warna disesuaikan agar sama dengan kotak-kotak legend (Tailwind colors)
+            const chartColors = totalData === 0 
+                ? ['#E5E7EB'] 
+                : ['#22c55e', '#3b82f6', '#facc15', '#ef4444']; 
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Hadir', 'Izin', 'Sakit', 'Alpha'],
+                    datasets: [{
+                        data: chartData,
+                        backgroundColor: chartColors,
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: totalData !== 0 }
+                    }
+                }
+            });
+        });
     </script>
 
 @endsection
