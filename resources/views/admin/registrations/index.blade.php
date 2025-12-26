@@ -49,8 +49,9 @@
                 <h2 class="text-sm font-semibold text-slate-700">Antrian Pending</h2>
                 
                 <div class="flex items-center gap-3">
+                    {{-- === PERBAIKAN: Menggunakan total() agar menampilkan jumlah total seluruh data === --}}
                     <span class="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                        Total: {{ $registrations->count() }}
+                        Total: {{ $registrations->total() }}
                     </span>
 
                     {{-- TOMBOL SETUJUI SEMUA --}}
@@ -86,7 +87,8 @@
                     <tbody class="divide-y divide-slate-100 bg-white">
                         @foreach ($registrations as $reg)
                         <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-4 py-3 text-slate-500 w-12">{{ $loop->iteration }}</td>
+                            {{-- === PERBAIKAN: Penomoran Berlanjut Sesuai Halaman === --}}
+                            <td class="px-4 py-3 text-slate-500 w-12">{{ $registrations->firstItem() + $loop->index }}</td>
                             
                             <td class="px-4 py-3">
                                 <div class="font-medium text-slate-900">{{ $reg->siswa->nama }}</div>
@@ -147,6 +149,12 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- === TAMBAHAN: BAGIAN PAGINATION (LINKS) === --}}
+            <div class="px-4 py-3 border-t border-slate-200 bg-slate-50">
+                {{ $registrations->links() }}
+            </div>
+
         </div>
     @endif
 

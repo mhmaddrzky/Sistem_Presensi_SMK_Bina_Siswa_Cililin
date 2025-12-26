@@ -175,7 +175,7 @@
     {{-- Alfa --}}
     <div class="flex items-center gap-2">
         <span class="w-3 h-3 rounded-full bg-red-500"></span>
-        Alpha ({{ $alphaHariIni }})
+        Alfa ({{ $alphaHariIni }})
     </div>
     </div>
 

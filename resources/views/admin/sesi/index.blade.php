@@ -139,7 +139,7 @@
                 </div>
             </div>
 
-            {{-- CONTENT TABLE --}}
+{{-- CONTENT TABLE --}}
             <div id="tableContent">
                 <div class="overflow-x-auto w-full">
                     <table class="min-w-full divide-y divide-gray-200 text-xs md:text-sm" id="tableSiswa">
@@ -154,6 +154,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
+                            {{-- LOOPING SISWA --}}
                             @foreach ($siswas as $siswa)
                             <tr class="hover:bg-slate-50 transition-colors student-row">
                                 <td class="p-3 text-center">
@@ -172,18 +173,31 @@
                                     <span class="text-slate-400 italic text-xs">Belum dimuat</span>
                                 </td>
                             </tr>
-                            @endforeach
+                            @endforeach  
 
+                            {{-- JIKA DATA KOSONG --}}
                             @if ($siswas->count() == 0)
                             <tr>
                                 <td colspan="6" class="p-8 text-center text-slate-500">
-                                    @if(request('search')) Tidak ditemukan data untuk "<strong>{{ request('search') }}</strong>". @else Data tidak tersedia. @endif
+                                    {{-- IF PENCARIAN --}}
+                                    @if(request('search')) 
+                                        Tidak ditemukan data untuk "<strong>{{ request('search') }}</strong>". 
+                                    @else 
+                                        Data tidak tersedia. 
+                                    @endif
                                 </td>
                             </tr>
-                            @endif
+                            @endif 
                         </tbody>
                     </table>
                 </div>
+
+                {{-- PAGINATION --}}
+                <div class="px-5 py-4 border-t border-slate-200">
+                    {{ $siswas->links() }}
+                </div>
+
+            </div>
 
         <div>
             <button type="submit" class="px-6 py-3 bg-emerald-600 text-white rounded-lg shadow-md hover:bg-emerald-700 transition font-semibold w-full md:w-auto">

@@ -147,7 +147,7 @@
                        id="kelas"
                        name="kelas"
                        value="{{ old('kelas') }}"
-                       placeholder="Contoh: XII, XI, X"
+                       placeholder="Contoh: X-A, XI-B, XII-C"
                        maxlength="10"
                        class="w-full bg-white/80 border @error('kelas') border-red-500 @else border-gray-300 @enderror
                               rounded-xl px-4 py-3 text-sm shadow-sm

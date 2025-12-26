@@ -50,21 +50,23 @@ class PresensiController extends Controller
                 ->pluck('count', 'status')
                 ->toArray();
 
+        // ... (kode sebelumnya)
+
         // Set default 0 jika belum ada datanya
         $hadir = $stats['Hadir'] ?? 0;
         $izin = $stats['Izin'] ?? 0;
         $sakit = $stats['Sakit'] ?? 0;
-        $alpha = $stats['Alpha'] ?? 0; // Asumsi ada status Alpha
+        $alfa = $stats['Alfa'] ?? 0; 
 
-        // Hitung total dan persentase kehadiran
-        $totalPertemuan = $hadir + $izin + $sakit + $alpha;
+        $totalPertemuan = $hadir + $izin + $sakit + $alfa;
+        
         $persentaseHadir = $totalPertemuan > 0 ? round(($hadir / $totalPertemuan) * 100) : 0;
         
         // Kirim semua variabel ke View
         return view('siswa.dashboard', compact(
             'jadwalTerdekat', 
             'presensiTerbaru',
-            'hadir', 'izin', 'sakit', 'alpha', 'persentaseHadir'
+            'hadir', 'izin', 'sakit', 'alfa', 'persentaseHadir'
         ));
     }
 

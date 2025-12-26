@@ -112,9 +112,9 @@
                     <div class="bg-red-50 p-3 rounded-lg border border-red-100 hover:shadow-sm transition-shadow">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                            <span class="text-xs text-gray-600 font-medium">Alpha</span>
+                            <span class="text-xs text-gray-600 font-medium">Alfa</span>
                         </div>
-                        <p class="text-lg font-bold text-red-700">{{ $alpha }}</p>
+                        <p class="text-lg font-bold text-red-700">{{ $alfa }}</p>
                     </div>
 
                 </div>
@@ -271,7 +271,7 @@
             const dataHadir = {{ $hadir }};
             const dataIzin = {{ $izin }};
             const dataSakit = {{ $sakit }};
-            const dataAlpha = {{ $alpha }};
+            const dataAlpha = {{ $alfa }};
 
             const totalData = dataHadir + dataIzin + dataSakit + dataAlpha;
             const chartData = totalData === 0 ? [1] : [dataHadir, dataIzin, dataSakit, dataAlpha];
@@ -283,7 +283,7 @@
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Hadir', 'Izin', 'Sakit', 'Alpha'],
+                    labels: ['Hadir', 'Izin', 'Sakit', 'Alfa'],
                     datasets: [{
                         data: chartData,
                         backgroundColor: chartColors,
