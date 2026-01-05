@@ -27,30 +27,24 @@
     @endif
 
     {{-- FORM FILTER --}}
-@php
-    
-    $periode = $periode ?? 'mingguan'; // Fallback jika $periode datang dari Controller sebagai null
-    
-    // 2. Label untuk Jurusan (String)
-    $labelJurusan = $jurusanFilter ?? 'all'; // Fallback jika $jurusanFilter null
-    $labelJurusan = $labelJurusan === 'all' ? 'Semua Jurusan' : $labelJurusan;
-    
-    // 3. Array Mapping Periode (Array)
-    $periodeOptions = [
-        'mingguan'      => 'Minggu Ini',
-        'bulanan'       => 'Bulan Ini',
-        'keseluruhan'   => 'Keseluruhan',
-    ]; 
-    
-    // 4. Label untuk Periode Aktif (String tunggal)
-    // FIX UTAMA: Pastikan $periode adalah key yang valid
-    $labelPeriode = $periodeOptions[$periode] ?? 'Minggu Ini';
-@endphp
+    @php
+        $periode = $periode ?? 'mingguan';
+        $labelJurusan = $jurusanFilter ?? 'all';
+        $labelJurusan = $labelJurusan === 'all' ? 'Semua Jurusan' : $labelJurusan;
+        
+        $periodeOptions = [
+            'mingguan'      => 'Minggu Ini',
+            'bulanan'       => 'Bulan Ini',
+            'keseluruhan'   => 'Keseluruhan',
+        ];
+        
+        $labelPeriode = $periodeOptions[$periode] ?? 'Minggu Ini';
+    @endphp
 
     <form action="{{ route('admin.laporan.index') }}" method="GET" id="form_laporan_filter">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 px-4 md:px-6 py-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
 
-            {{-- FILTER JURUSAN (DROPDOWN CUSTOM) --}}
+            {{-- FILTER JURUSAN --}}
             <div class="w-full md:w-1/3">
                 <label class="block text-sm font-semibold text-slate-700 mb-1">
                     Filter Berdasarkan Jurusan
@@ -75,29 +69,20 @@
 
                     <div id="jurusan_filter_list"
                          class="absolute left-0 mt-1 hidden w-full overflow-hidden rounded-xl border border-slate-200 bg-white text-sm shadow-lg z-30">
-                        <button type="button"
-                                class="w-full px-3 py-2 text-left hover:bg-blue-50"
-                                data-value="all" data-label="Semua Jurusan"
-                                onclick="pickJurusanFilter(this)">
+                        <button type="button" class="w-full px-3 py-2 text-left hover:bg-blue-50" data-value="all" data-label="Semua Jurusan" onclick="pickJurusanFilter(this)">
                             Semua Jurusan
                         </button>
-                        <button type="button"
-                                class="w-full px-3 py-2 text-left hover:bg-blue-50"
-                                data-value="TKJ" data-label="TKJ"
-                                onclick="pickJurusanFilter(this)">
+                        <button type="button" class="w-full px-3 py-2 text-left hover:bg-blue-50" data-value="TKJ" data-label="TKJ" onclick="pickJurusanFilter(this)">
                             TKJ
                         </button>
-                        <button type="button"
-                                class="w-full px-3 py-2 text-left hover:bg-blue-50"
-                                data-value="TBSM" data-label="TBSM"
-                                onclick="pickJurusanFilter(this)">
+                        <button type="button" class="w-full px-3 py-2 text-left hover:bg-blue-50" data-value="TBSM" data-label="TBSM" onclick="pickJurusanFilter(this)">
                             TBSM
                         </button>
                     </div>
                 </div>
             </div>
 
-            {{-- FILTER PERIODE (DROPDOWN CUSTOM) --}}
+            {{-- FILTER PERIODE --}}
             <div class="w-full md:w-1/3">
                 <label class="block text-sm font-semibold text-slate-700 mb-1">
                     Pilih Periode Laporan
@@ -111,7 +96,7 @@
                             class="w-full flex items-center justify-between gap-2 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-800
                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                        <span id="periode_label" class="truncate">
-                             {{ $labelPeriode }}
+                            {{ $labelPeriode }}
                         </span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
@@ -122,22 +107,13 @@
 
                     <div id="periode_list"
                          class="absolute left-0 mt-1 hidden w-full overflow-hidden rounded-xl border border-slate-200 bg-white text-sm shadow-lg z-30">
-                        <button type="button"
-                                class="w-full px-3 py-2 text-left hover:bg-blue-50"
-                                data-value="mingguan" data-label="Minggu Ini"
-                                onclick="pickPeriodeFilter(this)">
+                        <button type="button" class="w-full px-3 py-2 text-left hover:bg-blue-50" data-value="mingguan" data-label="Minggu Ini" onclick="pickPeriodeFilter(this)">
                             Minggu Ini
                         </button>
-                        <button type="button"
-                                class="w-full px-3 py-2 text-left hover:bg-blue-50"
-                                data-value="bulanan" data-label="Bulan Ini"
-                                onclick="pickPeriodeFilter(this)">
+                        <button type="button" class="w-full px-3 py-2 text-left hover:bg-blue-50" data-value="bulanan" data-label="Bulan Ini" onclick="pickPeriodeFilter(this)">
                             Bulan Ini
                         </button>
-                        <button type="button"
-                                class="w-full px-3 py-2 text-left hover:bg-blue-50"
-                                data-value="keseluruhan" data-label="Keseluruhan"
-                                onclick="pickPeriodeFilter(this)">
+                        <button type="button" class="w-full px-3 py-2 text-left hover:bg-blue-50" data-value="keseluruhan" data-label="Keseluruhan" onclick="pickPeriodeFilter(this)">
                             Keseluruhan
                         </button>
                     </div>
@@ -181,21 +157,23 @@
             </span>
         </div>
 
-        <div class="mt-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-sm text-left rounded-xl overflow-hidden">
-            <thead class="bg-[#0B57D0] text-white rounded-xl">
-                <tr>
-                    <th class="px-4 py-3">NIS</th>
-                    <th class="px-4 py-3">Nama Siswa</th>
-                    <th class="px-4 py-3">Kelas</th>
-                    <th class="px-4 py-3">Jurusan</th>
-                    <th class="px-4 py-3 text-center">Total Sesi</th>
-                </tr>
-            </thead>
-                    <tbody class="divide-y divide-slate-100">
+        {{-- MODIFIKASI: max-h-[500px] dan overflow-y-auto --}}
+        <div class="mt-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+            <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                <table class="min-w-full text-sm text-left border-collapse">
+                    {{-- MODIFIKASI: sticky top-0 --}}
+                    <thead class="bg-[#0B57D0] text-white sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="px-4 py-3 border-b border-blue-800">NIS</th>
+                            <th class="px-4 py-3 border-b border-blue-800">Nama Siswa</th>
+                            <th class="px-4 py-3 border-b border-blue-800">Kelas</th>
+                            <th class="px-4 py-3 border-b border-blue-800">Jurusan</th>
+                            <th class="px-4 py-3 border-b border-blue-800 text-center">Total Sesi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
                         @foreach($dataLaporan as $data)
-                            <tr class="hover:bg-slate-50">
+                            <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-4 py-3 text-slate-800 whitespace-nowrap">
                                     {{ $data['nis'] }}
                                 </td>
@@ -246,7 +224,6 @@
 
 {{-- SCRIPT DROPDOWN CUSTOM --}}
 <script>
-    // === JURUSAN ===
     function toggleJurusanFilter() {
         const list = document.getElementById('jurusan_filter_list');
         if (list) list.classList.toggle('hidden');
@@ -255,17 +232,12 @@
     function pickJurusanFilter(btn) {
         const val   = btn.dataset.value;
         const label = btn.dataset.label;
-
         document.getElementById('jurusan_filter_input').value = val;
         document.getElementById('jurusan_filter_label').textContent = label;
-
-        const list = document.getElementById('jurusan_filter_list');
-        if (list) list.classList.add('hidden');
-
+        document.getElementById('jurusan_filter_list').classList.add('hidden');
         document.getElementById('form_laporan_filter').submit();
     }
 
-    // === PERIODE ===
     function togglePeriodeFilter() {
         const list = document.getElementById('periode_list');
         if (list) list.classList.toggle('hidden');
@@ -274,17 +246,12 @@
     function pickPeriodeFilter(btn) {
         const val   = btn.dataset.value;
         const label = btn.dataset.label;
-
         document.getElementById('periode_input').value = val;
         document.getElementById('periode_label').textContent = label;
-
-        const list = document.getElementById('periode_list');
-        if (list) list.classList.add('hidden');
-
+        document.getElementById('periode_list').classList.add('hidden');
         document.getElementById('form_laporan_filter').submit();
     }
 
-    // Tutup dropdown jika klik di luar
     document.addEventListener('click', function(e) {
         const jurusanWrapper = document.getElementById('jurusanFilterWrapper');
         const jurusanList    = document.getElementById('jurusan_filter_list');

@@ -5,7 +5,7 @@
             <th colspan="6" style="text-align: center;">REKAPITULASI PRESENSI SISWA - SMK BINA SISWA 2 CILILIN</th>
         </tr>
         <tr>
-            <th colspan="6" style="text-align: center;">Periode: {{ $ketPeriode }} | Filter: {{ $jurusan }}</th>
+            <th colspan="6" style="text-align: center;">Periode: {{ $ketPeriode }} | {{ $jurusan }}</th>
         </tr>
         
         {{-- HEADER TABEL (Warna border) --}}
