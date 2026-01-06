@@ -45,7 +45,7 @@ class SesiSiswaController extends Controller
         }
         
         // Gunakan Paginate agar tabel rapi 
-        $siswas = $siswasQuery->paginate(20)->withQueryString();
+        $siswas = $siswasQuery->paginate(15)->withQueryString();
         
         $jadwals = KelolaJadwal::orderBy('hari')->orderBy('waktu_mulai')->get();
         $mappingSesi = SesiSiswa::get()->groupBy('jadwal_id');

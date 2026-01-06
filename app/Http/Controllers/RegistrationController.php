@@ -136,11 +136,11 @@ class RegistrationController extends Controller
      */
     public function index()
     {
-        // === PERUBAHAN: MENGGUNAKAN PAGINATE(20) ===
+        // === PERUBAHAN: MENGGUNAKAN PAGINATE ===
         $registrations = Registrasi::with('siswa')
             ->where('status', 'Pending')
             ->orderByDesc('id_reg')
-            ->paginate(20);
+            ->paginate(15);
 
         return view('admin.registrations.index', compact('registrations'));
     }
