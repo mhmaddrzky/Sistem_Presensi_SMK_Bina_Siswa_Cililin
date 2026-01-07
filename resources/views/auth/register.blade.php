@@ -84,7 +84,7 @@
                        id="username"
                        name="username"
                        value="{{ old('username') }}"
-                       placeholder="Buat username unik (contoh: dimas123)"
+                       placeholder="Masukkan username"
                        class="w-full bg-white/80 border @error('username') border-red-500 @else border-gray-300 @enderror
                               rounded-xl px-4 py-3 text-sm shadow-sm
                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500

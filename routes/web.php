@@ -48,25 +48,8 @@ Route::middleware(['auth'])->group(function () {
         // 1. Dashboard Admin (sekarang pakai controller baru)
         Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
             ->name('admin.dashboard');
-        
-        // 2. Persetujuan Registrasi Siswa (FULL ACCESS)
-        // - Setujui Semua (approveAll)
-        // Daftar registrasi (halaman index yang menampilkan pending)
-        Route::get('/admin/registrations', [RegistrationController::class, 'index'])
-        ->name('admin.registrations.index');
 
-        Route::post('/admin/registrations/approve-all', [RegistrationController::class, 'approveAll'])
-            ->name('admin.registrations.approveAll');
-
-        // - Approve single
-        Route::post('/admin/registrations/{id}/approve', [RegistrationController::class, 'approve'])
-            ->name('admin.registrations.approve');
-
-        // - Reject single
-        Route::post('/admin/registrations/{id}/reject', [RegistrationController::class, 'reject'])
-            ->name('admin.registrations.reject');
-
-        // 3. Kelola Jadwal (FULL CRUD UNTUK SEMUA)
+        // 2. Kelola Jadwal (FULL CRUD UNTUK SEMUA)
         Route::resource('admin/jadwal', KelolaJadwalController::class)
             ->names([
                 'index' => 'admin.jadwal.index',
@@ -77,19 +60,37 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'admin.jadwal.destroy',
             ]);
 
-        // 4. Pembagian Sesi / Mapping Kuota (FULL CRUD UNTUK SEMUA)
+        // 3. Pembagian Sesi / Mapping Kuota (FULL CRUD UNTUK SEMUA)
         Route::get('/admin/sesi-siswa', [SesiSiswaController::class, 'index'])->name('admin.sesi.index');
         Route::post('/admin/sesi-siswa', [SesiSiswaController::class, 'store'])->name('admin.sesi.store');
 
-        // 5. Koreksi Presensi (Validasi Akhir)
+        // 4. Koreksi Presensi (Validasi Akhir)
         Route::get('/admin/koreksi', [KoreksiPresensiController::class, 'index'])->name('admin.koreksi.index');
         Route::post('/admin/koreksi', [KoreksiPresensiController::class, 'store'])->name('admin.koreksi.store');
     });
 
-    // 🛑 BLOK C: KHUSUS PEMBUATAN AKUN (ADMIN UTAMA SAJA) 🛑
-    Route::middleware('role:Admin')->group(function () {
+    // Khusus admin dan AsistenLab
+    Route::middleware('role:Admin,AsistenLab')->group(function () {
+
+        // Persetujuan Registrasi Siswa (FULL ACCESS)
+        // - Setujui Semua (approveAll)
+        // Daftar registrasi (halaman index yang menampilkan pending)
+        Route::get('/admin/registrations', [RegistrationController::class, 'index'])
+        ->name('admin.registrations.index');
+
+        Route::post('/admin/registrations/approve-all', [RegistrationController::class, 'approveAll'])
+            ->name('admin.registrations.approveAll');
+            
+        // - Approve single
+        Route::post('/admin/registrations/{id}/approve', [RegistrationController::class, 'approve'])
+            ->name('admin.registrations.approve');
+
+        // - Reject single
+        Route::post('/admin/registrations/{id}/reject', [RegistrationController::class, 'reject'])
+            ->name('admin.registrations.reject');
+
         // Manajemen Akun Staf (CRUD) - HANYA ADMIN UTAMA
-        Route::prefix('admin/users')->name('admin.users.')->group(function () {
+            Route::prefix('admin/users')->name('admin.users.')->group(function () {
             Route::get('/', [AdminUserController::class, 'index'])->name('index'); 
             Route::get('/create', [AdminUserController::class, 'create'])->name('create'); 
             Route::post('/', [AdminUserController::class, 'store'])->name('store'); 
