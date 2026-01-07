@@ -42,87 +42,63 @@
 
     <hr class="border-slate-200 mb-6">
 
-    {{-- GRID CARD --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+{{-- GRID CARD DENGAN LOGIKA DINAMIS --}}
+<div class="grid grid-cols-1 {{ in_array($role, ['Admin', 'AsistenLab']) ? 'md:grid-cols-3' : 'md:grid-cols-2' }} gap-4">
 
-        {{-- CARD: Siswa Pending Approval --}}
-<div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-3">
-    <div class="flex items-center justify-between">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Siswa Menunggu Approval
-        </p>
-
-        {{-- ICON USER-PLUS --}}
-        <div class="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M12 4.5c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3zM19 8v6m3-3h-6M6 20v-1c0-2.761 2.239-5 5-5h2" />
-            </svg>
+    {{-- 1. CARD APPROVAL (Hanya Muncul untuk Admin & AsistenLab) --}}
+    @if(in_array($role, ['Admin', 'AsistenLab']))
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Siswa Menunggu Approval
+            </p>
+            <div class="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3zM19 8v6m3-3h-6M6 20v-1c0-2.761 2.239-5 5-5h2" />
+                </svg>
+            </div>
         </div>
+        <p class="text-4xl font-semibold {{ $pendingApproval > 0 ? 'text-amber-500' : 'text-emerald-600' }}">
+            {{ $pendingApproval }}
+        </p>
+        <p class="text-[11px] text-slate-500">Pendaftaran baru yang menunggu verifikasi.</p>
+    </div>
+    @endif
+
+    {{-- 2. CARD KEHADIRAN (Muncul untuk Semua) --}}
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Kehadiran Hari Ini
+            </p>
+            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+        <p class="text-4xl font-semibold text-blue-700">{{ $hadirHariIni }}</p>
+        <p class="text-[11px] text-slate-500">Total siswa yang hadir pada semua sesi hari ini.</p>
     </div>
 
-    <p class="text-4xl font-semibold {{ $pendingApproval > 0 ? 'text-amber-500' : 'text-emerald-600' }}">
-        {{ $pendingApproval }}
-    </p>
-
-    <p class="text-[11px] text-slate-500">
-        Pendaftaran baru yang menunggu verifikasi.
-    </p>
+    {{-- 3. CARD SESI LAB (Muncul untuk Semua) --}}
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Sesi Lab Hari Ini
+            </p>
+            <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 2v6l-5 9c0 2.209 1.791 4 4 4h8c2.209 0 4-1.791 4-4l-5-9V2" />
+                </svg>
+            </div>
+        </div>
+        <p class="text-4xl font-semibold text-indigo-600">{{ $totalSesiHariIni }}</p>
+        <p class="text-[11px] text-slate-500">Total sesi yang berlangsung hari ini.</p>
+    </div>
 </div>
 
-
-        {{-- CARD: Kehadiran Hari Ini --}}
-        <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    Kehadiran Hari Ini
-                </p>
-
-                {{-- ICON CHECK-CIRCLE --}}
-                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-            </div>
-
-            <p class="text-4xl font-semibold text-blue-700">
-                {{ $hadirHariIni }}
-            </p>
-
-            <p class="text-[11px] text-slate-500">
-                Total siswa yang hadir pada semua sesi hari ini.
-            </p>
-        </div>
-
-        {{-- CARD: Sesi Lab Hari Ini --}}
-        <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-5 flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    Sesi Lab Hari Ini
-                </p>
-
-                {{-- ICON BEAKER --}}
-                <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9 2v6l-5 9c0 2.209 1.791 4 4 4h8c2.209 0 4-1.791 4-4l-5-9V2" />
-                    </svg>
-                </div>
-            </div>
-
-            <p class="text-4xl font-semibold text-indigo-600">
-                {{ $totalSesiHariIni }}
-            </p>
-
-            <p class="text-[11px] text-slate-500">
-                Total sesi yang berlangsung hari ini.
-            </p>
-        </div>
+</div>
 
     </div>
 

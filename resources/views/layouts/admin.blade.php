@@ -87,7 +87,6 @@
 
                     {{-- MENU ITEMS --}}
                     <div class="py-2">
-                        {{-- REVISI: Menu Approval HANYA muncul untuk Admin --}}
                         @if($userRole === 'Admin')
                             <a href="{{ route('admin.registrations.index') }}"
                                class="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors group">

@@ -82,9 +82,10 @@ public function store(Request $request)
 }
 
     /** Menampilkan form edit (Hanya Admin/Guru/Aslab) */
-    public function edit(KelolaJadwal $jadwal)
+    public function edit(string $id)
     {
         $this->authorizeCreation();
+        $jadwal = KelolaJadwal::find($id);
         return view('admin.jadwal.edit', compact('jadwal'));
     }
     
