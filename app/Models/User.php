@@ -1,7 +1,5 @@
 <?php
 
-// app/Models/User.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +14,8 @@ class User extends Authenticatable
     protected $fillable = [
         'username',
         'password',
-        'role', // Admin, Guru, AsistenLab, Siswa
+        'role',
+        'status', // ✅ TAMBAHKAN INI
     ];
 
     // Relasi One-to-One: User bisa menjadi Siswa (sesuai peran)
@@ -30,9 +29,27 @@ class User extends Authenticatable
     {
         return $this->hasOne(Admin::class);
     }
-    public function getAuthIdentifierName()
-{
-    return 'username';
-}
 
+    public function getAuthIdentifierName()
+    {
+        return 'username';
+    }
+
+    /**
+     * ✅ METHOD UNTUK CEK STATUS AKTIF
+     */
+    public function isActive()
+    {
+        return $this->status === 'Aktif';
+    }
+
+    /**
+     * ✅ METHOD UNTUK TOGGLE STATUS
+     */
+    public function toggleStatus()
+    {
+        $this->status = $this->status === 'Aktif' ? 'Nonaktif' : 'Aktif';
+        $this->save();
+        return $this->status;
+    }
 }

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Panel Administrasi | Sistem Presensi Laboratorium</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- Tailwind via CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -152,13 +153,59 @@
     @if(!$isKepsek)
     <div class="hidden md:block border-t border-white/20 bg-[#0B57D0]">
         <nav class="max-w-6xl mx-auto px-6 py-2 flex items-center justify-center gap-6 text-[11px] font-semibold uppercase tracking-[0.20em]">
-            <a href="{{ route('admin.dashboard') }}" class="pb-1 border-b-2 {{ $routeName === 'admin.dashboard' ? 'border-white' : 'border-transparent hover:border-white/70' }}">Home</a>
-            <a href="{{ route('admin.jadwal.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.jadwal') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Jadwal</a>
-            <a href="{{ route('admin.sesi.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.sesi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Sesi</a>
-            <a href="{{ route('admin.koreksi.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.koreksi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Presensi</a>
-            <a href="{{ route('admin.laporan.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.laporan') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Rekap Presensi</a>
+            <a href="{{ route('admin.dashboard') }}" 
+               class="pb-1 border-b-2 transition-colors {{ $routeName === 'admin.dashboard' ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+                Home
+            </a>
+            <a href="{{ route('admin.jadwal.index') }}" 
+               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.jadwal') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+                Jadwal
+            </a>
+            <a href="{{ route('admin.sesi.index') }}" 
+               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.sesi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+                Sesi
+            </a>
+            <a href="{{ route('admin.koreksi.index') }}" 
+               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.koreksi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+                Presensi
+            </a>
+            <a href="{{ route('admin.laporan.index') }}" 
+               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.laporan') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+                Rekap Presensi
+            </a>
+            
             @if ($userRole === 'Admin')
-                <a href="{{ route('admin.users.index') }}" class="pb-1 border-b-2 {{ str_starts_with($routeName, 'admin.users') ? 'border-white' : 'border-transparent hover:border-white/70' }}">Management Akun</a>
+                {{-- DROPDOWN MANAGEMENT AKUN (DESKTOP) - IMPROVED --}}
+                <div class="relative group">
+                    <button type="button" 
+                            class="pb-1 border-b-2 transition-colors flex items-center gap-1.5 {{ (str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'admin.siswa')) ? 'border-white' : 'border-transparent group-hover:border-white/70' }}">
+                        <span>MANAGEMENT AKUN</span>
+                        <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                    
+                    {{-- DROPDOWN MENU - SIMPLIFIED --}}
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden border border-slate-200">
+                        <div class="py-1">
+                            <a href="{{ route('admin.users.index') }}" 
+                               class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-blue-50 transition-colors {{ str_starts_with($routeName, 'admin.users') ? 'bg-blue-50 text-blue-700 font-medium' : '' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                <span>Akun Pengelola</span>
+                            </a>
+                            
+                            <a href="{{ route('admin.siswa.index') }}" 
+                               class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-green-50 transition-colors {{ str_starts_with($routeName, 'admin.siswa') ? 'bg-green-50 text-green-700 font-medium' : '' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                                <span>Data Siswa</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             @endif
         </nav>
     </div>
@@ -185,15 +232,18 @@
         </div>
 
         <nav class="max-w-6xl mx-auto px-4 py-4 space-y-1 text-[11px] font-semibold uppercase tracking-[0.20em]">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ $routeName === 'admin.dashboard' ? 'bg-white/15' : 'hover:bg-white/10' }}">
+            <a href="{{ route('admin.dashboard') }}" 
+               class="flex items-center justify-between rounded-lg px-3 py-2 {{ $routeName === 'admin.dashboard' ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Home</span>
             </a>
-            <a href="{{ route('admin.jadwal.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.jadwal') ? 'bg-white/15' : 'hover:bg-white/10' }}">
+            <a href="{{ route('admin.jadwal.index') }}" 
+               class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.jadwal') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Jadwal</span>
             </a>
 
             @if($userRole === 'Admin')
-            <a href="{{ route('admin.registrations.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.registrations') ? 'bg-white/15' : 'hover:bg-white/10' }}">
+            <a href="{{ route('admin.registrations.index') }}" 
+               class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.registrations') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Approval</span>
                 @if($pendingCount > 0)
                     <span class="flex items-center justify-center min-w-[22px] h-5 px-1.5 text-[10px] font-bold text-white bg-red-600 rounded-full">
@@ -203,20 +253,46 @@
             </a>
             @endif
 
-            <a href="{{ route('admin.sesi.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.sesi') ? 'bg-white/15' : 'hover:bg-white/10' }}">
+            <a href="{{ route('admin.sesi.index') }}" 
+               class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.sesi') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Sesi</span>
             </a>
-            <a href="{{ route('admin.koreksi.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.koreksi') ? 'bg-white/15' : 'hover:bg-white/10' }}">
+            <a href="{{ route('admin.koreksi.index') }}" 
+               class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.koreksi') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Presensi</span>
             </a>
-            <a href="{{ route('admin.laporan.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.laporan') ? 'bg-white/15' : 'hover:bg-white/10' }}">
+            <a href="{{ route('admin.laporan.index') }}" 
+               class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.laporan') ? 'bg-white/15' : 'hover:bg-white/10' }}">
                 <span>Rekap Presensi</span>
             </a>
 
             @if ($userRole === 'Admin')
-                <a href="{{ route('admin.users.index') }}" class="flex items-center justify-between rounded-lg px-3 py-2 {{ str_starts_with($routeName, 'admin.users') ? 'bg-white/15' : 'hover:bg-white/10' }}">
-                    <span>Management Akun</span>
-                </a>
+                {{-- MOBILE: Management Akun Dropdown - SIMPLIFIED --}}
+                <button id="mobile-dropdown-toggle" type="button"
+                        class="w-full flex items-center justify-between rounded-lg px-3 py-2 hover:bg-white/10 {{ (str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'admin.siswa')) ? 'bg-white/15' : '' }}">
+                    <span>MANAGEMENT AKUN</span>
+                    <svg id="mobile-dropdown-icon" class="w-3.5 h-3.5 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+                
+                {{-- SUB MENU - SIMPLIFIED --}}
+                <div id="mobile-dropdown-menu" class="hidden space-y-0.5 pl-3 ml-3 border-l-2 border-white/30">
+                    <a href="{{ route('admin.users.index') }}" 
+                       class="flex items-center gap-2 rounded-lg px-3 py-2 text-[10px] {{ str_starts_with($routeName, 'admin.users') ? 'bg-white/15 font-semibold' : 'hover:bg-white/10' }}">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        <span>Akun Pengelola</span>
+                    </a>
+                    <a href="{{ route('admin.siswa.index') }}" 
+                       class="flex items-center gap-2 rounded-lg px-3 py-2 text-[10px] {{ str_starts_with($routeName, 'admin.siswa') ? 'bg-white/15 font-semibold' : 'hover:bg-white/10' }}">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        <span>Data Siswa</span>
+                    </a>
+                </div>
             @endif
 
             <form action="{{ route('logout') }}" method="POST" class="pt-3 mt-2 border-t border-white/25">
@@ -242,9 +318,13 @@
     document.addEventListener('DOMContentLoaded', () => {
         const profBtn = document.getElementById('profile-toggle');
         const profMenu = document.getElementById('profile-menu');
-        const navBtn  = document.getElementById('nav-toggle');
+        const navBtn = document.getElementById('nav-toggle');
         const navMenu = document.getElementById('mobile-menu');
+        const mobileDropdownToggle = document.getElementById('mobile-dropdown-toggle');
+        const mobileDropdownMenu = document.getElementById('mobile-dropdown-menu');
+        const mobileDropdownIcon = document.getElementById('mobile-dropdown-icon');
 
+        // Profile dropdown
         if (profBtn && profMenu) {
             profBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -252,15 +332,26 @@
                 if (navMenu) navMenu.classList.add('hidden');
             });
             document.addEventListener('click', (e) => {
-                if (!profBtn.contains(e.target) && !profMenu.contains(e.target)) profMenu.classList.add('hidden');
+                if (!profBtn.contains(e.target) && !profMenu.contains(e.target)) {
+                    profMenu.classList.add('hidden');
+                }
             });
         }
 
+        // Mobile nav toggle
         if (navBtn && navMenu) {
             navBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 navMenu.classList.toggle('hidden');
                 if (profMenu) profMenu.classList.add('hidden');
+            });
+        }
+
+        // Mobile dropdown toggle
+        if (mobileDropdownToggle && mobileDropdownMenu && mobileDropdownIcon) {
+            mobileDropdownToggle.addEventListener('click', () => {
+                mobileDropdownMenu.classList.toggle('hidden');
+                mobileDropdownIcon.classList.toggle('rotate-180');
             });
         }
     });

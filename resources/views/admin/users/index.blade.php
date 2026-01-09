@@ -7,7 +7,7 @@
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
             <h1 class="text-2xl md:text-3xl font-bold text-blue-900">
-                Daftar Akun Pengelola & Staf
+               👥Daftar Akun Pengelola & Staf
             </h1>
             <p class="text-sm text-slate-600">
                 Manajemen akun Guru, Asisten Lab, dan Kepala Sekolah.

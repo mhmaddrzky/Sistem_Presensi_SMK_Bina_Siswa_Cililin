@@ -8,8 +8,9 @@ use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\SesiSiswaController;
 use App\Http\Controllers\KoreksiPresensiController;
-use App\Http\Controllers\AdminUserController; // Wajib di-import
-use App\Http\Controllers\AdminDashboardController; // ⬅️ controller dashboard baru
+use App\Http\Controllers\AdminUserController; 
+use App\Http\Controllers\AdminDashboardController; 
+use App\Http\Controllers\SiswaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
     // --- A. RUTE MANAJEMEN OPERASIONAL (ADMIN, GURU, ASLAB) ---
     Route::middleware('role:Admin,Guru,AsistenLab')->group(function () {
         
-        // 1. Dashboard Admin (sekarang pakai controller baru)
+        // 1. Dashboard Admin
         Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
             ->name('admin.dashboard');
 
@@ -60,7 +61,7 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'admin.jadwal.destroy',
             ]);
         
-        // 3. Pembagian Sesi / Mapping Kuota (FULL CRUD UNTUK SEMUA)
+        // 3. Pembagian Sesi / Mapping Kuota
         Route::get('/admin/sesi-siswa', [SesiSiswaController::class, 'index'])->name('admin.sesi.index');
         Route::post('/admin/sesi-siswa', [SesiSiswaController::class, 'store'])->name('admin.sesi.store');
 
@@ -69,62 +70,65 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/koreksi', [KoreksiPresensiController::class, 'store'])->name('admin.koreksi.store');
     });
 
-    // Khusus admin dan AsistenLab
+    // --- B. KHUSUS ADMIN DAN ASISTEN LAB ---
     Route::middleware('role:Admin,AsistenLab')->group(function () {
 
-        // Persetujuan Registrasi Siswa (FULL ACCESS)
-        // - Setujui Semua (approveAll)
-        // Daftar registrasi (halaman index yang menampilkan pending)
+        // Persetujuan Registrasi Siswa
         Route::get('/admin/registrations', [RegistrationController::class, 'index'])
-        ->name('admin.registrations.index');
-
+            ->name('admin.registrations.index');
         Route::post('/admin/registrations/approve-all', [RegistrationController::class, 'approveAll'])
             ->name('admin.registrations.approveAll');
-            
-        // - Approve single
         Route::post('/admin/registrations/{id}/approve', [RegistrationController::class, 'approve'])
             ->name('admin.registrations.approve');
-
-        // - Reject single
         Route::post('/admin/registrations/{id}/reject', [RegistrationController::class, 'reject'])
             ->name('admin.registrations.reject');
 
-        // Manajemen Akun Staf (CRUD) - HANYA ADMIN UTAMA
-            Route::prefix('admin/users')->name('admin.users.')->group(function () {
+        // Manajemen Akun Staf (CRUD)
+        Route::prefix('admin/users')->name('admin.users.')->group(function () {
             Route::get('/', [AdminUserController::class, 'index'])->name('index'); 
             Route::get('/create', [AdminUserController::class, 'create'])->name('create'); 
             Route::post('/', [AdminUserController::class, 'store'])->name('store'); 
-            // Tambahkan route CRUD lengkap di sini (jika diperlukan)
             Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit'); 
             Route::put('/{user}', [AdminUserController::class, 'update'])->name('update'); 
             Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
-        });
+        }); 
+
+         // Data Siswa CRUD
+        Route::resource('admin/siswa', SiswaController::class)->names([
+            'index' => 'admin.siswa.index',
+            'store' => 'admin.siswa.store',
+            'edit' => 'admin.siswa.edit',
+            'update' => 'admin.siswa.update',
+            'destroy' => 'admin.siswa.destroy',
+        ]);
+
+        // ✅ ROUTE TOGGLE STATUS (BARU!)
+        Route::post('admin/siswa/{id}/toggle-status', [SiswaController::class, 'toggleStatus'])
+            ->name('admin.siswa.toggleStatus');
+
     });
 
+    // Tambahkan middleware check.status ke semua route yang memerlukan auth
+    Route::middleware(['check.status'])->group(function () {
+        // Semua route dashboard, presensi, dll masuk ke sini
+    });
+    
 
-    // --- D. RUTE LAPORAN (ADMIN, GURU, ASLAB, KEPSEK) ---
+
+    // --- C. RUTE LAPORAN (ADMIN, GURU, ASLAB, KEPSEK) ---
     Route::middleware('role:Admin,Guru,AsistenLab,Kepsek')->group(function () {
-        // Laporan Index
         Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
-        // Laporan Export
         Route::post('/admin/laporan/export', [LaporanController::class, 'export'])->name('admin.laporan.export');
     });
 
 
-        // --- E. RUTE KHUSUS SISWA ---
-         Route::middleware('role:Siswa')->group(function () {
-            // 1. Dashboard Siswa
-            Route::get('/siswa/dashboard', [PresensiController::class, 'showSiswaDashboard'])->name('siswa.dashboard');
-            
-            // 2. Jadwal (Read Only - tanpa button)
-            Route::get('/siswa/jadwal', [PresensiController::class, 'showPresensiForm'])->name('siswa.presensi.form');
-            
-            // 3. Presensi (dengan button untuk absen)
-            Route::get('/siswa/presensi', [PresensiController::class, 'index'])->name('siswa.presensi.index');
-            Route::post('/siswa/presensi', [PresensiController::class, 'storePresensi'])->name('siswa.presensi.store');
-            
-            // 4. Riwayat Presensi Siswa (di dropdown user menu)
-            Route::get('/siswa/riwayat', [PresensiController::class, 'showRiwayat'])->name('siswa.riwayat.index');
-        });
+    // --- D. RUTE KHUSUS SISWA ---
+    Route::middleware('role:Siswa')->group(function () {
+        Route::get('/siswa/dashboard', [PresensiController::class, 'showSiswaDashboard'])->name('siswa.dashboard');
+        Route::get('/siswa/jadwal', [PresensiController::class, 'showPresensiForm'])->name('siswa.presensi.form');
+        Route::get('/siswa/presensi', [PresensiController::class, 'index'])->name('siswa.presensi.index');
+        Route::post('/siswa/presensi', [PresensiController::class, 'storePresensi'])->name('siswa.presensi.store');
+        Route::get('/siswa/riwayat', [PresensiController::class, 'showRiwayat'])->name('siswa.riwayat.index');
+    });
 
 });

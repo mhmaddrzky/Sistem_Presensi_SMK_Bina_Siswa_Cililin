@@ -16,7 +16,7 @@ class AdminUserController extends Controller
     public function index()
     {
         // Ambil semua user kecuali Siswa
-        $users = User::whereIn('role', ['Admin', 'Guru', 'AsistenLab', 'Kepsek'])
+        $users = User::whereIn('role', ['Admin', 'Guru', 'Kepsek'])
                       ->with('admin')
                       ->get();
         return view('admin.users.index', compact('users'));
@@ -26,7 +26,7 @@ class AdminUserController extends Controller
     public function create()
     {
         // Daftar role yang diizinkan untuk dibuat
-        $roles = ['Guru', 'AsistenLab', 'Kepsek'];
+        $roles = ['Guru', 'Kepsek'];
         return view('admin.users.create', compact('roles'));
     }
 
@@ -38,7 +38,7 @@ class AdminUserController extends Controller
             'nama' => 'required|string|max:100',
             'username' => 'required|string|unique:users|max:50',
             'password' => 'required|string|min:6',
-            'role' => ['required', Rule::in(['Guru', 'AsistenLab', 'Kepsek'])], 
+            'role' => ['required', Rule::in(['Guru', 'Kepsek'])], 
             'id_pengelola' => 'required|string|unique:admins,id_admin', 
         ]);
 
@@ -81,7 +81,7 @@ class AdminUserController extends Controller
        $user = User::with('admin')->findOrFail($id);
 
        // Role yang bisa dipilih
-       $roles = ['Guru', 'AsistenLab', 'Kepsek'];
+       $roles = ['Guru', 'Kepsek'];
 
        return view('admin.users.edit', compact('user', 'roles'));
    }
@@ -94,7 +94,7 @@ class AdminUserController extends Controller
        $request->validate([
            'nama' => 'required|string|max:100',
            'username' => ['required', 'max:50', Rule::unique('users')->ignore($user->id)],
-           'role' => ['required', Rule::in(['Guru', 'AsistenLab', 'Kepsek'])],
+           'role' => ['required', Rule::in(['Guru', 'Kepsek'])],
            'id_pengelola' => [
                'required',
                Rule::unique('admins', 'id_admin')->ignore($user->admin->id_admin, 'id_admin'),

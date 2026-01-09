@@ -98,7 +98,7 @@
             {{-- NIS --}}
             <div>
                 <label for="nis" class="block text-sm font-medium text-gray-700 mb-1">
-                    NIS (Nomor Induk Siswa) <span class="text-red-500">*</span>
+                    Password (NIS) <span class="text-red-500">*</span>
                 </label>
                 <input type="text"
                        id="nis"
@@ -120,7 +120,7 @@
             {{-- KONFIRMASI NIS --}}
             <div>
                 <label for="nis_confirmation" class="block text-sm font-medium text-gray-700 mb-1">
-                    Konfirmasi NIS <span class="text-red-500">*</span>
+                    Konfirmasi NIS (Nomor Induk Siswa) <span class="text-red-500">*</span>
                 </label>
                 <input type="text"
                        id="nis_confirmation"

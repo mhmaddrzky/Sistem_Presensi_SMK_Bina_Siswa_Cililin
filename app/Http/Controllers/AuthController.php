@@ -39,17 +39,24 @@ class AuthController extends Controller
             ])->onlyInput('username');
         }
 
-        // 3. Coba Autentikasi (cek password)
+        // ✅ 3. CEK STATUS AKUN (SEBELUM CEK PASSWORD)
+        if ($user->status === 'Nonaktif') {
+            return back()->withErrors([
+                'username' => 'Akun Anda telah dinonaktifkan. Silakan hubungi administrator.',
+            ])->onlyInput('username');
+        }
+
+        // 4. Coba Autentikasi (cek password)
         if (!Auth::attempt($request->only('username', 'password'))) {
             return back()->withErrors([
                 'password' => 'Password salah.',
             ])->onlyInput('username');
         }
 
-        // 4. Login sukses → regenerate session
+        // 5. Login sukses → regenerate session
         $request->session()->regenerate();
 
-        // 5. Redirect sesuai role
+        // 6. Redirect sesuai role
         $role = Auth::user()->role;
 
         if ($role === 'Kepsek') {
