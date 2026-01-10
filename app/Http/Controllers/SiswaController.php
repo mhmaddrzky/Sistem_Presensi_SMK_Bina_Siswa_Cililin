@@ -16,10 +16,12 @@ class SiswaController extends Controller
      */
 public function index(Request $request)
 {
+    // Tambahkan ->has('user') agar hanya siswa yang punya akun yang muncul
     $query = Siswa::with('user')
+        ->has('user') 
         ->orderBy('nama', 'asc');
 
-    // 🔍 Search NIS / Nama / Kelas
+    // ... (sisa kodingan search dan filter tetap sama)
     if ($request->filled('search')) {
         $search = $request->search;
         $query->where(function ($q) use ($search) {
@@ -29,7 +31,6 @@ public function index(Request $request)
         });
     }
 
-    // 🎓 Filter jurusan
     if ($request->filled('jurusan')) {
         $query->where('jurusan', $request->jurusan);
     }
