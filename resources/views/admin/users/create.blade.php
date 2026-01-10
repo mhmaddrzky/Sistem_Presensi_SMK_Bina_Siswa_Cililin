@@ -118,12 +118,12 @@
             {{-- Tombol Aksi --}}
             <div class="flex items-center justify-between pt-2">
                 <a href="{{ route('admin.users.index') }}"
-                   class="text-xs font-medium text-slate-600 hover:text-slate-800">
+                  class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900">
                     ← Kembali ke daftar staf
                 </a>
 
                 <button type="submit"
-                        class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700">
+                        class="inline-flex items-center px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-semibold shadow hover:bg-green-700">
                     Buat Akun Staf
                 </button>
             </div>

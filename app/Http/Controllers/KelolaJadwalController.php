@@ -89,34 +89,30 @@ public function store(Request $request)
         return view('admin.jadwal.edit', compact('jadwal'));
     }
     
-    /** Memperbarui jadwal (Hanya Admin/Guru/Aslab) */
-   public function update(Request $request, KelolaJadwal $jadwal)
+   public function update(Request $request, $id)
 {
     $this->authorizeCreation();
-    
-    $request->validate([
+
+    $jadwal = KelolaJadwal::findOrFail($id);
+
+    $validated = $request->validate([
         'mata_pelajaran' => 'required|string|max:100',
         'nama_guru' => 'required|string|max:100',
         'ruang_lab' => 'required|string|max:50',
-        'kapasitas' => 'required|integer|min:1|max:20',
         'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
         'waktu_mulai' => 'required|date_format:H:i',
         'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-        'sesi' => 'nullable|string|max:50', 
+        'kapasitas' => 'required|integer|min:1|max:20',
         'jurusan' => 'required|in:TKJ,TBSM',
     ]);
 
-    try {
-        $jadwal->update($request->only([
-             'hari', 'sesi', 'ruang_lab', 'mata_pelajaran', 'nama_guru',
-             'kapasitas', 'waktu_mulai', 'waktu_selesai', 
-             'jurusan' 
-         ]));
-         return redirect()->route('admin.jadwal.index')->with('success', 'Jadwal berhasil diperbarui.');
-    } catch (\Exception $e) {
-         return back()->with('error', 'Gagal memperbarui jadwal: ' . $e->getMessage());
-    }
+    $jadwal->update($validated);
+
+    return redirect()
+        ->route('admin.jadwal.index')
+        ->with('success', 'Jadwal berhasil diperbarui.');
 }
+
 
     /** Menghapus jadwal (Hanya Admin/Guru/Aslab) */
     public function destroy(KelolaJadwal $jadwal)

@@ -201,17 +201,31 @@
         </div>
 
         {{-- EXPORT BUTTON --}}
-        <form action="{{ route('admin.laporan.export') }}" method="POST" class="mt-4">
-            @csrf
-            <input type="hidden" name="periode" value="{{ $periode }}">
-            <input type="hidden" name="jurusan_filter" value="{{ $jurusanFilter }}">
-            <button type="submit"
-                    class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm
-                           hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1">
-                <i class="fas fa-file-csv mr-2"></i>
-                Export Data ke CSV
+<form action="{{ route('admin.laporan.export') }}" method="POST" class="mt-4">
+    @csrf
+    <input type="hidden" name="periode" value="{{ $periode }}">
+    <input type="hidden" name="jurusan_filter" value="{{ $jurusanFilter }}">
+
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+            <p class="text-xs text-slate-500">
+                Data akan diekspor sesuai filter jurusan dan periode aktif.
+            </p>
+
+            <button
+                type="submit"
+                class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg
+                       bg-green-600 text-white text-sm font-semibold shadow-sm
+                       hover:bg-green-700 focus:outline-none focus:ring-2
+                       focus:ring-green-500 focus:ring-offset-1">
+                Export Data
             </button>
-        </form>
+
+        </div>
+    </div>
+</form>
+
 
     @else
         <div class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">

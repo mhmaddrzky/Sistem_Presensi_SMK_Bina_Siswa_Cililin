@@ -54,34 +54,36 @@ public function index(Request $request)
      * UPDATE DATA SISWA
      * =================================
      */
-    public function update(Request $request, $id)
-    {
-        $siswa = Siswa::findOrFail($id);
+   public function update(Request $request, $id)
+{
+    $siswa = Siswa::findOrFail($id);
 
-        $request->validate([
-            'nama' => [
-                'required','string','min:3','max:100',
-                'regex:/^[a-zA-Z\s]+$/'
-            ],
-            'nis' => [
-                'required','string','min:3','max:20',
-                Rule::unique('siswas','nis')->ignore($siswa->id),
-                'regex:/^[0-9]+$/'
-            ],
-            'kelas' => ['required','string','min:1','max:10'],
-            'jurusan' => ['required','in:TKJ,TBSM'],
-        ]);
+    $request->validate([
+        'nama'    => 'required|min:3|max:100',
+        'nis'     => 'required|min:3|max:20|unique:siswas,nis,' . $siswa->id,
+        'kelas'   => 'required|max:10',
+        'jurusan' => 'required',
+    ], [
+        'nama.required'    => 'Nama lengkap wajib diisi.',
+        'nama.min'         => 'Nama minimal 3 karakter.',
+        'nis.required'     => 'NIS wajib diisi.',
+        'nis.unique'       => 'NIS sudah terdaftar.',
+        'kelas.required'   => 'Kelas wajib diisi.',
+        'jurusan.required' => 'Jurusan wajib dipilih.',
+    ]);
 
-        $siswa->update([
-            'nis' => $request->nis,
-            'nama' => ucwords(strtolower(trim($request->nama))),
-            'kelas' => strtoupper(trim($request->kelas)),
-            'jurusan' => $request->jurusan,
-        ]);
+    $siswa->update([
+        'nama'    => trim($request->nama),
+        'nis'     => $request->nis,
+        'kelas'   => strtoupper(trim($request->kelas)),
+        'jurusan' => $request->jurusan,
+    ]);
 
-        return redirect()->route('admin.siswa.index')
-            ->with('success', 'Data siswa berhasil diperbarui.');
-    }
+    return redirect()
+        ->route('admin.siswa.index')
+        ->with('success', 'Data siswa berhasil diperbarui.');
+}
+
 
     /**
      * =================================

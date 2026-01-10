@@ -130,22 +130,24 @@
                 </div>
             </div>
 
-            {{-- FOOTER --}}
-            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pt-4 border-t border-slate-100">
-                <a href="{{ route('admin.users.index') }}"
-                   class="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-slate-600 hover:text-slate-900">
-                    ← Kembali ke Manajemen Akun
-                </a>
+{{-- FOOTER --}}
+<div class="pt-6 border-t border-slate-100">
+    <div class="flex items-center justify-between">
 
-                <button type="submit"
-                        class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg
-                               bg-blue-600 text-white text-sm font-semibold shadow-sm
-                               hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
-                    Simpan Perubahan
-                </button>
-            </div>
+        <a href="{{ route('admin.users.index') }}"
+           class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900">
+            ← Kembali ke Manajemen Akun
+        </a>
 
-        </form>
+
+        <button type="submit"
+                class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg
+                       bg-green-600 text-white text-sm font-semibold shadow-sm
+                       hover:bg-green-700 focus:outline-none focus:ring-2
+                       focus:ring-green-500 focus:ring-offset-1">
+            Simpan Perubahan
+        </button>
     </div>
 </div>
+
 @endsection

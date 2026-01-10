@@ -211,10 +211,24 @@
         </div>
 
         {{-- Submit --}}
-        <button type="submit"
-                class="px-6 py-3 bg-[#0D47C9] text-white rounded-lg shadow hover:bg-[#0D47C9] text-white transition w-full sm:w-auto">
-            Simpan Absen 
+<div class="bg-white border border-slate-200 rounded-xl shadow-sm px-5 py-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+        <p class="text-xs text-slate-500">
+            Pastikan koreksi kehadiran sudah benar sebelum disimpan.
+        </p>
+
+        <button
+            type="submit"
+            class="inline-flex items-center justify-center px-6 py-2.5 rounded-lg
+                       bg-green-600 text-white text-sm font-semibold shadow-sm
+                       hover:bg-green-700 focus:outline-none focus:ring-2
+                       focus:ring-green-500 focus:ring-offset-1">
+            Simpan Absen
         </button>
+
+    </div>
+</div>
     </form>
 
 @else
