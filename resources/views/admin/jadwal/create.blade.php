@@ -162,26 +162,34 @@
                 </p>
             </div>
 
-            {{-- FOOTER FORM --}}
-            <div class="pt-4 border-t border-slate-100">
-                <div class="flex items-center justify-between">
-
+{{-- FOOTER FORM --}}
+            <div class="pt-6 border-t border-slate-100">
+                <div class="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
+                    
+                    {{-- Tombol Batal --}}
                     <a href="{{ route('admin.jadwal.index') }}"
-                       class="text-sm font-medium text-slate-600 hover:text-slate-900">
-                        ← Kembali ke daftar jadwal
+                       class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl
+                              border border-slate-300 bg-white text-slate-700 text-sm font-semibold
+                              shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-all active:scale-95
+                              w-full md:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Batal
                     </a>
 
+                    {{-- Tombol Simpan --}}
                     <button type="submit"
-                            class="inline-flex items-center px-4 py-2 rounded-lg
+                            class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl
                                    bg-green-600 text-white text-sm font-semibold
-                                   shadow hover:bg-green-700 transition">
+                                   shadow-lg shadow-green-100 hover:bg-green-700 transition-all active:scale-95
+                                   w-full md:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
                         Simpan Jadwal Berulang
                     </button>
 
                 </div>
             </div>
-
-        </form>
-    </div>
-</div>
 @endsection

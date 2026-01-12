@@ -36,7 +36,7 @@
             {{-- GRID FORM --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {{-- KOLOM KIRI --}}
+                {{-- KOLOM KIRI: Informasi Dasar --}}
                 <div class="space-y-4">
                     <h2 class="text-sm font-semibold text-slate-700 border-b border-dashed pb-2">
                         Informasi Dasar
@@ -48,8 +48,7 @@
                         </label>
                         <input type="text" name="mata_pelajaran"
                                value="{{ old('mata_pelajaran', $jadwal->mata_pelajaran) }}" required
-                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <div>
@@ -58,8 +57,7 @@
                         </label>
                         <input type="text" name="nama_guru"
                                value="{{ old('nama_guru', $jadwal->nama_guru) }}" required
-                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <div>
@@ -67,11 +65,10 @@
                             Jurusan
                         </label>
                         <select name="jurusan" required
-                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white
-                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Pilih Jurusan --</option>
-                            <option value="TKJ" {{ old('jurusan',$jadwal->jurusan)=='TKJ'?'selected':'' }}>TKJ</option>
-                            <option value="TBSM" {{ old('jurusan',$jadwal->jurusan)=='TBSM'?'selected':'' }}>TBSM</option>
+                            <option value="TKJ" {{ old('jurusan', $jadwal->jurusan) == 'TKJ' ? 'selected' : '' }}>TKJ</option>
+                            <option value="TBSM" {{ old('jurusan', $jadwal->jurusan) == 'TBSM' ? 'selected' : '' }}>TBSM</option>
                         </select>
                     </div>
 
@@ -81,12 +78,11 @@
                         </label>
                         <input type="text" name="ruang_lab"
                                value="{{ old('ruang_lab', $jadwal->ruang_lab) }}" required
-                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 
-                {{-- KOLOM KANAN --}}
+                {{-- KOLOM KANAN: Detail Waktu --}}
                 <div class="space-y-4">
                     <h2 class="text-sm font-semibold text-slate-700 border-b border-dashed pb-2">
                         Detail Waktu
@@ -97,37 +93,28 @@
                             Hari
                         </label>
                         <select name="hari" required
-                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white
-                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="">-- Pilih Hari --</option>
                             @foreach (['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'] as $hari)
-                                <option value="{{ $hari }}"
-                                    {{ old('hari',$jadwal->hari)==$hari?'selected':'' }}>
+                                <option value="{{ $hari }}" {{ old('hari', $jadwal->hari) == $hari ? 'selected' : '' }}>
                                     {{ $hari }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">
-                                Waktu Mulai
-                            </label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Waktu Mulai</label>
                             <input type="time" name="waktu_mulai"
-                                   value="{{ old('waktu_mulai', substr($jadwal->waktu_mulai,0,5)) }}" required
-                                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   value="{{ old('waktu_mulai', substr($jadwal->waktu_mulai, 0, 5)) }}" required
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
-
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">
-                                Waktu Selesai
-                            </label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Waktu Selesai</label>
                             <input type="time" name="waktu_selesai"
-                                   value="{{ old('waktu_selesai', substr($jadwal->waktu_selesai,0,5)) }}" required
-                                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   value="{{ old('waktu_selesai', substr($jadwal->waktu_selesai, 0, 5)) }}" required
+                                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     </div>
 
@@ -136,49 +123,57 @@
                             Kapasitas (maks. 20)
                         </label>
                         <input type="number" name="kapasitas" min="1" max="20"
-                               value="{{ old('kapasitas',$jadwal->kapasitas) }}" required
-                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                               value="{{ old('kapasitas', $jadwal->kapasitas) }}" required
+                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
-                    {{-- FIELD SESI (INI YANG TADI HILANG) --}}
-               <label class="block text-xs font-semibold text-slate-700 mb-1">
-                    Deskripsi Sesi
-                        <span class="text-slate-400 font-normal">(Opsional)</span>
-                    </label>
-
-                    <input type="text"
-                        name="sesi"
-                        value="{{ old('sesi', $jadwal->sesi ?? '') }}"
-                        placeholder="Opsional"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-                                focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">
+                            Deskripsi Sesi <span class="text-slate-400 font-normal">(Opsional)</span>
+                        </label>
+                        <input type="text" name="sesi"
+                               value="{{ old('sesi', $jadwal->sesi ?? '') }}"
+                               placeholder="Contoh: Sesi 1"
+                               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
                 </div>
             </div>
 
             {{-- CATATAN --}}
             <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-700">
                 <p class="font-semibold text-blue-700 mb-1">Catatan:</p>
-                <p>
-                    Jadwal akan diulang setiap minggu. Pastikan hari, waktu,
-                    dan kapasitas sudah benar sebelum disimpan.
-                </p>
+                <p>Jadwal akan diulang setiap minggu. Pastikan hari, waktu, dan kapasitas sudah benar sebelum disimpan.</p>
             </div>
 
-            {{-- FOOTER --}}
-            <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <a href="{{ route('admin.jadwal.index') }}"
-                   class="text-sm font-medium text-slate-600 hover:text-slate-900">
-                    ← Kembali ke daftar jadwal
-                </a>
+            {{-- FOOTER FORM --}}
+            <div class="pt-6 border-t border-slate-100">
+                <div class="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-4">
+                    
+                    {{-- Tombol Batal --}}
+                    <a href="{{ route('admin.jadwal.index') }}"
+                       class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl
+                              border border-slate-300 bg-white text-slate-700 text-sm font-semibold
+                              shadow-sm hover:bg-slate-50 hover:text-slate-900 transition-all active:scale-95
+                              w-full md:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Batal
+                    </a>
 
-                <button type="submit"
-                        class="inline-flex items-center px-4 py-2 rounded-lg
-                               bg-green-600 text-white text-sm font-semibold
-                               shadow hover:bg-green-700 transition">
-                    Perbarui Jadwal
-                </button>
+                    {{-- Tombol Perbarui --}}
+                    <button type="submit"
+                            class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl
+                                   bg-green-600 text-white text-sm font-semibold
+                                   shadow-lg shadow-green-100 hover:bg-green-700 transition-all active:scale-95
+                                   w-full md:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Simpan Perubahan
+                    </button>
+
+                </div>
             </div>
 
         </form>

@@ -149,67 +149,68 @@
         </div>
     </div>
 
-    {{-- DESKTOP NAVBAR --}}
-    @if(!$isKepsek)
-    <div class="hidden md:block border-t border-white/20 bg-[#0B57D0]">
-        <nav class="max-w-6xl mx-auto px-6 py-2 flex items-center justify-center gap-6 text-[11px] font-semibold uppercase tracking-[0.20em]">
-            <a href="{{ route('admin.dashboard') }}" 
-               class="pb-1 border-b-2 transition-colors {{ $routeName === 'admin.dashboard' ? 'border-white' : 'border-transparent hover:border-white/70' }}">
-                Home
-            </a>
-            <a href="{{ route('admin.jadwal.index') }}" 
-               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.jadwal') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
-                Jadwal
-            </a>
-            <a href="{{ route('admin.sesi.index') }}" 
-               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.sesi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
-                Sesi
-            </a>
-            <a href="{{ route('admin.koreksi.index') }}" 
-               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.koreksi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
-                Presensi
-            </a>
-            <a href="{{ route('admin.laporan.index') }}" 
-               class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.laporan') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
-                Rekap Presensi
-            </a>
-            
-            @if ($userRole === 'Admin')
-                {{-- DROPDOWN MANAGEMENT AKUN (DESKTOP) - IMPROVED --}}
-                <div class="relative group">
-                    <button type="button" 
-                            class="pb-1 border-b-2 transition-colors flex items-center gap-1.5 {{ (str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'admin.siswa')) ? 'border-white' : 'border-transparent group-hover:border-white/70' }}">
-                        <span>MANAGEMENT AKUN</span>
-                        <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                        </svg>
-                    </button>
-                    
-                    {{-- DROPDOWN MENU - SIMPLIFIED --}}
-                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden border border-slate-200">
-                        <div class="py-1">
-                            <a href="{{ route('admin.users.index') }}" 
-                               class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-blue-50 transition-colors {{ str_starts_with($routeName, 'admin.users') ? 'bg-blue-50 text-blue-700 font-medium' : '' }}">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                </svg>
-                                <span>Akun Pengelola</span>
-                            </a>
-                            
-                            <a href="{{ route('admin.siswa.index') }}" 
-                               class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-green-50 transition-colors {{ str_starts_with($routeName, 'admin.siswa') ? 'bg-green-50 text-green-700 font-medium' : '' }}">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                </svg>
-                                <span>Data Siswa</span>
-                            </a>
-                        </div>
+   {{-- DESKTOP NAVBAR --}}
+@if(!$isKepsek)
+<div class="hidden md:block border-t border-white/20 bg-[#0B57D0]">
+    <nav class="max-w-6xl mx-auto px-6 py-2 flex items-center justify-center gap-6 text-[11px] font-semibold uppercase tracking-[0.20em]">
+        <a href="{{ route('admin.dashboard') }}" 
+           class="pb-1 border-b-2 transition-colors {{ $routeName === 'admin.dashboard' ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+           Home
+        </a>
+        <a href="{{ route('admin.jadwal.index') }}" 
+           class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.jadwal') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+           Jadwal
+        </a>
+        <a href="{{ route('admin.sesi.index') }}" 
+           class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.sesi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+           Sesi
+        </a>
+        <a href="{{ route('admin.koreksi.index') }}" 
+           class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.koreksi') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+           Presensi
+        </a>
+        <a href="{{ route('admin.laporan.index') }}" 
+           class="pb-1 border-b-2 transition-colors {{ str_starts_with($routeName, 'admin.laporan') ? 'border-white' : 'border-transparent hover:border-white/70' }}">
+           Rekap Presensi
+        </a>
+        
+        @if ($userRole === 'Admin')
+            {{-- DROPDOWN MANAGEMENT AKUN (DESKTOP) --}}
+            <div class="relative group">
+                <button type="button" 
+                        class="pb-1 border-b-2 transition-colors flex items-center gap-1.5 {{ (str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'admin.siswa')) ? 'border-white' : 'border-transparent group-hover:border-white/70' }}">
+                    <span>MANAGEMENT AKUN</span>
+                    <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+                
+                {{-- MENU DROPDOWN - DIUBAH MENJADI BIRU & RAPIH --}}
+                <div class="absolute top-full left-0 mt-2 w-47 bg-[#0A50C0] rounded-lg shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden border border-white/10">
+                    <div class="py-1.5">
+                        <a href="{{ route('admin.users.index') }}" 
+                           class="flex items-center gap-3 px-4 py-2.5 text-[10px] tracking-wider text-blue-100 hover:bg-white/10 hover:text-white transition-colors {{ str_starts_with($routeName, 'admin.users') ? 'bg-white/20 text-white border-l-4 border-white' : 'border-l-4 border-transparent' }}">
+                            <svg class="w-4 h-4 shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                            <span>AKUN PENGELOLA</span>
+                        </a>
+                        
+                        <a href="{{ route('admin.siswa.index') }}" 
+                           class="flex items-center gap-3 px-4 py-2.5 text-[10px] tracking-wider text-blue-100 hover:bg-white/10 hover:text-white transition-colors {{ str_starts_with($routeName, 'admin.siswa') ? 'bg-white/20 text-white border-l-4 border-white' : 'border-l-4 border-transparent' }}">
+                            <svg class="w-4 h-4 shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                            <span>DATA SISWA</span>
+                        </a>
                     </div>
                 </div>
-            @endif
-        </nav>
-    </div>
-    @endif
+            </div>
+        @endif
+    </nav>
+</div>
+@endif
+
 
     {{-- MOBILE MENU --}}
     @if(!$isKepsek)

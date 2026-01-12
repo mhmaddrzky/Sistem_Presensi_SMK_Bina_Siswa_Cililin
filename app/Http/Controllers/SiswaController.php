@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Siswa;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
 {
@@ -55,37 +56,57 @@ public function index(Request $request)
      * UPDATE DATA SISWA
      * =================================
      */
-   public function update(Request $request, $id)
+ public function update(Request $request, $id)
 {
-    $siswa = Siswa::findOrFail($id);
+    $siswa = Siswa::with('user')->findOrFail($id);
 
     $request->validate([
         'nama'    => 'required|min:3|max:100',
-        'nis'     => 'required|min:3|max:20|unique:siswas,nis,' . $siswa->id,
         'kelas'   => 'required|max:10',
         'jurusan' => 'required',
+        // Validasi: nis harus unik di tabel siswas, kecuali untuk ID siswa ini sendiri
+        // Kita gunakan 'password_baru' sebagai input NIS agar sesuai dengan tampilan form
+        'password_baru' => 'nullable|min:3|max:20|unique:siswas,nis,' . $siswa->id,
     ], [
-        'nama.required'    => 'Nama lengkap wajib diisi.',
-        'nama.min'         => 'Nama minimal 3 karakter.',
-        'nis.required'     => 'NIS wajib diisi.',
-        'nis.unique'       => 'NIS sudah terdaftar.',
-        'kelas.required'   => 'Kelas wajib diisi.',
-        'jurusan.required' => 'Jurusan wajib dipilih.',
+        'nama.required'         => 'Nama lengkap wajib diisi.',
+        'password_baru.unique'  => 'NIS sudah terdaftar/digunakan oleh siswa lain.',
+        'password_baru.min'     => 'NIS/Password minimal 3 karakter.',
     ]);
 
-    $siswa->update([
-        'nama'    => trim($request->nama),
-        'nis'     => $request->nis,
-        'kelas'   => strtoupper(trim($request->kelas)),
-        'jurusan' => $request->jurusan,
-    ]);
+    try {
+        DB::beginTransaction();
 
-    return redirect()
-        ->route('admin.siswa.index')
-        ->with('success', 'Data siswa berhasil diperbarui.');
+        // 1. Update Data Profil
+        $siswa->nama = trim($request->nama);
+        $siswa->kelas = strtoupper(trim($request->kelas));
+        $siswa->jurusan = $request->jurusan;
+
+        // 2. Jika input Password Baru (NIS) diisi
+        if ($request->filled('password_baru')) {
+            $nilaibaru = $request->password_baru;
+            
+            // Update NIS di tabel Siswa
+            $siswa->nis = $nilaibaru;
+
+            // Update Password di tabel User (Konsep NIS = Password)
+            if ($siswa->user) {
+                $siswa->user->update([
+                    'password' => Hash::make($nilaibaru)
+                ]);
+            }
+        }
+
+        $siswa->save();
+
+        DB::commit();
+        return redirect()->route('admin.siswa.index')
+            ->with('success', 'Data siswa berhasil diperbarui.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
 }
-
-
     /**
      * =================================
      * DELETE SISWA
